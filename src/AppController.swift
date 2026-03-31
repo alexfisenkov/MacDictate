@@ -1,5 +1,6 @@
 import Cocoa
 import AVFoundation
+import ServiceManagement
 
 class AppController {
     
@@ -49,6 +50,15 @@ class AppController {
         let menu = NSMenu()
         menu.addItem(NSMenuItem(title: "Status: Ready", action: nil, keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
+        
+        if #available(macOS 13.0, *) {
+            let autoLaunchItem = NSMenuItem(title: "Запускать при включении Mac", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
+            autoLaunchItem.target = self
+            autoLaunchItem.state = SMAppService.mainApp.status == .enabled ? .on : .off
+            menu.addItem(autoLaunchItem)
+            menu.addItem(NSMenuItem.separator())
+        }
+        
         menu.addItem(NSMenuItem(title: "Quit MacDictate", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         menu.addItem(NSMenuItem.separator())
         let uninstallItem = NSMenuItem(title: "🗑 Удалить MacDictate полностью", action: #selector(confirmUninstall), keyEquivalent: "")
@@ -58,6 +68,7 @@ class AppController {
         
         checkPermissions()
         setupHotkeys()
+        checkForUpdates()
     }
     
     @objc func confirmUninstall() {
@@ -161,14 +172,96 @@ class AppController {
     }
     
     func relaunchApp() {
-        let process = Process()
         let appPath = Bundle.main.bundlePath
-        // Команда "open "ПутьДоНас.app"" запускает через терминал новую копию
-        process.launchPath = "/usr/bin/open"
-        process.arguments = [appPath]
-        try? process.run()
-        // Мгновенно убиваем ЭТУ пустую копию
+        let task = Process()
+        task.launchPath = "/bin/bash"
+        task.arguments = ["-c", "sleep 1 && /usr/bin/open '\(appPath)'"]
+        try? task.run()
         NSApplication.shared.terminate(nil)
+    }
+    
+    @available(macOS 13.0, *)
+    @objc func toggleLaunchAtLogin(_ sender: NSMenuItem) {
+        let appPath = Bundle.main.bundlePath
+        
+        do {
+            if SMAppService.mainApp.status == .enabled {
+                try SMAppService.mainApp.unregister()
+                sender.state = .off
+                
+                // Fallback delete via AppleScript
+                let script = "tell application \"System Events\" to delete login item \"MacDictate\""
+                let task = Process()
+                task.launchPath = "/usr/bin/osascript"
+                task.arguments = ["-e", script]
+                try? task.run()
+                
+            } else {
+                try SMAppService.mainApp.register()
+                sender.state = .on
+                
+                // Fallback add via AppleScript to guarantee it appears in the visual list!
+                let script = "tell application \"System Events\" to make login item at end with properties {path:\"\(appPath)\", hidden:false, name:\"MacDictate\"}"
+                let task = Process()
+                task.launchPath = "/usr/bin/osascript"
+                task.arguments = ["-e", script]
+                try? task.run()
+                
+                let alert = NSAlert()
+                alert.messageText = "MacDictate добавлен в Автозагрузку!"
+                alert.informativeText = "Теперь программа будет запускаться вместе с вашим Mac. Вы можете проверить это в Настройки -> Основные -> Элементы входа."
+                alert.alertStyle = .informational
+                alert.runModal()
+            }
+        } catch {
+            let alert = NSAlert()
+            alert.messageText = "Ошибка Автозагрузки"
+            alert.informativeText = "macOS заблокировала фоновый запуск. Убедитесь, что MacDictate находится в папке 'Программы' (Applications). Ошибка: \(error.localizedDescription)"
+            alert.alertStyle = .warning
+            alert.runModal()
+        }
+    }
+    
+    func checkForUpdates() {
+        // Мы используем публичный Gist или сервер для проверки версий.
+        // Замените этот URL на ваш реальный публичный источник!
+        let updateUrlString = "https://gist.githubusercontent.com/alexfisenkov/dbd7b27fc29b4661000/raw/version.json" 
+        
+        guard let url = URL(string: updateUrlString) else { return }
+        
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data, error == nil else { return }
+            
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let fetchedVersion = json["version"] as? String,
+                   let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
+                   let downloadUrlStr = json["download_url"] as? String,
+                   let releaseNotes = json["release_notes"] as? String {
+                    
+                    // Самое банальное сравнение строк (1.2 > 1.1)
+                    if fetchedVersion.compare(currentVersion, options: .numeric) == .orderedDescending {
+                        DispatchQueue.main.async {
+                            let alert = NSAlert()
+                            alert.messageText = "Доступно обновление MacDictate!"
+                            alert.informativeText = "Вышла версия \(fetchedVersion) (у вас \(currentVersion)).\n\nИзменения:\n\(releaseNotes)\n\nХотите скачать обновление прямо сейчас?"
+                            alert.alertStyle = .informational
+                            alert.addButton(withTitle: "Скачать")
+                            alert.addButton(withTitle: "Позже")
+                            
+                            if alert.runModal() == .alertFirstButtonReturn {
+                                if let downloadUrl = URL(string: downloadUrlStr) {
+                                    NSWorkspace.shared.open(downloadUrl)
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch {
+                print("Failed to parse update json: \(error)")
+            }
+        }
+        task.resume()
     }
     
     func setStatus(_ text: String, icon: String) {
