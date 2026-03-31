@@ -1,0 +1,74 @@
+#!/bin/bash
+set -e
+
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$PROJECT_DIR"
+
+echo "🚀 Начинаем сборку 100% Native macOS приложения MacDictate (Swift)..."
+
+APP_NAME="MacDictate.app"
+BUILD_DIR="$PROJECT_DIR/build"
+APP_DIR="$BUILD_DIR/$APP_NAME"
+CONTENTS_DIR="$APP_DIR/Contents"
+MACOS_DIR="$CONTENTS_DIR/MacOS"
+RESOURCES_DIR="$CONTENTS_DIR/Resources"
+
+# 1. Очистка и создание структуры
+rm -rf "$BUILD_DIR"
+mkdir -p "$MACOS_DIR"
+mkdir -p "$RESOURCES_DIR/bin"
+
+# 2. Копирование Info.plist
+cp "$PROJECT_DIR/assets/Info.plist" "$CONTENTS_DIR/Info.plist"
+cp "$PROJECT_DIR/assets/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
+cp "$PROJECT_DIR/assets/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
+
+# 3. Компиляция Swift-файлов
+echo "📦 Компиляция Swift-кода (arm64)... это займет пару секунд!"
+swiftc -O -target arm64-apple-macosx11.0 \
+    "$PROJECT_DIR/src/main.swift" \
+    "$PROJECT_DIR/src/AppDelegate.swift" \
+    "$PROJECT_DIR/src/ModelDownloader.swift" \
+    "$PROJECT_DIR/src/AppController.swift" \
+    -o "$MACOS_DIR/MacDictate"
+
+# 4. (Пропущено) Использование whisper-cli напрямую из Homebrew
+# Мы используем системный /opt/homebrew/bin/whisper-cli, так как он зависит от
+# множества динамических библиотек (libggml, libwhisper) и путей @rpath.
+
+# 5. Ad-Hoc подпись бинарников
+echo "🔐 Подписание приложения..."
+xattr -cr "$APP_DIR"
+find "$APP_DIR" -name ".DS_Store" -type f -delete
+codesign --force --deep --sign - "$APP_DIR"
+
+# 6. Сборка легкого DMG-образа
+DMG_NAME="MacDictate_Final_Auto.dmg"
+DMG_PATH="$PROJECT_DIR/$DMG_NAME"
+rm -f "$DMG_PATH"
+
+echo "💿 Установка create-dmg (утилита AppleScript для DMG)..."
+brew install create-dmg > /dev/null 2>&1 || true
+
+echo "💿 Упаковка в DMG-образ..."
+# Создаем фолдер для сборки DMG
+DMG_SRC_DIR="$BUILD_DIR/dmg_src"
+mkdir -p "$DMG_SRC_DIR"
+cp -R "$APP_DIR" "$DMG_SRC_DIR/"
+
+cd "$PROJECT_DIR"
+create-dmg \
+  --volname "MacDictate_Final_Auto" \
+  --volicon "assets/AppIcon.icns" \
+  --background "assets/dmg_background.png" \
+  --window-pos 200 120 \
+  --window-size 600 400 \
+  --icon-size 100 \
+  --icon "MacDictate.app" 140 190 \
+  --app-drop-link 460 190 \
+  --eula "assets/license.txt" \
+  --no-internet-enable \
+  "$DMG_PATH" \
+  "$DMG_SRC_DIR"
+
+echo "✅ ГОТОВО! Ваш нативный профессиональный дистрибутив (с иконками): $DMG_PATH"

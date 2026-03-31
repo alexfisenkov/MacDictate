@@ -1,0 +1,16 @@
+# Модели нейросети (не кладем в git)
+models/
+.macdictate/
+*.bin
+
+# Артефакты сборки
+build/
+build_log*.txt
+
+# MacOS
+.DS_Store
+
+# Игнорируем временные звуки
+*.wav
+*.m4a
+*.txt
