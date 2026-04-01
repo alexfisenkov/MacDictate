@@ -14,3 +14,6 @@ build_log*.txt
 *.wav
 *.m4a
 *.txt
+
+# Игнорируем релизы (DMG)
+*.dmg

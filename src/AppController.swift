@@ -42,6 +42,8 @@ class AppController {
     }
 
     func start() {
+        handleVersionUpgrade()
+        
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
             button.title = "🎙️"
@@ -51,24 +53,60 @@ class AppController {
         menu.addItem(NSMenuItem(title: "Status: Ready", action: nil, keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
         
+        let helpItem = NSMenuItem(title: "📖 Инструкция", action: #selector(showInstructions), keyEquivalent: "")
+        helpItem.target = self
+        menu.addItem(helpItem)
+        menu.addItem(NSMenuItem.separator())
+        
+        // --- Подменю: Настройки ---
+        let settingsMenuItem = NSMenuItem(title: "⚙️ Настройки", action: nil, keyEquivalent: "")
+        let settingsSubmenu = NSMenu()
+        
+        let emojiStatus = NSMenuItem(title: AXIsProcessTrusted() ? "✅ Права получены" : "❌ Права отсутствуют", action: nil, keyEquivalent: "")
+        settingsSubmenu.addItem(emojiStatus)
+        
+        let accessibilityStatus = NSMenuItem(title: "Разрешить отслеживание", action: #selector(openAccessibilitySettings), keyEquivalent: "")
+        accessibilityStatus.target = self
+        settingsSubmenu.addItem(accessibilityStatus)
+        settingsSubmenu.addItem(NSMenuItem.separator())
+        
         if #available(macOS 13.0, *) {
             let autoLaunchItem = NSMenuItem(title: "Запускать при включении Mac", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
             autoLaunchItem.target = self
             autoLaunchItem.state = SMAppService.mainApp.status == .enabled ? .on : .off
-            menu.addItem(autoLaunchItem)
-            menu.addItem(NSMenuItem.separator())
+            settingsSubmenu.addItem(autoLaunchItem)
+            settingsSubmenu.addItem(NSMenuItem.separator())
         }
         
-        menu.addItem(NSMenuItem(title: "Quit MacDictate", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
-        menu.addItem(NSMenuItem.separator())
-        let uninstallItem = NSMenuItem(title: "🗑 Удалить MacDictate полностью", action: #selector(confirmUninstall), keyEquivalent: "")
+        let restartItem = NSMenuItem(title: "🔄 Перезапустить программу", action: #selector(relaunchApp), keyEquivalent: "")
+        restartItem.target = self
+        settingsSubmenu.addItem(restartItem)
+        
+        settingsSubmenu.addItem(NSMenuItem.separator())
+        
+        let uninstallItem = NSMenuItem(title: "🛑 Удалить MacDictate (Dangerous Zone)", action: #selector(confirmUninstall), keyEquivalent: "")
         uninstallItem.target = self
-        menu.addItem(uninstallItem)
+        settingsSubmenu.addItem(uninstallItem)
+        
+        settingsMenuItem.submenu = settingsSubmenu
+        menu.addItem(settingsMenuItem)
+        // -----------------------------
+        
+        menu.addItem(NSMenuItem.separator())
+        let updateItem = NSMenuItem(title: "🔄 Проверить обновления", action: #selector(manualCheckForUpdates), keyEquivalent: "")
+        updateItem.target = self
+        menu.addItem(updateItem)
+        
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: "Выход", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        
         statusItem.menu = menu
         
         checkPermissions()
         setupHotkeys()
-        checkForUpdates()
+        
+        // Автоматическая (тихая) проверка при запуске
+        performUpdateCheck(isManual: false)
     }
     
     @objc func confirmUninstall() {
@@ -83,6 +121,30 @@ class AppController {
         if response == .alertFirstButtonReturn {
             executeSelfDestruct()
         }
+    }
+    
+    @objc func showInstructions() {
+        let alert = NSAlert()
+        alert.messageText = "Как использовать MacDictate"
+        
+        var info = """
+        • Двойное нажатие Option (⌥): Начать запись.
+        • Одинарное нажатие Option (⌥): Остановить запись.
+        
+        Программа распознаёт речь абсолютно без интернета. Текст вставляется туда, где стоит ваш курсор.
+        
+        """
+        
+        if !AXIsProcessTrusted() {
+            info += "\n⚠️ ВАЖНО: У вас не выданы права на отслеживание клавиш. Если при выдаче прав галочка «залипла» — обязательно выделите старую версию MacDictate, нажмите минус (-) внизу списка и добавьте её заново плюсом (+)."
+        }
+        
+        alert.informativeText = info
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "Понятно")
+        
+        NSApp.activate(ignoringOtherApps: true)
+        alert.runModal()
     }
     
     func executeSelfDestruct() {
@@ -130,10 +192,28 @@ class AppController {
         }
     }
     
+    @objc func openAccessibilitySettings() {
+        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
+        NSWorkspace.shared.open(url)
+        
+        let alert = NSAlert()
+        alert.messageText = "Настройки Отслеживания (Универсальный доступ)"
+        alert.informativeText = "Поставьте галочку напротив MacDictate.\n\n❗️ СИСТЕМНЫЙ БАГ MACOS: Если программа не реагирует на галочку (например, после обновления версий) — вам НУЖНО физически выделить MacDictate мышкой, нажать минус (-) в самом низу списка, а затем нажать плюс (+) и добавить программу заново из папки Программы."
+        alert.alertStyle = .warning
+        NSApp.activate(ignoringOtherApps: true)
+        
+        // Запускаем таймер, если права еще не даны
+        if !AXIsProcessTrusted() {
+            startPermissionPolling()
+        }
+        
+        alert.runModal()
+    }
+    
     func promptAccessibility() {
         let alert = NSAlert()
         alert.messageText = "Требуется Универсальный доступ"
-        alert.informativeText = "MacDictate нужно разрешение для отслеживания двойного нажатия системной клавиши Option (Alt).\n\nНажмите «Открыть Настройки», поставьте галочку напротив MacDictate. Мы автоматически перезапустим приложение, когда вы это сделаете!"
+        alert.informativeText = "MacDictate нужно разрешение для отслеживания двойного нажатия системной клавиши Option (Alt).\n\nНажмите «Открыть Настройки» и поставьте галочку. \n\n❗️ ЕСЛИ ОБНОВЛЯЕТЕ ВЕРСИЮ: Старая галочка может \"залипать\". Выделите её мышкой, нажмите минус (-) внизу списка, а затем добавьте новую программу плюсом (+)."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Открыть Настройки")
         alert.addButton(withTitle: "Позже")
@@ -171,7 +251,7 @@ class AppController {
         }
     }
     
-    func relaunchApp() {
+    @objc func relaunchApp() {
         let appPath = Bundle.main.bundlePath
         let task = Process()
         task.launchPath = "/bin/bash"
@@ -222,15 +302,42 @@ class AppController {
         }
     }
     
-    func checkForUpdates() {
-        // Мы используем публичный Gist или сервер для проверки версий.
-        // Замените этот URL на ваш реальный публичный источник!
+    func handleVersionUpgrade() {
+        let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+        let currentBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
+        let versionKey = "\(currentVersion)_\(currentBuild)"
+        // Из-за ограничений безопасности (SIP) Apple запрещает приложению самому
+        // сбрасывать свои же права TCC через bash без прав администратора, поэтому
+        // мы больше не пытаемся делать tccutil reset. Пользователю нужно использовать минус и плюс вручную.
+        UserDefaults.standard.set(versionKey, forKey: "LastLaunchedVersion")
+    }
+    
+    @objc func manualCheckForUpdates() {
+        performUpdateCheck(isManual: true)
+    }
+    
+    func performUpdateCheck(isManual: Bool) {
+        // Если вы сделаете ваш репозиторий GitHub ПУБЛИЧНЫМ, мы сможем поменять этот URL
+        // на: https://api.github.com/repos/alexfisenkov/MacDictate/releases/latest
+        // А пока используем публичный Gist:
         let updateUrlString = "https://gist.githubusercontent.com/alexfisenkov/dbd7b27fc29b4661000/raw/version.json" 
         
         guard let url = URL(string: updateUrlString) else { return }
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data, error == nil else { return }
+            guard let data = data, error == nil else {
+                if isManual {
+                    DispatchQueue.main.async {
+                        let alert = NSAlert()
+                        alert.messageText = "Ошибка сети"
+                        alert.informativeText = "Не удалось проверить обновления. Проверьте подключение к интернету."
+                        alert.alertStyle = .warning
+                        NSApp.activate(ignoringOtherApps: true)
+                        alert.runModal()
+                    }
+                }
+                return
+            }
             
             do {
                 if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
@@ -239,7 +346,6 @@ class AppController {
                    let downloadUrlStr = json["download_url"] as? String,
                    let releaseNotes = json["release_notes"] as? String {
                     
-                    // Самое банальное сравнение строк (1.2 > 1.1)
                     if fetchedVersion.compare(currentVersion, options: .numeric) == .orderedDescending {
                         DispatchQueue.main.async {
                             let alert = NSAlert()
@@ -248,17 +354,39 @@ class AppController {
                             alert.alertStyle = .informational
                             alert.addButton(withTitle: "Скачать")
                             alert.addButton(withTitle: "Позже")
-                            
+                            NSApp.activate(ignoringOtherApps: true)
                             if alert.runModal() == .alertFirstButtonReturn {
                                 if let downloadUrl = URL(string: downloadUrlStr) {
                                     NSWorkspace.shared.open(downloadUrl)
                                 }
                             }
                         }
+                    } else {
+                        // Если проверка ручная и обновлений нет
+                        if isManual {
+                            DispatchQueue.main.async {
+                                let alert = NSAlert()
+                                alert.messageText = "У вас установлена последняя версия!"
+                                alert.informativeText = "Версия \(currentVersion) является самой актуальной. Обновлений не найдено."
+                                alert.alertStyle = .informational
+                                alert.addButton(withTitle: "ОК")
+                                NSApp.activate(ignoringOtherApps: true)
+                                alert.runModal()
+                            }
+                        }
                     }
                 }
             } catch {
-                print("Failed to parse update json: \(error)")
+                if isManual {
+                    DispatchQueue.main.async {
+                        let alert = NSAlert()
+                        alert.messageText = "Ошибка"
+                        alert.informativeText = "Не удалось обработать данные об обновлениях."
+                        alert.alertStyle = .warning
+                        NSApp.activate(ignoringOtherApps: true)
+                        alert.runModal()
+                    }
+                }
             }
         }
         task.resume()

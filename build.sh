@@ -40,10 +40,11 @@ swiftc -O -target arm64-apple-macosx11.0 \
 echo "🔐 Подписание приложения..."
 xattr -cr "$APP_DIR"
 find "$APP_DIR" -name ".DS_Store" -type f -delete
+xattr -cr "$APP_DIR"
 codesign --force --deep --sign - "$APP_DIR"
 
 # 6. Сборка легкого DMG-образа
-DMG_NAME="MacDictate_Final_v1.1.dmg"
+DMG_NAME="MacDictate_Final_v1.4.dmg"
 DMG_PATH="$PROJECT_DIR/$DMG_NAME"
 rm -f "$DMG_PATH"
 
@@ -58,7 +59,7 @@ cp -R "$APP_DIR" "$DMG_SRC_DIR/"
 
 cd "$PROJECT_DIR"
 create-dmg \
-  --volname "MacDictate_v1_1" \
+  --volname "MacDictate_v1_4" \
   --volicon "assets/AppIcon.icns" \
   --background "assets/dmg_background.png" \
   --window-pos 200 120 \
