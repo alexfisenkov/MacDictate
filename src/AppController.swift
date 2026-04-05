@@ -317,20 +317,22 @@ class AppController {
     }
     
     func performUpdateCheck(isManual: Bool) {
-        // Если вы сделаете ваш репозиторий GitHub ПУБЛИЧНЫМ, мы сможем поменять этот URL
-        // на: https://api.github.com/repos/alexfisenkov/MacDictate/releases/latest
-        // А пока используем публичный Gist:
-        let updateUrlString = "https://gist.githubusercontent.com/alexfisenkov/dbd7b27fc29b4661000/raw/version.json" 
+        // Запрос к официальному API GitHub Releases
+        let updateUrlString = "https://api.github.com/repos/alexfisenkov/MacDictate/releases/latest"
         
         guard let url = URL(string: updateUrlString) else { return }
         
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data, error == nil else {
+        var request = URLRequest(url: url)
+        request.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            // Проверка на 404 (приватный репозиторий) или сетевую ошибку
+            guard let data = data, error == nil, let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                 if isManual {
                     DispatchQueue.main.async {
                         let alert = NSAlert()
-                        alert.messageText = "Ошибка сети"
-                        alert.informativeText = "Не удалось проверить обновления. Проверьте подключение к интернету."
+                        alert.messageText = "ОШИБКА: Репозиторий скрыт (Private) или нет сети"
+                        alert.informativeText = "Не удалось проверить обновления. Если репозиторий на GitHub всё ещё Private (Скрытый), обновления будут возвращать ошибку 404. Сделайте его Public в настройках."
                         alert.alertStyle = .warning
                         NSApp.activate(ignoringOtherApps: true)
                         alert.runModal()
@@ -341,10 +343,15 @@ class AppController {
             
             do {
                 if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                   let fetchedVersion = json["version"] as? String,
+                   var fetchedVersion = json["tag_name"] as? String,
                    let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
-                   let downloadUrlStr = json["download_url"] as? String,
-                   let releaseNotes = json["release_notes"] as? String {
+                   let releasePageUrl = json["html_url"] as? String,
+                   let releaseNotes = json["body"] as? String {
+                    
+                    // Убираем букву 'v' из тега (например, 'v1.4' -> '1.4')
+                    if fetchedVersion.hasPrefix("v") {
+                        fetchedVersion.removeFirst()
+                    }
                     
                     if fetchedVersion.compare(currentVersion, options: .numeric) == .orderedDescending {
                         DispatchQueue.main.async {
@@ -356,7 +363,7 @@ class AppController {
                             alert.addButton(withTitle: "Позже")
                             NSApp.activate(ignoringOtherApps: true)
                             if alert.runModal() == .alertFirstButtonReturn {
-                                if let downloadUrl = URL(string: downloadUrlStr) {
+                                if let downloadUrl = URL(string: releasePageUrl) {
                                     NSWorkspace.shared.open(downloadUrl)
                                 }
                             }
@@ -537,6 +544,8 @@ class AppController {
         pb.setString(text, forType: .string)
         
         simulatePaste()
+        
+        NSSound(named: "Tink")?.play()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             if let old = oldString {
