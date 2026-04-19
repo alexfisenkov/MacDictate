@@ -117,14 +117,14 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
                 self.downloader.completion(true)
             }
         } catch {
-            downloader.statusLabel.stringValue = "Ошибка сохранения. Перезапустите."
+            downloader.statusLabel.stringValue = "Не удалось сохранить модель. Проверьте доступ к домашней папке и свободное место."
             downloader.downloadButton.isEnabled = true
         }
     }
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let err = error {
-            downloader.statusLabel.stringValue = "Ошибка: \(err.localizedDescription)"
+            downloader.statusLabel.stringValue = "Ошибка загрузки: \(err.localizedDescription). Проверьте интернет/VPN и попробуйте снова."
             downloader.downloadButton.isEnabled = true
             downloader.progressIndicator.doubleValue = 0
         }
