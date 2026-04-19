@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacDictate — Голосовой ввод нового поколения для macOS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#007AFF', // Apple Blue
+                        brandDark: '#0A0A0A',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-brandDark text-white selection:bg-brand selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🎙️</span>
+                    <span class="font-bold text-xl tracking-tight">MacDictate</span>
+                </div>
+                <div class="flex gap-4 items-center">
+                    <a href="#features" class="text-sm text-gray-300 hover:text-white transition" data-i18n="nav_features">Функции</a>
+                    <a href="#pricing" class="text-sm text-gray-300 hover:text-white transition" data-i18n="nav_pricing">Цены</a>
+                    <button id="langToggle" class="text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition">EN</button>
+                    <a href="/downloads/MacDictate_Latest.dmg" class="hidden sm:inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg text-white bg-brand hover:bg-blue-600 transition" data-i18n="nav_download">Скачать</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 text-center">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500" data-i18n="hero_title_gradient">Офлайн</span>
+                <span data-i18n="hero_title">распознавание речи для macOS</span>
+            </h1>
+            <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto" data-i18n="hero_subtitle">
+                Диктуйте текст абсолютно без интернета. Нулевая задержка, идеальное качество Whisper и мгновенная вставка текста в любую программу.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="/downloads/MacDictate_Latest.dmg" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition shadow-[0_0_20px_rgba(0,122,255,0.4)] hover:shadow-[0_0_30px_rgba(0,122,255,0.6)] transform hover:-translate-y-1">
+                    <span class="mr-2" data-i18n="btn_download">Скачать для macOS</span>
+                    <span class="text-sm font-normal opacity-80">( Silicon)</span>
+                </a>
+                <a href="#pricing" class="inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-2xl text-white bg-white/10 hover:bg-white/20 transition">
+                    <span data-i18n="btn_pricing">Смотреть тарифы</span>
+                </a>
+            </div>
+            <p class="mt-6 text-sm text-gray-500" data-i18n="hero_trial">Попробуйте бесплатно: первые 60 дней включены.</p>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-20 bg-black/50">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16" data-i18n="feat_title">Идеально для работы</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="glass p-8 rounded-3xl">
+                    <div class="text-4xl mb-4">⚡️</div>
+                    <h3 class="text-xl font-bold mb-3" data-i18n="feat_1_title">Мгновенный отклик</h3>
+                    <p class="text-gray-400 leading-relaxed" data-i18n="feat_1_desc">Аудио обрабатывается локально на вашем процессоре. Никакого пинга до удаленных серверов, всё работает моментально.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="glass p-8 rounded-3xl">
+                    <div class="text-4xl mb-4">🔒</div>
+                    <h3 class="text-xl font-bold mb-3" data-i18n="feat_2_title">Абсолютная приватность</h3>
+                    <p class="text-gray-400 leading-relaxed" data-i18n="feat_2_desc">Ваш голос никогда не покидает ваш компьютер. Мы не собираем и не храним ваши аудиозаписи. 100% защита данных.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="glass p-8 rounded-3xl">
+                    <div class="text-4xl mb-4">⌨️</div>
+                    <h3 class="text-xl font-bold mb-3" data-i18n="feat_3_title">Работает везде</h3>
+                    <p class="text-gray-400 leading-relaxed" data-i18n="feat_3_desc">Пишите код в Cursor, общайтесь в Telegram, создавайте таблицы в Excel. MacDictate вставит текст в любое активное окно.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="py-24">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4" data-i18n="price_title">Простые тарифы</h2>
+                <p class="text-xl text-gray-400" data-i18n="price_subtitle">Никаких скрытых платежей. 60 дней бесплатно.</p>
+            </div>
+            
+            <div id="pricingCards" class="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                <!-- 1 Month -->
+                <div class="glass rounded-3xl p-8 flex flex-col hover:border-white/30 transition">
+                    <h3 class="text-xl text-gray-300 font-medium mb-2" data-i18n="plan_1mo">1 Месяц</h3>
+                    <div class="text-4xl font-bold mb-6"><span data-i18n="price_1mo">399₽</span><span class="text-lg text-gray-500 font-normal" data-i18n="per_mo">/мес</span></div>
+                    <ul class="text-gray-400 mb-8 flex-1 space-y-3">
+                        <li class="flex items-center"><span>✓</span><span class="ml-2" data-i18n="feat_full">Полный доступ</span></li>
+                        <li class="flex items-center"><span>✓</span><span class="ml-2" data-i18n="feat_updates">Обновления</span></li>
+                    </ul>
+                    <button class="w-full py-3 px-4 rounded-xl font-medium bg-white/10 hover:bg-white/20 transition" data-i18n="btn_buy" onclick="openCheckout('monthly')">Оплатить</button>
+                </div>
+
+                <!-- 3 Months -->
+                <div class="glass rounded-3xl p-8 flex flex-col hover:border-white/30 transition">
+                    <h3 class="text-xl text-gray-300 font-medium mb-2" data-i18n="plan_3mo">3 Месяца</h3>
+                    <div class="text-4xl font-bold mb-6"><span data-i18n="price_3mo">799₽</span><span class="text-lg text-gray-500 font-normal"></span></div>
+                    <ul class="text-gray-400 mb-8 flex-1 space-y-3">
+                        <li class="flex items-center"><span>✓</span><span class="ml-2" data-i18n="feat_save_20">Экономия 20%</span></li>
+                        <li class="flex items-center"><span>✓</span><span class="ml-2" data-i18n="feat_full">Полный доступ</span></li>
+                    </ul>
+                    <button class="w-full py-3 px-4 rounded-xl font-medium bg-white/10 hover:bg-white/20 transition" data-i18n="btn_buy" onclick="openCheckout('quarterly')">Оплатить</button>
+                </div>
+
+                <!-- 6 Months -->
+                <div class="glass rounded-3xl p-8 flex flex-col border-brand/50 relative transform md:-translate-y-4 shadow-[0_0_30px_rgba(0,122,255,0.2)]">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-brand text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider" data-i18n="tag_popular">Популярный</div>
+                    <h3 class="text-xl text-gray-300 font-medium mb-2" data-i18n="plan_6mo">Полгода</h3>
+                    <div class="text-4xl font-bold mb-6"><span data-i18n="price_6mo">1299₽</span><span class="text-lg text-gray-500 font-normal"></span></div>
+                    <ul class="text-gray-400 mb-8 flex-1 space-y-3">
+                        <li class="flex items-center"><span>✓</span><span class="ml-2" data-i18n="feat_save_35">Экономия 35%</span></li>
+                        <li class="flex items-center"><span>✓</span><span class="ml-2" data-i18n="feat_full">Полный доступ</span></li>
+                    </ul>
+                    <button class="w-full py-3 px-4 rounded-xl font-medium bg-brand hover:bg-blue-600 transition" data-i18n="btn_buy" onclick="openCheckout('half_year')">Оплатить</button>
+                </div>
+
+                <!-- 12 Months -->
+                <div class="glass rounded-3xl p-8 flex flex-col hover:border-white/30 transition">
+                    <h3 class="text-xl text-gray-300 font-medium mb-2" data-i18n="plan_12mo">1 Год</h3>
+                    <div class="text-4xl font-bold mb-6"><span data-i18n="price_12mo">1799₽</span><span class="text-lg text-gray-500 font-normal"></span></div>
+                    <ul class="text-gray-400 mb-8 flex-1 space-y-3">
+                        <li class="flex items-center"><span>✓</span><span class="ml-2" data-i18n="feat_save_max">Максимальная выгода</span></li>
+                        <li class="flex items-center"><span>✓</span><span class="ml-2" data-i18n="feat_full">Полный доступ</span></li>
+                    </ul>
+                    <button class="w-full py-3 px-4 rounded-xl font-medium bg-white/10 hover:bg-white/20 transition" data-i18n="btn_buy" onclick="openCheckout('yearly')">Оплатить</button>
+                </div>
+            </div>
+            
+
+            
+        </div>
+    </section>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="glass rounded-3xl p-8 max-w-md w-full mx-4 relative transform scale-95 transition-transform duration-300" id="checkoutContent">
+            <button onclick="closeCheckout()" class="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
+            <h3 class="text-2xl font-bold mb-2">Оформление лицензии</h3>
+            <p class="text-gray-400 mb-6 text-sm" id="checkoutDesc">Введите данные для оплаты тарифа.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">MacDictate ID</label>
+                    <input type="text" id="uidInput" placeholder="MD-XXXX-XXXX" class="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl focus:border-brand focus:outline-none text-white font-mono uppercase">
+                    <p class="text-xs text-gray-500 mt-1">ID написан в настройках приложения MacDictate на вашем Mac.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Ваш Email</label>
+                    <input type="email" id="emailInput" placeholder="name@example.com" class="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl focus:border-brand focus:outline-none text-white">
+                    <p class="text-xs text-gray-500 mt-1">Сюда придет кассовый чек.</p>
+                </div>
+                
+                <button id="payBtn" onclick="submitPayment()" class="w-full mt-4 py-4 rounded-xl font-bold bg-brand hover:bg-blue-600 transition flex justify-center items-center">
+                    Перейти к оплате 
+                </button>
+                <p class="text-[10px] text-gray-500 text-center uppercase tracking-wider mt-2">Оплата защищена Тинькофф Банк ОАО</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-12 mt-10">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-gray-500 text-sm">
+                &copy; <span id="year"></span> ИП Фисенков Александр Андреевич. ИНН: 772607547835
+            </div>
+            <div class="flex gap-6 text-sm">
+                <a href="/legal.html#privacy" class="text-gray-400 hover:text-white transition" data-i18n="foot_privacy">Политика конфиденциальности</a>
+                <a href="/legal.html#eula" class="text-gray-400 hover:text-white transition" data-i18n="foot_oferta">Договор Оферта</a>
+                <a href="/legal.html#consent" class="text-gray-400 hover:text-white transition" data-i18n="foot_consent">Согласие на обработку ПД</a>
+                <a href="mailto:a.fisenkov@gmail.com" class="text-gray-400 hover:text-white transition" data-i18n="foot_contact">Контакты</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // -----------------------------------------------------
+        // MULTI-LANGUAGE SYSTEM
+        // -----------------------------------------------------
+        const translations = {
+            ru: {
+                nav_features: "Функции", nav_pricing: "Цены", nav_download: "Скачать",
+                hero_title_gradient: "Офлайн", hero_title: "распознавание речи для macOS",
+                hero_subtitle: "Диктуйте текст абсолютно без интернета. Нулевая задержка, идеальное качество Whisper и мгновенная вставка текста в любую программу.",
+                btn_download: "Скачать для macOS", btn_pricing: "Смотреть тарифы", hero_trial: "Попробуйте бесплатно: первые 60 дней включены.",
+                feat_title: "Идеально для работы",
+                feat_1_title: "Мгновенный отклик", feat_1_desc: "Аудио обрабатывается локально на процессоре. Никакого пинга до серверов, всё работает моментально.",
+                feat_2_title: "Абсолютная приватность", feat_2_desc: "Ваш голос никогда не покидает ваш компьютер. Мы не собираем и не храним аудиозаписи.",
+                feat_3_title: "Работает везде", feat_3_desc: "Пишите код, общайтесь в Telegram, создавайте таблицы. MacDictate вставит текст в любое активное окно.",
+                price_title: "Простые тарифы", price_subtitle: "Никаких скрытых платежей. 60 дней бесплатно.",
+                btn_buy: "Оплатить", tag_popular: "Популярный",
+                plan_1mo: "1 Месяц", plan_3mo: "3 Месяца", plan_6mo: "Полгода", plan_12mo: "1 Год",
+                price_1mo: "399₽", price_3mo: "799₽", price_6mo: "1299₽", price_12mo: "1799₽", per_mo: "/мес",
+                feat_full: "Полный доступ", feat_updates: "Обновления", feat_save_20: "Экономия 20%", feat_save_35: "Экономия 35%", feat_save_max: "Максимальная выгода",
+                foot_privacy: "Политика конфиденциальности", foot_oferta: "Договор Оферты", foot_consent: "Согласие на обработку ПД", foot_contact: "Контакты"
+            },
+            en: {
+                nav_features: "Features", nav_pricing: "Pricing", nav_download: "Download",
+                hero_title_gradient: "Offline", hero_title: "speech recognition for macOS",
+                hero_subtitle: "Dictate text completely without the internet. Zero latency, Whisper precision, and instant text insertion into any app.",
+                btn_download: "Download for macOS", btn_pricing: "View pricing", hero_trial: "Try it free: First 60 days included.",
+                feat_title: "Perfect for productivity",
+                feat_1_title: "Lightning Fast", feat_1_desc: "Audio is processed locally on Apple Silicon. Zero server ping, instant results.",
+                feat_2_title: "Absolute Privacy", feat_2_desc: "Your voice never leaves your Mac. We don't collect or store your audio. 100% secure.",
+                feat_3_title: "Works Everywhere", feat_3_desc: "Write code, chat in apps, edit sheets. MacDictate types wherever your cursor is.",
+                price_title: "Simple Pricing", price_subtitle: "No hidden fees. 60 days completely free.",
+                btn_buy: "Subscribe", tag_popular: "Popular",
+                plan_1mo: "1 Month", plan_3mo: "3 Months", plan_6mo: "Half Year", plan_12mo: "1 Year",
+                price_1mo: "399₽", price_3mo: "799₽", price_6mo: "1299₽", price_12mo: "1799₽", per_mo: "/mo",
+                feat_full: "Full Access", feat_updates: "Updates", feat_save_20: "Save 20%", feat_save_35: "Save 35%", feat_save_max: "Max Savings",
+                foot_privacy: "Privacy Policy", foot_oferta: "Terms of Service", foot_consent: "Data Consent", foot_contact: "Contact"
+            }
+        };
+
+        let currentLang = 'ru'; // Default
+        const fallbackPlanCatalog = [
+            { planId: 'monthly', amountRub: 399, months: 1, label: '1 Месяц', labelEn: '1 Month' },
+            { planId: 'quarterly', amountRub: 799, months: 3, label: '3 Месяца', labelEn: '3 Months' },
+            { planId: 'half_year', amountRub: 1299, months: 6, label: 'Полгода', labelEn: 'Half Year' },
+            { planId: 'yearly', amountRub: 1799, months: 12, label: '1 Год', labelEn: '1 Year' }
+        ];
+        let currentPlanParams = null;
+        let planCatalog = new Map(fallbackPlanCatalog.map(plan => [plan.planId, plan]));
+
+        // Detect browser language
+        const userLang = navigator.language || navigator.userLanguage; 
+        if (!userLang.toLowerCase().includes('ru')) {
+            currentLang = 'en';
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            const t = translations[lang];
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.textContent = t[key];
+            });
+
+            // Toggle pricing logic button tags
+            if (lang === 'en') {
+                document.getElementById('langToggle').textContent = 'RU';
+            } else {
+                document.getElementById('langToggle').textContent = 'EN';
+            }
+        }
+
+        function syncPriceTranslations(plans) {
+            const planKeyMap = {
+                monthly: '1mo',
+                quarterly: '3mo',
+                half_year: '6mo',
+                yearly: '12mo'
+            };
+
+            plans.forEach((plan) => {
+                const suffix = planKeyMap[plan.planId];
+                if (!suffix) return;
+
+                const priceText = `${plan.amountRub}₽`;
+                translations.ru[`price_${suffix}`] = priceText;
+                translations.en[`price_${suffix}`] = priceText;
+            });
+        }
+
+        async function loadPlanCatalog() {
+            try {
+                const response = await fetch('/api/plans', {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const data = await response.json();
+                if (!Array.isArray(data.plans) || data.plans.length === 0) {
+                    return;
+                }
+
+                syncPriceTranslations(data.plans);
+                planCatalog = new Map(data.plans.map(plan => [plan.planId, plan]));
+                setLanguage(currentLang);
+            } catch (_error) {
+                // Fallback catalog keeps the page usable even if backend is temporarily unavailable.
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setLanguage(currentLang);
+            loadPlanCatalog();
+            const params = new URLSearchParams(window.location.search);
+            const uidInUrl = params.get('uid');
+            if (uidInUrl) {
+                document.getElementById('uidInput').value = uidInUrl;
+                
+                // If it linked with #pricing hash, smoothly scroll there after a small delay
+                if (window.location.hash.includes('pricing')) {
+                    setTimeout(() => {
+                        const el = document.getElementById('pricing');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }, 500);
+                }
+            }
+        });
+
+        // Toggle button click
+        document.getElementById('langToggle').addEventListener('click', () => {
+            setLanguage(currentLang === 'ru' ? 'en' : 'ru');
+        });
+        // -----------------------------------------------------
+        // CHECKOUT SYSTEM
+        // -----------------------------------------------------
+        function openCheckout(planId) {
+            const plan = planCatalog.get(planId);
+            if (!plan) {
+                alert(currentLang === 'en' ? 'Plan configuration is unavailable' : 'Конфигурация тарифа недоступна');
+                return;
+            }
+
+            currentPlanParams = plan;
+            const m = document.getElementById('checkoutModal');
+            const c = document.getElementById('checkoutContent');
+            
+            if (currentLang === 'en') {
+                c.querySelector('h3').textContent = 'License Checkout';
+                document.getElementById('checkoutDesc').textContent = `${plan.labelEn}. ${plan.amountRub} RUB, billed once.`;
+                document.getElementById('payBtn').textContent = 'Proceed to secure payment';
+            } else {
+                c.querySelector('h3').textContent = 'Оформление лицензии';
+                document.getElementById('checkoutDesc').textContent = `Тариф "${plan.label}". Сумма: ${plan.amountRub}₽`;
+                document.getElementById('payBtn').textContent = 'Перейти к оплате';
+            }
+
+            m.classList.remove('hidden');
+            // Small delay for fade in animation
+            setTimeout(() => {
+                m.classList.remove('opacity-0');
+                c.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeCheckout() {
+            const m = document.getElementById('checkoutModal');
+            const c = document.getElementById('checkoutContent');
+            m.classList.add('opacity-0');
+            c.classList.add('scale-95');
+            setTimeout(() => {
+                m.classList.add('hidden');
+            }, 300);
+        }
+
+        async function submitPayment() {
+            const uid = document.getElementById('uidInput').value.trim();
+            const email = document.getElementById('emailInput').value.trim();
+            const btn = document.getElementById('payBtn');
+
+            if (!currentPlanParams) {
+                alert(currentLang === 'en' ? 'Choose a plan first' : 'Сначала выберите тариф');
+                return;
+            }
+
+            if (!uid || !email) {
+                alert(currentLang === 'en' ? 'Please fill all fields' : 'Пожалуйста заполните все поля');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = currentLang === 'en' ? 'Processing...' : 'Соединение с банком...';
+            btn.classList.add('opacity-50');
+
+            try {
+                const res = await fetch('/api/payment/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        deviceId: uid,
+                        email: email,
+                        planId: currentPlanParams.planId
+                    })
+                });
+
+                const data = await res.json();
+                if (data.paymentUrl) {
+                    window.location.href = data.paymentUrl;
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown API Error'));
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50');
+                    btn.textContent = currentLang === 'en' ? 'Proceed to secure payment' : 'Перейти к оплате';
+                }
+            } catch (e) {
+                alert('Server connection error');
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+                btn.textContent = currentLang === 'en' ? 'Proceed to secure payment' : 'Перейти к оплате';
+            }
+        }
+    </script>
+</body>
+</html>

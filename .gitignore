@@ -17,3 +17,18 @@ build_log*.txt
 
 # Игнорируем релизы (DMG)
 *.dmg
+
+# Локальные env / secrets
+.env
+.env.*
+backend/.env
+backend/.env.*
+!.env.example
+!backend/.env.example
+
+# Backend runtime data
+backend/node_modules/
+backend/data/
+*.sqlite
+*.sqlite-*
+npm-debug.log*

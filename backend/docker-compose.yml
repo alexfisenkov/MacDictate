@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PORT=${PORT:-3000}
+      - DB_PATH=${DB_PATH:-/app/data/database.sqlite}
+      - TINKOFF_TERMINAL_KEY=${TINKOFF_TERMINAL_KEY:-}
+      - TINKOFF_PASSWORD=${TINKOFF_PASSWORD:-}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://macdictate.pro,http://localhost:3000}
+      - OUTBOUND_PROXY_URL=${OUTBOUND_PROXY_URL:-}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-https://macdictate.pro}
+    restart: unless-stopped

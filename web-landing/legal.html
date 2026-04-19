@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacDictate — Юридические документы</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: '#007AFF', brandDark: '#0A0A0A' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .prose h1 { font-size: 2rem; font-weight: bold; margin-bottom: 1.5rem; color: white;}
+        .prose h2 { font-size: 1.5rem; font-weight: bold; margin-top: 2rem; margin-bottom: 1rem; color: white;}
+        .prose p { margin-bottom: 1rem; color: #9ca3af; line-height: 1.6; }
+        .prose ul { list-style-type: disc; padding-left: 1.5rem; color: #9ca3af; margin-bottom: 1rem; }
+        .prose li { margin-bottom: 0.5rem; }
+        .prose strong { color: white; }
+    </style>
+</head>
+<body class="bg-brandDark text-white selection:bg-brand selection:text-white pb-20">
+    <nav class="w-full z-50 glass border-b border-white/10 mb-10">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/" class="flex items-center gap-2 font-bold text-xl hover:text-gray-300 transition" id="navHome">⬅ На главную (MacDictate)</a>
+            <button id="langToggle" class="text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition">EN</button>
+        </div>
+    </nav>
+    
+    <div class="max-w-4xl mx-auto px-4">
+        <div class="flex gap-4 mb-8 border-b border-white/10 pb-4">
+            <button onclick="loadDoc('privacy_policy')" class="px-4 py-2 bg-white/10 hover:bg-brand rounded transition" id="btnPrivacy">Политика Конфиденциальности</button>
+            <button onclick="loadDoc('eula_oferta')" class="px-4 py-2 bg-white/10 hover:bg-brand rounded transition" id="btnEula">Договор Оферта</button>
+            <button onclick="loadDoc('data_consent')" class="px-4 py-2 bg-white/10 hover:bg-brand rounded transition" id="btnConsent">Согласие ПД</button>
+        </div>
+        
+        <div id="content" class="prose max-w-none glass p-8 rounded-2xl">
+            Загрузка документа...
+        </div>
+    </div>
+
+    <script>
+        let currentLang = 'ru';
+        let currentDoc = 'privacy_policy';
+
+        const userLang = navigator.language || navigator.userLanguage; 
+        if (!userLang.toLowerCase().includes('ru')) {
+            currentLang = 'en';
+        }
+
+        function updateUITexts() {
+            if (currentLang === 'en') {
+                document.getElementById('langToggle').textContent = 'RU';
+                document.getElementById('navHome').textContent = '⬅ Back to Home (MacDictate)';
+                document.getElementById('btnPrivacy').textContent = 'Privacy Policy';
+                document.getElementById('btnEula').textContent = 'EULA / Terms';
+                document.getElementById('btnConsent').textContent = 'Data Consent';
+                document.title = 'MacDictate — Legal Documents';
+            } else {
+                document.getElementById('langToggle').textContent = 'EN';
+                document.getElementById('navHome').textContent = '⬅ На главную (MacDictate)';
+                document.getElementById('btnPrivacy').textContent = 'Политика Конфиденциальности';
+                document.getElementById('btnEula').textContent = 'Договор Оферта';
+                document.getElementById('btnConsent').textContent = 'Согласие ПД';
+                document.title = 'MacDictate — Юридические документы';
+            }
+        }
+
+        async function loadDoc(basename) {
+            currentDoc = basename;
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = currentLang === 'en' ? "Loading..." : "Загрузка...";
+            try {
+                let filename = basename + (currentLang === 'en' ? '_en.md' : '.md');
+                const res = await fetch(`/docs/${filename}`);
+                if (!res.ok) {
+                    if (currentLang === 'en') {
+                        // Fallback to RU if EN doc doesn't exist
+                        const fallbackRes = await fetch(`/docs/${basename}.md`);
+                        if (!fallbackRes.ok) throw new Error("Document not found");
+                        const text = await fallbackRes.text();
+                        contentDiv.innerHTML = marked.parse(text);
+                    } else {
+                        throw new Error("Document not found");
+                    }
+                } else {
+                    const text = await res.text();
+                    contentDiv.innerHTML = marked.parse(text);
+                }
+                window.location.hash = basename.split('_')[0]; // updates anchor #privacy etc
+            } catch (e) {
+                contentDiv.innerHTML = `<p class='text-red-400'>${currentLang === 'en' ? 'Failed to load document.' : 'Ошибка загрузки документа.'}</p>`;
+            }
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            currentLang = currentLang === 'ru' ? 'en' : 'ru';
+            updateUITexts();
+            loadDoc(currentDoc);
+        });
+
+        // Init
+        window.addEventListener('DOMContentLoaded', () => {
+            updateUITexts();
+            const hash = window.location.hash.replace('#', '');
+            if(hash === 'eula' || hash === 'oferta') loadDoc('eula_oferta');
+            else if(hash === 'consent') loadDoc('data_consent');
+            else loadDoc('privacy_policy');
+        });
+    </script>
+</body>
+</html>
