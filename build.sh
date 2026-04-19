@@ -25,11 +25,13 @@ cp "$PROJECT_DIR/assets/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
 
 # 3. Компиляция Swift-файлов
 echo "📦 Компиляция Swift-кода (arm64)... это займет пару секунд!"
+SWIFT_FILES=()
+while IFS= read -r file; do
+  SWIFT_FILES+=("$file")
+done < <(find "$PROJECT_DIR/src" -name "*.swift" | sort)
+
 swiftc -O -target arm64-apple-macosx11.0 \
-    "$PROJECT_DIR/src/main.swift" \
-    "$PROJECT_DIR/src/AppDelegate.swift" \
-    "$PROJECT_DIR/src/ModelDownloader.swift" \
-    "$PROJECT_DIR/src/AppController.swift" \
+    "${SWIFT_FILES[@]}" \
     -o "$MACOS_DIR/MacDictate"
 
 # 4. (Пропущено) Использование whisper-cli напрямую из Homebrew

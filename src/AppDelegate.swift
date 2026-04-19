@@ -7,58 +7,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var activeDownloader: ModelDownloader? // Жесткая ссылка (Критически важно для работы кнопки)
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        
-        let fileManager = FileManager.default
-        let modelsDir = fileManager.homeDirectoryForCurrentUser.path + "/.macdictate/models"
-        
-        // Создаем папку, если ее нет
-        try? fileManager.createDirectory(atPath: modelsDir, withIntermediateDirectories: true, attributes: nil)
-        
-        // Проверяем наличие любой модели в ~/.macdictate
-        var hasModel = false
-        if let files = try? fileManager.contentsOfDirectory(atPath: modelsDir) {
-            hasModel = files.contains { $0.hasSuffix(".bin") }
-        }
-        
-        // Магия: Умный поиск по системе!
+        let modelsDir = ModelLocator.modelsDirectoryPath
+        ModelLocator.ensureModelsDirectoryExists()
+
+        var hasModel = ModelLocator.hasInstalledModel(in: modelsDir)
         if !hasModel {
-            hasModel = smartSearchExistingModels(destDir: modelsDir)
+            hasModel = ModelLocator.smartSearchExistingModels(destDir: modelsDir)
         }
-        
+
         if !hasModel {
             showModelDownloader(modelsDir: modelsDir)
         } else {
             launchCoreApp()
         }
-    }
-    
-    func smartSearchExistingModels(destDir: String) -> Bool {
-        let fileManager = FileManager.default
-        let homeDir = fileManager.homeDirectoryForCurrentUser.path
-        let knownPaths = [
-            "/opt/homebrew/share/whisper.cpp/models",
-            "/usr/local/share/whisper.cpp/models",
-            homeDir + "/.cache/whisper",
-            homeDir + "/Library/Application Support/whisper.cpp/models",
-            homeDir + "/Downloads"
-        ]
-        
-        for p in knownPaths {
-            guard let files = try? fileManager.contentsOfDirectory(atPath: p) else { continue }
-            let bins = files.filter { $0.hasSuffix(".bin") }
-            for b in bins {
-                let fullPath = p + "/" + b
-                if let size = (try? fileManager.attributesOfItem(atPath: fullPath)[.size]) as? Int64, size > 50_000_000 {
-                    do {
-                        try fileManager.copyItem(atPath: fullPath, toPath: destDir + "/" + b)
-                        return true
-                    } catch {
-                        continue
-                    }
-                }
-            }
-        }
-        return false
     }
     
     func showModelDownloader(modelsDir: String) {

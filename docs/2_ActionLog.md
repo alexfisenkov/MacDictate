@@ -1,26 +1,34 @@
 # Журнал Действий (Action Log) MacDictate
 
-Этот документ хронологически фиксирует все крупные изменения и решения, чтобы ИИ-агенты понимали контекст истории разработки.
+Этот журнал фиксирует инженерные шаги и checkpoints, а не маркетинговое описание релиза.
 
-## 31 Марта 2026 г.
+## 2026-04-19 — Sprint 1: backend / checkout / product surface hardening
 
-### 1. Переход на Native Swift (AppKit)
-- **Событие:** Отказ от Python (PyInstaller/Rumps) в пользу компилируемого Swift `mac-dictate-swift` из-за проблем со сборкой DMG, стабильностью `pynput`, и ограничениями Apple Gatekeeper.
-- **Действие:** Написан новый проект, собирающийся через гибридный bash-компилятор `swiftc`, без XCode. Суперактивная библиотека `AppKit` используется по максимуму для горячих клавиш.
+- Добавлен server-authoritative plan catalog и `GET /api/plans`.
+- `POST /api/payment/create` переведен на `planId` как основной контракт с backward-compatible legacy mapping.
+- Убраны hardcoded secrets и proxy config из backend-кода; введен `.env.example`.
+- Укреплены CORS, input validation и базовое throttling.
+- Landing и legal-слой синхронизированы с реальным checkout contract.
+- Чекпойнт: `checkpoint/1.5.0-sprint1`.
 
-### 2. Исправление Памяти UI (ARC Bug)
-- **Событие:** Кнопка "Установить" в окне загрузчика не нажималась.
-- **Действие:** Менеджер окон деаллоцировался Swift ARC. Внедрена сильная ссылка `activeDownloader` в `AppDelegate`, кнопка заработала стабильно.
+## 2026-04-19 — Sprint 2: app-side licensing / diagnostics
 
-### 3. Чистая Система Прав (Homebrew Whisper, Dylib Bug)
-- **Событие:** Нейросеть крашилась после записи из-за отсутствия `libggml` в бандле программы (dyld error @rpath).
-- **Действие:** Вырезано копирование `whisper-cli` в пакет. Программа теперь стабильно вызывает `/opt/homebrew/bin/whisper-cli`, чтобы использовать полные системные мощности Apple Silicon без танцев с библиотеками.
+- В app добавлена явная state machine лицензии.
+- Бесконечный fail-open заменен на bounded offline grace.
+- Убран startup race вокруг первой license check.
+- Добавлены различимые runtime diagnostics для `whisper-cli`, модели, permissions, transcription и paste.
+- Чекпойнт: `checkpoint/1.5.0-sprint2`.
 
-### 4. Авто-Апгрейд Прав и Само-Рестарт (Permissions)
-- **Событие:** Пользователь забывал/лентяйничал выключать программу после выдачи Универсального Доступа (Accessibility).
-- **Действие:** Написан "хитрый цикл": Таймер -> Автопроверка `AXIsProcessTrusted()` -> Всплывающее предупреждение -> Кликом программа сама закрывает свою копию и перезапускает новую через টারмiनal `Process("/usr/bin/open")`.
-- **Действие (Uninstaller):** Деинсталляция дополнена очисткой TCC (Privacy Settings) через скрытую команду `tccutil reset`. Полностью чистая аура "Мака".
+## 2026-04-19 — Architecture adaptation for 1.5.0
 
-### 5. Идеальный Установщик (UI DMG)
-- **Событие:** Кэширование папок Finder на macOS Sonoma/Sequoia уничтожало весь дизайн упаковщика `dmgbuild` (синие стрелочки и фоны пропадали).
-- **Действие:** Переход на `create-dmg` (AppleScript-пакет), Python-скриптом отрисован кастомный фон-стрелочка (`dmg_background.png`). Иконка микрофона идеально вырезана `Pillow` (прозрачный скверкл вместо белого квадрата). Переименование тома для обхода кэша (`MacDictate_Final_Auto`). EULA переписана на английский (во избежание проблем с UTF-8).
+- `AppController.swift` перестал быть единственным бог-объектом.
+- License, diagnostics, hotkeys, transcription, paste и UI presentation вынесены в отдельные app-side модули.
+- `build.sh` переведен на рекурсивный сбор `.swift` файлов.
+- Добавлен project operating model, decision log, smoke matrix, release checklist и structured changelog.
+- Pre-refactor checkpoint: `checkpoint/1.5.0-pre-architecture`.
+
+## Legacy context — 2026-03-31
+
+- Проект был переведен с Python/Rumps на native Swift/AppKit.
+- Для стабильного runtime был принят внешний `whisper-cli` вместо хрупкого bundle с dylib.
+- `ModelDownloader` и permission auto-restart стали частью первого рабочего app-layer.

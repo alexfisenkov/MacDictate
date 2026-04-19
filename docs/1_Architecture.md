@@ -1,47 +1,59 @@
 # Архитектура проекта MacDictate (Native Swift)
 
-Этот документ описывает высокоуровневую структуру приложения MacDictate, чтобы любой разработчик (или AI-агент) мог мгновенно понять "как всё устроено" и ничего не держать в голове.
+Этот документ описывает текущую app-side архитектуру `1.5.0` после декомпозиции `AppController.swift`.
 
-## Технологический Стек
-*   **Ядро:** Нативный Swift (CLI/AppKit-гибрид), компилируется через `swiftc`.
-*   **Нейросеть:** `whisper-cli` (Whisper.cpp), используется системно через Homebrew для поддержки хардверного ускорения (Metal/Apple Silicon).
-*   **Сборка:** Bash-скрипт `build.sh` (Ad-Hoc подпись через `codesign`).
-*   **Упаковка:** DMG-образ пакетируется утилитой AppleScript `create-dmg`.
+## Технологический стек
 
-## Разделение по слоям (Layers)
+- **Ядро:** нативный Swift + AppKit, сборка через `swiftc`.
+- **Speech-to-text:** `whisper-cli` (Whisper.cpp), запускается как внешний процесс.
+- **Сборка:** `build.sh`, который рекурсивно собирает все `.swift` в `src/`.
+- **Упаковка:** DMG через `create-dmg`.
 
-Структура проекта разделена на четко изолированные логические слои:
+## Entry / Lifecycle
 
-### Слой 1: Точка входа (Entry Point)
-*   `src/main.swift` — Файл инициализации. Запускает главный луп приложения (`NSApplication.shared.run()`) без использования тяжелого Xcode UI/Storyboards.
+- `src/main.swift` — entry point.
+- `src/AppDelegate.swift` — lifecycle bootstrap, проверка модели и показ `ModelDownloader`.
+- `src/ModelDownloader.swift` — isolated first-run downloader для Whisper model.
 
-### Слой 2: Контроллеры жизненного цикла (App Lifecycle)
-*   `src/AppDelegate.swift` — Делегат приложения. Отвечает за:
-    *   Скрытие иконки приложения из Dock (`NSApp.setActivationPolicy(.accessory)`).
-    *   Первоначальную проверку нейромодели через `ModelDownloader`.
-    *   Инициализацию и запуск ядра диктовки `AppController`.
-    *   Обработку завершения приложения.
+## App Composition Root
 
-### Слой 3: UI-Слой (Загрузчик Моделей)
-*   `src/ModelDownloader.swift` — Полностью изолированный UI-компонент, который:
-    *   Создает графическое окно загрузки.
-    *   Рисует прогресс-бар и текстовые сообщения (построенные на `NSWindow`, `NSTextField`, `NSProgressIndicator`).
-    *   Синхронно загружает файл модели напрямую с HuggingFace (или другого URL) в `~/.macdictate/models/ggml-large-v3-turbo.bin`.
+- `src/AppController.swift` — тонкий coordinator.
+- Его ответственность: собрать сервисы, построить menu bar UI, связать hotkeys с use case и держать high-level orchestration.
 
-### Слой 4: Ядро Бизнес-Логики и Аудио (The Core)
-*   `src/AppController.swift` — Самый массивный и важный класс. Является сердцем бизнес-логики.
-    *   **Микрофон & Аудио:** `AVAudioRecorder` пишет звук в 16kHz PCM (только во время зажатых клавиш).
-    *   **Статус-Бар (Menu Bar):** Управляет иконкой (🎙️, 🔴, ⏳, ⚠️) и выпадающим меню.
-    *   **Горячие клавиши (Hotkeys):** Использует `NSEvent.addGlobalMonitorForEvents` для перехвата двойного нажатия `Option` в глобальной среде macOS. Обрабатывает логику "нажал — держишь/отпустил".
-    *   **Интеграция с Whisper:** Вызывает внешний системный бинарник `Process()` -> `/opt/homebrew/bin/whisper-cli`.
-    *   **Вставка текста (Clipboard & HID):** Парсит `.txt`, фильтрует "[БЕЗ ЗВУКА]", подменяет `NSPasteboard`, симулирует системное нажатие `Cmd+V` (через `CGEvent(keyboardEventSource:...)`).
-    *   **Разрешения (Permissions):** Полностью автоматизированный опрос `AXIsProcessTrusted()` через Timer, запуск системных настроек и авто-ребута (минуя ручной перезапуск).
-    *   **Деинсталлятор (Self-Destruct):** Запускает скрытый bash-скрипт, который стирает папку с моделями, сам `.app` из `Applications` и чистит системные базы данных TCC через `tccutil reset`.
+## App Modules
 
-### Слой 5: Сборка и Релиз (Build & CI/CD)
-*   `build.sh` — Автоматизирует всю цепочку компиляции:
-    1.  Собирает все `.swift` файлы.
-    2.  Копирует `Info.plist` и сгенерированную нативную иконку `AppIcon.icns`.
-    3.  Подписывает код (`codesign`).
-    4.  Создает "бесшовный" DMG с фоном `dmg_background.png` используя маковскую утилиту `create-dmg`.
-    *   *Важно:* Имя тома DMG и название файла меняются при каждой мажорной версии, чтобы пробить параноидальный кэш Finder в macOS.
+- `src/License/*`
+  - `LicenseState.swift` — state model (`checking`, `active`, `grace`, `expired`, `serverUnavailable`).
+  - `LicenseSnapshot.swift` — кэшируемый snapshot и network response model.
+  - `LicenseCache.swift` — bounded offline grace cache.
+  - `LicenseService.swift` — machine ID, `/api/license/status`, refresh loop, state transitions.
+
+- `src/Diagnostics/*`
+  - `DiagnosticStatus.swift` — типы diagnostic/event state.
+  - `EnvironmentDiagnostics.swift` — проверки accessibility, microphone, model и `whisper-cli`.
+
+- `src/Hotkeys/*`
+  - `HotkeyMonitor.swift` — double `Option` start и single `Option` stop.
+
+- `src/Transcription/*`
+  - `ModelLocator.swift` — поиск и выбор модели.
+  - `RecordingService.swift` — запись WAV.
+  - `WhisperRunner.swift` — запуск `whisper-cli`, cleanup temp files, различимые ошибки.
+
+- `src/Paste/*`
+  - `PasteService.swift` — pasteboard write / restore и simulated `Cmd+V`.
+
+- `src/UI/*`
+  - `StatusPresentation.swift` — user-facing строки и status summaries.
+  - `MenuBuilder.swift` — сборка menu skeleton.
+
+## Поведенческие правила app-layer
+
+- Меню остается `menu bar utility`, без отдельного большого окна настроек.
+- Горячая клавиша не меняется: double `Option` старт, `Option` во время записи стоп.
+- Backend contract не меняется: app продолжает читать `GET /api/license/status`.
+- Offline grace ограничен и больше не является бесконечным fail-open.
+
+## Build note
+
+`build.sh` должен оставаться совместимым с модульной структурой: при добавлении новых `.swift` файлов они должны подхватываться автоматически, а не вручную дописываться в один список.

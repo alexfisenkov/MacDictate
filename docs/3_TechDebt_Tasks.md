@@ -1,37 +1,21 @@
-# Журнал Долгов и Задач (Technical Debt & TODOs)
+# Технический Долг и Backlog
 
-В этом файле хранятся все нереализованные идеи, технические долги (Technical Debt), планы по монетизации и оптимизации. Любой агент, подключившийся к проекту, должен стартовать отсюда.
+Этот файл теперь ведется как живой backlog с приоритетом и ожидаемым impact.
 
-## 🚀 Планы на Версию 1.1 (Ближайшее обновление)
-1. **Надежный Авто-Рестарт (Permissions Reboot)**
-   *   *Суть:* Сейчас при клике "Перезагрузить" в окне получения прав, программа просто мгновенно убивается (`terminate`), а система не всегда успевает подхватить повторный вызов `open .app`. Из-за этого юзеру приходится искать иконку вLaunchpad.
-   *   *Решение:* Использовать "мину замедленного действия" через `bash -c "sleep 1 && /usr/bin/open ..."`, чтобы родительский процесс успел полностью умереть перед вызовом новой копии.
-2. **Автозагрузка с Системой (Launch at Login)**
-   *   *Суть:* Добавить программу в элементы входа ("Вход" в настройках macOS), чтобы она стартовала вместе с компьютером прозрачно и в фоне.
-   *   *Решение:* Внедрить вызов `SMAppService.mainApp.register()` при запуске программы, возможно добавив галочку "Запускать с Mac" в выпадающее меню статус-бара.
+| Area | Status | Priority | Impact | Effort | Owner | Item |
+| --- | --- | --- | --- | --- | --- | --- |
+| Release | Open | P0 | Distribution | M | Project | Перевести release path на Developer ID + notarization + stapling. |
+| Release | Open | P0 | Integrity | M | Project | Определить один source of truth для release asset: GitHub release vs site download. |
+| Backend/App | Open | P0 | Revenue / UX | M | Project | Ввести app-side support snapshot и операторски понятный manual license recheck flow. |
+| Backend | Open | P1 | Ops | M | Project | Подтвердить parity локального `backend/` с production deploy и задокументировать production ownership. |
+| App | Open | P1 | Supportability | M | Project | Добавить repair flow для `no model / no whisper / permission denied`. |
+| App | Open | P1 | UX | M | Project | Вынести `launch at login` из AppleScript fallback в более чистый и проверяемый path. |
+| App | Open | P1 | Flexibility | M | Project | Сделать настраиваемую горячую клавишу без ломки menu bar utility UX. |
+| Repo | Open | P1 | Hygiene | S | Project | Провести отдельную cleanup-итерацию по root artifact clutter: legacy DMG, icon scratch files, build logs. |
+| App | Open | P2 | Onboarding | L | Project | Уйти от зависимости на Homebrew `whisper-cli` или хотя бы сделать управляемый bundled runtime path. |
+| App | Open | P2 | Diagnostics | S | Project | Добавить cleanup `/tmp/mac_dictate*` при старте после аварийных сценариев. |
 
-## 🕒 В Очереди (Сложные задачи / Монетизация)
+## Notes
 
-### 1. Система Лицензирования (Монетизация)
-*   **Валидация (Validation):** Внедрение механизма генерации и проверки серийных ключей (License Key).
-*   **Отсчет сроков действия (Expiration Count):** Добавление триала (например, 14 дней бесплатно), с локальным хранением зашифрованного таймстемпа.
-*   **Оплата (Payments Integration):** Подключение платежного шлюза (LemonSqueezy, Paddle или Stripe) для выписки ключей после успешной оплаты. Интерфейс ввода ключа при запуске (если срок вышел).
-
-### 2. Запуск при старте системы (Launch at Login)
-*   **Проблема:** В данный момент пользователь должен открывать приложение вручную после каждой перезагрузки Mac.
-*   **Решение:** Внедрить `SMLoginItemSetEnabled` (или современный `SMAppService.mainApp.register()`) в `AppDelegate`. Добавить в статус-меню галочку "Запускать при включении Mac".
-
-### 3. Нативная настройка горячих клавиш (Custom Hotkeys)
-*   **Проблема:** Хардкод двойного нажатия `Option` (`keyCode == 58`). Могут быть конфликты у некоторых пользователей.
-*   **Решение:** Внедрить библиотеку `KeyboardShortcuts` или собственную страницу настроек (`Preferences Window`), где пользователь сможет забиндить любую кнопку (например, `F5` или двойной `Cmd`).
-
-### 4. Apple Developer ID (Public Distribution)
-*   **Проблема:** Бинарник подписан Ad-Hoc (`codesign -s -`). За пределами личного использования macOS выдаст страшное предупреждение "App from unidentified developer" (требуется правый клик -> Open).
-*   **Решение:** Зарегистрировать аккаунт Apple Developer (99$/год), получить сертификат `Developer ID Application`, и внедрить нотаризацию (Notarization) в `build.sh` (через `xcrun altool`).
-
-## 🛠️ Технический Долг (Technical Debt)
-
-*   **Динамическая сборка Whisper:** Сейчас мы жестко полагаемся на `/opt/homebrew/bin/whisper-cli`. Это круто для гиков, но для рядового пользователя (бабушки) Homebrew может стать блокером.
-    *   *Решение на будущее:* Скомпилировать библиотеку `whisper.cpp` с поддержкой Metal (`libggml`, `libwhisper`) прямо внутрь `.app/Contents/Frameworks/` и обращаться к ней через C-Interop напрямую в Swift, вообще отказавшись от Bash-вызовов и установки Homebrew в систему пользователя. Это гигантский прыжок в стабильности, но требует сложного `Makefile` / `CMake`.
-
-*   **Удаление старых логов:** Программа может оставлять `.wav` файлы в `/tmp/` в случае системного краша или принудительного перезапуска. Стоит добавить очистку `/tmp/mac_dictate*` при функции `applicationDidFinishLaunching()`.
+- Исторические TODO уровня `1.1` не удалены по смыслу: часть из них реализована, часть перенесена в таблицу выше.
+- Каждый крупный спринт должен оставлять след здесь, если появились новые незавершенные риски или остаточные компромиссы.
