@@ -43,6 +43,8 @@
 
 - `src/TextImprovement/*`
   - `TextImprovementSettings.swift` — persisted toggle `MacDictateTextImprovementEnabled`.
+  - `TextImprovementProfile.swift` — prompt profile для Qwen: editorial rules, list/paragraph formatting rules, terminology packs и speech-normalization hints.
+  - `TextImprovementFormatter.swift` — узкий deterministic post-processor для очевидных ordered-list markers и частых терминов, когда Qwen оставляет их в сыром виде.
   - `TextImprovementRunner.swift` — запуск `llama.cpp` runtime для Qwen, timeout `5` минут, streaming drain `stdout`/`stderr`, controlled termination и fallback-friendly ошибки.
 
 - `src/Paste/*`
@@ -63,6 +65,8 @@
 - `stderr` subprocess читается во время выполнения, чтобы verbose/error-heavy `whisper-cli` не мог заблокироваться на заполненном pipe.
 - Text improvement является optional enhancement, а не блокером базовой диктовки. Если Qwen/`llama.cpp` runtime отсутствует или падает при включенном toggle, app вставляет cleaned Whisper-текст и показывает warning diagnostic.
 - Вторая модель хранится только как `qwen2.5-1.5b-instruct-q4_k_m.gguf`; `.gguf` не участвует в выборе Whisper model.
+- Поведение второй модели задается через `TextImprovementProfile.professionalCopyEditor`: она должна исправлять и оформлять текст, но не менять смысл, факты, цифры, имена, бренды и профессиональные термины.
+- После Qwen применяется `TextImprovementFormatter.normalize` как guardrail: он не пересказывает текст, а только нормализует заранее известные терминологические варианты и очевидные `во-первых/во-вторых` перечисления.
 - Для защиты от silent truncation Qwen-улучшение ограничено короткими/средними фрагментами: input больше `6_000` символов fallback-ится к исходному cleaned Whisper text.
 - Команда `Улучшить текст` в главном меню является toggle режима второй нейросети: когда галочка включена, cleaned Whisper text перед вставкой проходит через `TextImprovementRunner`; когда выключена, вставляется исходный cleaned Whisper text.
 
@@ -75,4 +79,4 @@
 - `scripts/test_whisper_runner_timeout.sh` компилирует `WhisperRunner` с fake `whisper-cli` и проверяет timeout recovery, cleanup temp audio и large-stderr subprocess path.
 - `scripts/test_license_machine_id_timeout.sh` проверяет parsing/cache machine ID и fallback при зависшем fake `ioreg`.
 - `scripts/test_recording_temp_cleanup.sh` проверяет cleanup stale temp WAV/TXT.
-- `scripts/test_text_improvement_runner.sh` компилирует `TextImprovementRunner` с fake llama.cpp executable и проверяет success cleanup, timeout recovery, missing runtime/model, safe input limit и non-zero stderr diagnostics.
+- `scripts/test_text_improvement_runner.sh` компилирует `TextImprovementRunner` с fake llama.cpp executable и проверяет profile prompt content, formatter guardrails, success cleanup, timeout recovery, missing runtime/model, safe input limit и non-zero stderr diagnostics.

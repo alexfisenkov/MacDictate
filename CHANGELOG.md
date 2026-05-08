@@ -13,6 +13,8 @@
 - release governance layer: `docs/7_Release_Governance.md`, `releases/registry.json`, per-version `RELEASE.md`, локальное хранилище artifacts и `scripts/verify_release_governance.sh`;
 - desktop-local `CLAUDE.md` / `AGENTS.md` с правилами работы будущих агентов;
 - optional локальное улучшение текста второй нейросетью: Qwen2.5-1.5B-Instruct Q4_K_M через `llama.cpp` (`llama-completion`), top-level toggle `Улучшить текст` и такой же toggle в настройках;
+- editor profile для второй нейросети: строгие правила сохранения смысла, оформление абзацев/списков, доменные терминологические пакеты и подсказки нормализации речи;
+- deterministic formatter guardrail для очевидных речевых перечислений (`во-первых`, `во-вторых`, `в-третьих`) и частых терминов, если Qwen оставляет их неоформленными;
 - targeted runtime harnesses для зависшего/stderr-heavy `whisper-cli`, machine ID timeout, cleanup stale temp audio и `TextImprovementRunner`.
 
 ### Changed

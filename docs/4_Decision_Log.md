@@ -73,3 +73,10 @@
 - **Почему:** Qwen2.5-1.5B достаточно легкий для M1/16 GB, официально мультиязычный, поддерживает instruct-following и structured output, а GGUF/llama.cpp повторяет уже принятый в MacDictate паттерн внешнего локального CLI-процесса. 7B/8B варианты дают лучшее качество, но увеличивают cold-start, RAM/disk footprint и риск UX-регрессии для фоновой диктовки.
 - **Источники:** `https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF`, `https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct`, `https://www.mintlify.com/ggml-org/llama.cpp/installation`.
 - **Ограничение:** отсутствие Qwen/`llama.cpp` runtime не блокирует базовую диктовку. При failure automatic text improvement должен fallback-ить к cleaned Whisper text.
+
+## D-013 — Qwen quality is guided by an editor profile before fine-tuning
+
+- **Дата:** 2026-05-08
+- **Решение:** улучшение качества второй нейросети сначала делается через `TextImprovementProfile.professionalCopyEditor`: prompt rules, terminology packs и speech-normalization hints. Настоящий LoRA/fine-tune откладывается до появления реального корпуса пар `raw Whisper text -> desired edited text`.
+- **Почему:** GGUF-модель внутри app не дообучается напрямую. Prompt/profile слой быстрее, локальнее, проверяемее и безопаснее для смысла текста. Fine-tune без корпуса пользовательских диктовок будет дороже, медленнее и менее контролируем.
+- **Ограничение:** терминологические пакеты не являются исчерпывающей энциклопедией. Они задают канонические написания и контекстные подсказки; новые термины должны добавляться по мере реальных ошибок.

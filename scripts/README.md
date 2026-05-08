@@ -64,7 +64,7 @@ scripts/test_recording_temp_cleanup.sh
 
 ## `test_text_improvement_runner.sh`
 
-Компилирует `TextImprovementRunner` с fake llama.cpp executable и проверяет success output cleanup, missing model/runtime, safe input limit, non-zero diagnostics, timeout recovery и drain большого `stderr`.
+Компилирует `TextImprovementRunner` с fake llama.cpp executable и проверяет editor profile prompt content, formatter guardrails, success output cleanup, missing model/runtime, safe input limit, non-zero diagnostics, timeout recovery и drain большого `stderr`.
 
 ```bash
 scripts/test_text_improvement_runner.sh

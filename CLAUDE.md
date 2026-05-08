@@ -47,7 +47,7 @@
 - Рабочая линия: `release/1.5.0`.
 - `v1.5.0` не считается релизом до tag, GitHub Release, registry update, DMG asset и smoke evidence.
 - В рабочей линии `1.5.0` `WhisperRunner` ограничивает зависший `whisper-cli` timeout `30` минут и читает `stderr` во время работы процесса; `LicenseService` ограничивает первый `ioreg`; `RecordingService` чистит stale temp audio.
-- В `1.5.0` добавлен optional second-AI layer: Qwen2.5-1.5B-Instruct Q4_K_M (`.gguf`) через `llama.cpp` (`llama-completion`), persisted toggle `MacDictateTextImprovementEnabled`, manual menu action `Улучшить текст`, downloader модели и safe input limit `6_000` символов.
+- В `1.5.0` добавлен optional second-AI layer: Qwen2.5-1.5B-Instruct Q4_K_M (`.gguf`) через `llama.cpp` (`llama-completion`), persisted toggle `MacDictateTextImprovementEnabled`, top-level toggle `Улучшить текст`, downloader модели, safe input limit `6_000` символов, `TextImprovementProfile.professionalCopyEditor` с editorial rules / terminology packs и `TextImprovementFormatter` для очевидных list/term guardrails.
 - Локальные runtime harnesses: `scripts/test_whisper_runner_timeout.sh`, `scripts/test_license_machine_id_timeout.sh`, `scripts/test_recording_temp_cleanup.sh`, `scripts/test_text_improvement_runner.sh`.
 
 ## Version Folder Contract

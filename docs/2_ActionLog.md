@@ -28,6 +28,8 @@
 - Downloader валидирует минимальный размер модели перед сохранением, а повторный запуск downloader поднимает уже открытое окно вместо второго параллельного download task.
 - Text improvement ограничен `6_000` символов input, чтобы длинная диктовка не могла быть тихо усечена generation cap; automatic pipeline fallback-ится к Whisper-тексту.
 - Добавлен targeted harness `scripts/test_text_improvement_runner.sh` для timeout, stderr/stdout drain, missing runtime/model и non-zero exit.
+- Добавлен `TextImprovementProfile.professionalCopyEditor`: редакторские правила, запрет на изменение смысла, правила списков/абзацев, терминологические пакеты и speech-normalization hints для Qwen prompt.
+- Добавлен `TextImprovementFormatter` как post-Qwen guardrail для очевидных ordered-list markers и частых терминов; real Qwen smoke подтвердил `ChatGPT`, `Qwen`, `EBITDA`, `DaVinci Resolve` и numbered list output.
 - `build.sh` дополнительно чистит xattrs на root `.app` bundle, проверяет подпись через `codesign --verify --deep`, готовит DMG staging-копию через `ditto --noextattr --noqtn` и запускает `hdiutil verify` для образа; отдельный release debt зафиксирован для strict verification смонтированной/установленной DMG-копии вместе с Developer ID/notarization.
 - Проведен реальный local smoke на M1: `llama.cpp` установлен через Homebrew, Qwen GGUF скачан полностью (`1,117,320,736` bytes), `TextImprovementRunner` исправил короткий русский текст через локальную модель.
 

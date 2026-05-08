@@ -54,6 +54,7 @@ final class TextImprovementRunner {
     private let timeoutSeconds: TimeInterval
     private let terminationGraceSeconds: TimeInterval
     private let outputLimitBytes: Int
+    private let profile: TextImprovementProfile
     private let modelPathProvider: () -> String?
     private let llamaCliPathProvider: () -> String?
 
@@ -62,12 +63,14 @@ final class TextImprovementRunner {
         timeoutSeconds: TimeInterval = TextImprovementRunner.defaultTimeoutSeconds,
         terminationGraceSeconds: TimeInterval = TextImprovementRunner.defaultTerminationGraceSeconds,
         outputLimitBytes: Int = TextImprovementRunner.defaultOutputLimitBytes,
+        profile: TextImprovementProfile = .professionalCopyEditor,
         modelPathProvider: (() -> String?)? = nil,
         llamaCliPathProvider: (() -> String?)? = nil
     ) {
         self.timeoutSeconds = timeoutSeconds
         self.terminationGraceSeconds = terminationGraceSeconds
         self.outputLimitBytes = outputLimitBytes
+        self.profile = profile
         self.modelPathProvider = modelPathProvider ?? {
             ModelLocator.bestAvailableTextImprovementModelPath()
         }
@@ -195,7 +198,7 @@ final class TextImprovementRunner {
                 return .failure(.nonZeroExit(task.terminationStatus, stderrText))
             }
 
-            let improved = Self.cleanModelOutput(stdoutCollector.text())
+            let improved = TextImprovementFormatter.normalize(Self.cleanModelOutput(stdoutCollector.text()))
             guard !improved.isEmpty else {
                 return .failure(.outputMissing)
             }
@@ -237,23 +240,11 @@ final class TextImprovementRunner {
     }
 
     private func writePromptFile(for input: String) throws -> String {
-        let prompt = Self.prompt(for: input)
+        let prompt = profile.prompt(for: input)
         let promptURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("macdictate-text-improvement-\(UUID().uuidString).txt")
         try prompt.write(to: promptURL, atomically: true, encoding: .utf8)
         return promptURL.path
-    }
-
-    private static func prompt(for input: String) -> String {
-        """
-        <|im_start|>system
-        Ты локальный редактор диктовки MacDictate. Исправь только орфографию, пунктуацию, очевидные ошибки распознавания речи и разбей текст на логичные абзацы. Не добавляй новые факты, не меняй смысл, не делай пересказ и не объясняй свои действия. Сохраняй язык исходного текста. Верни только готовый исправленный текст.
-        <|im_end|>
-        <|im_start|>user
-        \(input)
-        <|im_end|>
-        <|im_start|>assistant
-        """
     }
 
     private static func maxGeneratedTokens(for input: String) -> Int {

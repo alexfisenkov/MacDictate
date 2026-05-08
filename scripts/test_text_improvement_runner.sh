@@ -35,6 +35,13 @@ if [ -z "$PROMPT_FILE" ] || ! grep -q "превет мир" "$PROMPT_FILE"; then
   exit 9
 fi
 
+for required in "не меняй смысл" "DaVinci Resolve" "ChatGPT" "EBITDA" "HbA1c" "нумерованный список"; do
+  if ! grep -q "$required" "$PROMPT_FILE"; then
+    echo "prompt missing profile term: $required" >&2
+    exit 10
+  fi
+done
+
 i=0
 while [ "$i" -lt 5000 ]; do
   printf "stderr noise %04d\n" "$i" >&2
@@ -79,6 +86,7 @@ let failCli = "$FAIL_CLI"
 let successRunner = TextImprovementRunner(
     timeoutSeconds: 5,
     terminationGraceSeconds: 0.2,
+    profile: .professionalCopyEditor,
     modelPathProvider: { fakeModel },
     llamaCliPathProvider: { successCli }
 )
@@ -95,6 +103,33 @@ expect(
     TextImprovementRunner.cleanModelOutput("Improved text:\\nHello world.\\n[end of text]\\n<|endoftext|>") == "Hello world.",
     "expected English prefix cleanup"
 )
+
+let profilePrompt = TextImprovementProfile.professionalCopyEditor.prompt(for: "чат джпт и давинчи резолв")
+expect(profilePrompt.contains("чат джпт и давинчи резолв"), "expected source text in profile prompt")
+expect(profilePrompt.contains("не меняй смысл"), "expected no-meaning-change rule")
+expect(profilePrompt.contains("маркированный список"), "expected bullet list rule")
+expect(profilePrompt.contains("нумерованный список"), "expected numbered list rule")
+expect(profilePrompt.contains("ChatGPT"), "expected AI terminology")
+expect(profilePrompt.contains("DaVinci Resolve"), "expected creator terminology")
+expect(profilePrompt.contains("EBITDA"), "expected finance terminology")
+expect(profilePrompt.contains("HbA1c"), "expected medical terminology")
+expect(profilePrompt.contains("чат джпт -> ChatGPT"), "expected direct ChatGPT speech mapping")
+expect(profilePrompt.contains("давинчи резолв -> DaVinci Resolve"), "expected direct DaVinci speech mapping")
+expect(profilePrompt.contains("во-первых"), "expected ordered-list speech cue")
+expect(profilePrompt.contains("не оставляй слова «во первых»"), "expected strict ordered-list replacement rule")
+expect(profilePrompt.count < 12_000, "profile prompt should stay compact")
+
+let ordered = TextImprovementFormatter.formatObviousOrderedEnumeration(
+    "сегодня надо проверить ChatGPT, Qwen, EBITDA и DaVinci Resolve во первых сделать монтаж во вторых проверить финансы в третьих подготовить контент план"
+)
+expect(ordered.contains("Сегодня надо проверить ChatGPT, Qwen, EBITDA и DaVinci Resolve."), "expected intro sentence")
+expect(ordered.contains("1. Сделать монтаж."), "expected first numbered item")
+expect(ordered.contains("2. Проверить финансы."), "expected second numbered item")
+expect(ordered.contains("3. Подготовить контент-план."), "expected third numbered item")
+expect(!ordered.contains("во первых"), "ordered output should remove speech marker")
+
+let normalizedTerms = TextImprovementFormatter.normalize("чат джпт и давинчи резолв, контент план")
+expect(normalizedTerms == "ChatGPT и DaVinci Resolve, контент-план", "expected fallback terminology normalization")
 
 let missingModelRunner = TextImprovementRunner(
     modelPathProvider: { nil },
@@ -173,6 +208,8 @@ SWIFT
 
 swiftc \
     "$ROOT_DIR/src/Transcription/ModelLocator.swift" \
+    "$ROOT_DIR/src/TextImprovement/TextImprovementProfile.swift" \
+    "$ROOT_DIR/src/TextImprovement/TextImprovementFormatter.swift" \
     "$ROOT_DIR/src/TextImprovement/TextImprovementRunner.swift" \
     "$TEST_SWIFT" \
     -o "$TEST_BIN"

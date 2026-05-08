@@ -18,6 +18,8 @@
 - `WhisperRunner` получил bounded 30-минутный timeout для зависшего `whisper-cli` и streaming drain `stderr`; сценарии покрыты локальным harness `scripts/test_whisper_runner_timeout.sh`.
 - `LicenseService` получил bounded machine ID command timeout, а `RecordingService` чистит stale temp audio; сценарии покрыты локальными harness scripts.
 - Добавлен optional second-AI text improvement layer: Qwen2.5-1.5B-Instruct Q4_K_M через `llama.cpp` runtime, меню `Улучшить текст`, persisted toggle и downloader `.gguf` модели.
+- Qwen prompt теперь строится через `TextImprovementProfile.professionalCopyEditor`: правила сохранения смысла, оформление абзацев/списков, доменные терминологические пакеты и speech-normalization hints.
+- После Qwen применяется `TextImprovementFormatter` как guardrail для очевидных ordered-list markers и частых терминов, когда локальная модель оставляет их неоформленными.
 - `TextImprovementRunner` имеет bounded timeout, streaming drain `stdout`/`stderr`, safe input limit `6_000` символов и fallback semantics; покрыт `scripts/test_text_improvement_runner.sh`.
 - Реальный local smoke Qwen на M1 выполнен: `qwen2.5-1.5b-instruct-q4_k_m.gguf` скачан полностью (`1,117,320,736` bytes), короткий русский текст исправлен через `TextImprovementRunner`.
 - Локальные DMG/build logs остаются ignored artifacts; clean checkout проверка governance допускает их отсутствие, строгая локальная проверка доступна через `scripts/verify_release_governance.sh --strict-local-artifacts`.
