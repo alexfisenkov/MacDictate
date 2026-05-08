@@ -37,7 +37,7 @@
 - `RecordingService` чистит stale `/tmp/mac_dictate_dist.wav` и `.txt` при старте сервиса и перед новой записью.
 - Ошибка/отсутствие второй нейросети больше не ломает диктовку: при включенном улучшении MacDictate вставляет исходный Whisper-текст и показывает warning diagnostic.
 - Длинные тексты больше не отправляются в Qwen вслепую: input > 6 000 символов fallback-ится без риска silent truncation.
-- `ChaiJPT` / `Chai GPT` / `Чай и GPT` / `чай джипити` нормализуются в `ChatGPT`; heading cues вроде `И вот к чему пришли` / `Вот что мы достигли` перед перечислением превращаются в отдельный заголовок с двоеточием и numbered list.
+- `ChaiJPT` / `ChagPT` / `Chai GPT` / `Чай и GPT` / `чай джипити` нормализуются в `ChatGPT`; `Клод от Anthropic` нормализуется в `Claude от Anthropic`; heading cues вроде `И вот к чему пришли` / `Вот что мы достигли` перед перечислением превращаются в отдельный заголовок с двоеточием и numbered list.
 
 ### Notes
 - `v1.2` и `v1.3` помечены как reconstructed history: GitHub Releases существуют, но локальные tags отсутствуют, а remote tags указывают на commit `v1.4`.

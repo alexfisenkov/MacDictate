@@ -40,6 +40,7 @@
 - По real debug-сессии `20260508-212657-03DCBFBB` найдено, что Whisper дал `ChaiJPT`, Qwen не исправил термин и потерял часть list markers. Пайплайн усилен pre-formatting шагом перед Qwen: `ChaiJPT`/`Чай и GPT` -> `ChatGPT`, heading cues перед `во-первых/во-вторых/в-третьих` превращаются в заголовок с двоеточием и numbered list.
 - Preferred text-improvement model переключена с Qwen2.5-1.5B-Instruct Q4_K_M на промежуточную Qwen2.5-3B-Instruct Q4_K_M (~2.1 GB): 7B убрана из default-пути как слишком рискованная для M1/16 GB после пользовательского runtime-сбоя, 1.5B оставлена как automatic fallback.
 - `TextImprovementRunner` сохраняет увеличенные лимиты под 3B: timeout `10` минут и context `8_192` tokens.
+- По real debug-сессии `20260508-233428-E329E82F` найдено, что 3B/Qwen исправляет `ChagPT` только в части контекста. Deterministic formatter расширен вариантами `ChagPT`/`Chag GPT`/`ChagJPT` -> `ChatGPT`, `Клод от Anthropic` -> `Claude от Anthropic`, а list marker cleanup теперь убирает лишнюю точку после `Первое.` / `Второе.`.
 
 ## 2026-04-19 — Sprint 1: backend / checkout / product surface hardening
 

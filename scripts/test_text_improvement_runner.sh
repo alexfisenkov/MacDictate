@@ -190,7 +190,9 @@ expect(profilePrompt.contains("DaVinci Resolve"), "expected creator terminology"
 expect(profilePrompt.contains("EBITDA"), "expected finance terminology")
 expect(profilePrompt.contains("HbA1c"), "expected medical terminology")
 expect(profilePrompt.contains("чат джпт -> ChatGPT"), "expected direct ChatGPT speech mapping")
+expect(profilePrompt.contains("ChagPT / Chag GPT / ChagJPT -> ChatGPT"), "expected direct ChagPT speech mapping")
 expect(profilePrompt.contains("ChaiJPT -> ChatGPT"), "expected direct ChaiJPT speech mapping")
+expect(profilePrompt.contains("Клод от Anthropic / Cloud Anthropic -> Claude от Anthropic / Claude Anthropic"), "expected direct Claude speech mapping")
 expect(profilePrompt.contains("Не заменяй разговорные слова автора"), "expected conservative wording rule")
 expect(profilePrompt.contains("давинчи резолв -> DaVinci Resolve"), "expected direct DaVinci speech mapping")
 expect(profilePrompt.contains("во-первых"), "expected ordered-list speech cue")
@@ -206,8 +208,8 @@ expect(ordered.contains("2. Проверить финансы."), "expected seco
 expect(ordered.contains("3. Подготовить контент-план."), "expected third numbered item")
 expect(!ordered.contains("во первых"), "ordered output should remove speech marker")
 
-let normalizedTerms = TextImprovementFormatter.normalize("чат джпт и давинчи резолв, контент план")
-expect(normalizedTerms == "ChatGPT и DaVinci Resolve, контент-план", "expected fallback terminology normalization")
+let normalizedTerms = TextImprovementFormatter.normalize("ChagPT, чат джпт и давинчи резолв, контент план")
+expect(normalizedTerms == "ChatGPT, ChatGPT и DaVinci Resolve, контент-план", "expected fallback terminology normalization")
 
 let realDebugSessionOutput = TextImprovementFormatter.normalize(
     "Мы недавно собирались с ChaiJPT и Gemini от Google. Вот что мы достигли. Во-первых, мы создали специальный сценарий. Во-вторых, мы создали специальную штуку, которая обрабатывает этот сценарий. Ну, а в-третьих, мы выделили несколько файлов-факторов, которые это все закрывают."
@@ -218,6 +220,15 @@ expect(realDebugSessionOutput.contains("1. Мы создали специаль�
 expect(realDebugSessionOutput.contains("2. Мы создали специальную штуку, которая обрабатывает этот сценарий."), "expected second real debug item")
 expect(realDebugSessionOutput.contains("3. Мы выделили несколько файлов-факторов, которые это все закрывают."), "expected third real debug item")
 expect(!realDebugSessionOutput.contains("Во-первых"), "expected speech markers removed from real debug output")
+
+let chagPTLogRegression = TextImprovementFormatter.normalize(
+    "Когда-то давно у меня была такая игрушка под названием Gemini от Google, Клод от Anthropic и ChagPT от OpenAI. Знаете, что я сделал? Правильно. Первое. Я создал ChagPT с нуля. Сам. Самостоятельно. Дальше. Второе. Я преобразовал Gemini от Google в реально крутую игрушку."
+)
+expect(chagPTLogRegression.contains("Claude от Anthropic и ChatGPT от OpenAI."), "expected ChagPT in intro to normalize to ChatGPT")
+expect(chagPTLogRegression.contains("1. Я создал ChatGPT с нуля. Сам. Самостоятельно. Дальше."), "expected ChagPT in list item to normalize to ChatGPT")
+expect(chagPTLogRegression.contains("2. Я преобразовал Gemini от Google в реально крутую игрушку."), "expected second list item")
+expect(!chagPTLogRegression.contains("ChagPT"), "expected no ChagPT after formatter")
+expect(!chagPTLogRegression.contains("1. ."), "expected numbered marker punctuation cleanup")
 
 let missingModelRunner = TextImprovementRunner(
     modelPathProvider: { nil },

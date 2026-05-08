@@ -6,6 +6,12 @@ enum TextImprovementFormatter {
         ("премьер про", "Adobe Premiere Pro"),
         ("давинчи резолв", "DaVinci Resolve"),
         ("файн кат про", "Final Cut Pro"),
+        ("Chat GPT", "ChatGPT"),
+        ("ChagPT", "ChatGPT"),
+        ("ChagGPT", "ChatGPT"),
+        ("ChagJPT", "ChatGPT"),
+        ("Chag GPT", "ChatGPT"),
+        ("Chag JPT", "ChatGPT"),
         ("ChaiJPT", "ChatGPT"),
         ("ChaiGPT", "ChatGPT"),
         ("Chai JPT", "ChatGPT"),
@@ -19,6 +25,8 @@ enum TextImprovementFormatter {
         ("чат джпт", "ChatGPT"),
         ("чат gpt", "ChatGPT"),
         ("Cloud Anthropic", "Claude Anthropic"),
+        ("Клод от Anthropic", "Claude от Anthropic"),
+        ("Клод Anthropic", "Claude Anthropic"),
         ("контент план", "контент-план"),
         ("миджорни", "Midjourney"),
         ("капкат", "CapCut"),
@@ -207,7 +215,7 @@ enum TextImprovementFormatter {
     private static func sentenceCasedWithPeriod(_ text: String) -> String {
         var cleaned = text
             .trimmingCharacters(in: .whitespacesAndNewlines)
-            .trimmingCharacters(in: CharacterSet(charactersIn: ",;:"))
+            .trimmingCharacters(in: CharacterSet(charactersIn: ".,;:!?…–—-"))
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
         if let first = cleaned.first, first.isLowercase {

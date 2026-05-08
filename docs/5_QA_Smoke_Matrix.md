@@ -22,11 +22,11 @@
 | Hung / stderr-heavy llama.cpp subprocess | зависший процесс завершается timeout diagnostic; большой `stdout`/`stderr` не блокирует runner | Verified by `scripts/test_text_improvement_runner.sh` |
 | Text improvement editor profile | prompt содержит запрет менять смысл, правила абзацев/списков и доменные термины для Qwen | Verified by `scripts/test_text_improvement_runner.sh` |
 | Text improvement formatter guardrail | явные `во-первых/во-вторых` перечисления превращаются в numbered list; частые термины нормализуются | Verified by `scripts/test_text_improvement_runner.sh` |
-| Text improvement real debug regression | `ChaiJPT` нормализуется в `ChatGPT`, `И вот к чему пришли` становится heading с двоеточием, `во-первых/во-вторых/в-третьих` превращаются в numbered list до Qwen prompt | Verified by `scripts/test_text_improvement_runner.sh` and real Qwen local smoke |
+| Text improvement real debug regression | `ChaiJPT`/`ChagPT` нормализуются в `ChatGPT`, `Клод от Anthropic` нормализуется в `Claude от Anthropic`, heading cues становятся heading с двоеточием, ordered markers превращаются в numbered list без лишней точки | Verified by `scripts/test_text_improvement_runner.sh` and real Qwen local smoke |
 | Long text improvement input | input > 6 000 символов не отправляется в Qwen и fallback-ится без silent truncation | Verified by `scripts/test_text_improvement_runner.sh` |
 | Real Qwen short correction | локальная Qwen GGUF исправляет короткий русский текст через `TextImprovementRunner` | Verified locally with Homebrew `llama.cpp` + downloaded GGUF |
 | Real Qwen editor profile smoke | Qwen + profile + formatter нормализуют `ChatGPT`, `Qwen`, `EBITDA`, `DaVinci Resolve` и оформляют `во-первых/во-вторых/в-третьих` как numbered list | Verified locally |
-| Real Qwen 3B correction smoke | локальная Qwen2.5-3B Q4_K_M выбирается runtime и улучшает короткий русский текст через `TextImprovementRunner` | Pending until 3B download finishes in this iteration |
+| Real Qwen 3B correction smoke | локальная Qwen2.5-3B Q4_K_M выбирается runtime и улучшает короткий русский текст через `TextImprovementRunner` | Verified locally after 3B download |
 | Debug session logger opt-in | при включенном `MacDictateDebugSessionLoggingEnabled` создается локальная session folder с metadata, events, audio и staged text artifacts; при выключенном режиме logger no-op | Verified by `scripts/test_debug_session_logger.sh` |
 | Transcription fail | user видит различимую диагностическую ошибку | Compile-level only |
 | Paste fail | отображается локально различимая ошибка вставки | Compile-level only |
