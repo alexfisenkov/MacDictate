@@ -6,7 +6,7 @@
 
 - **Ядро:** нативный Swift + AppKit, сборка через `swiftc`.
 - **Speech-to-text:** `whisper-cli` (Whisper.cpp), запускается как внешний процесс.
-- **Text improvement:** `llama.cpp` (`llama-completion`, fallback search включает `llama-cli`) + `Qwen2.5-1.5B-Instruct-GGUF` Q4_K_M, запускается как второй локальный CLI-процесс.
+- **Text improvement:** `llama.cpp` (`llama-completion`, fallback search включает `llama-cli`) + preferred `Qwen2.5-3B-Instruct-GGUF` Q4_K_M; `Qwen2.5-1.5B-Instruct-GGUF` Q4_K_M остается legacy fallback, запускается как второй локальный CLI-процесс.
 - **Сборка:** `build.sh`, который рекурсивно собирает все `.swift` в `src/`.
 - **Упаковка:** DMG через `create-dmg`.
 
@@ -46,7 +46,7 @@
   - `TextImprovementSettings.swift` — persisted toggle `MacDictateTextImprovementEnabled`.
   - `TextImprovementProfile.swift` — prompt profile для Qwen: editorial rules, list/paragraph formatting rules, terminology packs и speech-normalization hints.
   - `TextImprovementFormatter.swift` — deterministic guardrail для частых терминов и очевидных ordered-list markers; применяется и как pre-formatting перед Qwen, и как post-processing после Qwen.
-  - `TextImprovementRunner.swift` — запуск `llama.cpp` runtime для Qwen, timeout `5` минут, preformatted prompt input, streaming drain `stdout`/`stderr`, controlled termination и fallback-friendly ошибки.
+  - `TextImprovementRunner.swift` — запуск `llama.cpp` runtime для Qwen, timeout `10` минут, context `8_192` tokens, preformatted prompt input, streaming drain `stdout`/`stderr`, controlled termination и fallback-friendly ошибки.
 
 - `docs/8_AI_Corpus_Strategy.md`
   - Канон по будущему обучению/eval второй нейросети: primary corpus строится из real dictation debug-сессий, а рекламные/copywriting датасеты HuggingFace считаются secondary style/eval material, не базовым correction corpus.
@@ -68,7 +68,7 @@
 - Transcription subprocess не должен блокировать app бесконечно: зависший `whisper-cli` завершается после timeout и возвращает runtime diagnostic.
 - `stderr` subprocess читается во время выполнения, чтобы verbose/error-heavy `whisper-cli` не мог заблокироваться на заполненном pipe.
 - Text improvement является optional enhancement, а не блокером базовой диктовки. Если Qwen/`llama.cpp` runtime отсутствует или падает при включенном toggle, app вставляет cleaned Whisper-текст и показывает warning diagnostic.
-- Вторая модель хранится только как `qwen2.5-1.5b-instruct-q4_k_m.gguf`; `.gguf` не участвует в выборе Whisper model.
+- Вторая модель выбирается из typed `.gguf` candidates: preferred `qwen2.5-3b-instruct-q4_k_m.gguf`, затем fallback `qwen2.5-1.5b-instruct-q4_k_m.gguf`; `.gguf` не участвует в выборе Whisper model.
 - Поведение второй модели задается через `TextImprovementProfile.professionalCopyEditor`: она должна исправлять и оформлять текст, но не менять смысл, факты, цифры, имена, бренды и профессиональные термины.
 - До Qwen применяется `TextImprovementFormatter.normalize` как lightweight pre-formatting: он исправляет заранее известные ASR-ошибки терминов (`ChaiJPT` / `Чай и GPT` -> `ChatGPT`) и оформляет очевидные `во-первых/во-вторых` перечисления, чтобы локальная модель не потеряла структуру.
 - После Qwen применяется тот же `TextImprovementFormatter.normalize` как финальный guardrail: он не пересказывает текст, а только нормализует заранее известные терминологические варианты и очевидные ordered-list structures.

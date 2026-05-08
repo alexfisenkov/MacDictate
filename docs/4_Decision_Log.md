@@ -88,3 +88,11 @@
 - **Почему:** задача MacDictate — исправлять диктовку, оформлять абзацы/списки и сохранять смысл. Датасеты рекламной генерации учат модель писать продающий copy и могут усилить нежелательное переписывание, добавление фактов, CTA и маркетингового тона.
 - **Как использовать:** после license review и фильтрации эти датасеты можно применять как вторичный материал для style/eval наборов или отдельных экспериментов, но не смешивать с базовым корректором без контрольных тестов на смысловую сохранность.
 - **Источники:** `https://huggingface.co/datasets/jaykin01/advertisement-copy`, `https://huggingface.co/datasets/smangrul/ad-copy-generation`, `https://huggingface.co/datasets/PeterBrendan/Ads_Creative_Text_Programmatic`, `https://huggingface.co/datasets/RafaM97/marketing_social_media`.
+
+## D-015 — Preferred text-improvement model moves to Qwen2.5-3B with 1.5B fallback
+
+- **Дата:** 2026-05-08
+- **Решение:** для desktop `1.5.0` preferred-моделью второй нейросети становится `Qwen2.5-3B-Instruct-GGUF` quantization `Q4_K_M`, локальный filename `qwen2.5-3b-instruct-q4_k_m.gguf`. Уже внедренная `Qwen2.5-1.5B-Instruct Q4_K_M` остается legacy fallback, если 3B отсутствует или не прошла size validation.
+- **Почему:** реальные debug-сессии показали, что 1.5B часто слишком консервативна для смыслового форматирования диктовки: может не выделить абзацы/списки и не исправить очевидные ASR-искажения терминов. 7B дает больше качества, но пользовательский runtime-сбой после попытки тяжелой модели показал высокий риск для M1/16 GB. 3B — промежуточный вариант: больше capacity, чем 1.5B, но заметно меньше диск/RAM footprint, чем 7B.
+- **Runtime guardrails:** text improvement остается optional enhancement; отсутствие 3B не блокирует диктовку. Timeout увеличен до `10` минут, context до `8_192` tokens, input limit `6_000` символов сохранен.
+- **Источники:** `https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF`, `https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF`.

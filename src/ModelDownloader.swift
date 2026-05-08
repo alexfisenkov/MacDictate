@@ -27,14 +27,14 @@ struct ModelDownloadConfiguration {
 
     static let textImprovement = ModelDownloadConfiguration(
         windowTitle: "Улучшение текста MacDictate",
-        title: "Скачать вторую нейросеть?",
-        description: "MacDictate может локально улучшать текст после Whisper: исправлять пунктуацию, орфографию и разбивать диктовку на абзацы. \n\nМодель Qwen2.5-1.5B-Instruct Q4_K_M занимает около 1.1 GB и работает на вашем Mac.",
-        buttonTitle: "Скачать Qwen",
+        title: "Скачать сбалансированную вторую нейросеть?",
+        description: "MacDictate может локально улучшать текст после Whisper: исправлять пунктуацию, орфографию и лучше разбивать диктовку на смысловые абзацы и списки. \n\nМодель Qwen2.5-3B-Instruct Q4_K_M занимает около 2.1 GB и легче подходит для Mac с 16 GB памяти. Qwen 1.5B остается fallback-моделью.",
+        buttonTitle: "Скачать Qwen 3B",
         statusReady: "Нажмите 'Скачать Qwen' для старта",
-        statusConnecting: "Подключение к HuggingFace для загрузки Qwen...",
+        statusConnecting: "Подключение к HuggingFace для загрузки Qwen 3B...",
         statusFinished: "Модель улучшения текста загружена.",
         destinationFilename: ModelLocator.textImprovementModelFilename,
-        modelURL: URL(string: "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf")!,
+        modelURL: URL(string: "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf")!,
         minimumBytes: ModelLocator.minimumTextImprovementModelBytes
     )
 }

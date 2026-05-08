@@ -27,7 +27,7 @@ By installing, launching, or paying for the License, the User unconditionally ag
 
 ## 5. INTELLECTUAL PROPERTY
 5.1. All rights to the application code, scripts, interface, and the "MacDictate" brand belong to the Licensor.
-5.2. The Whisper neural network used in the application is distributed under the MIT license and belongs to OpenAI. Optional text improvement may use the local Qwen2.5-1.5B-Instruct model (Apache-2.0). Model weights are downloaded locally either automatically or by a user action in the application.
+5.2. The Whisper neural network used in the application is distributed under the MIT license and belongs to OpenAI. Optional text improvement may use a local Qwen2.5-Instruct family model (preferred 3B, fallback 1.5B; the applicable model license terms apply). Model weights are downloaded locally either automatically or by a user action in the application.
 
 ## 6. FINAL PROVISIONS
 6.1. The Licensor reserves the right to make changes to the EULA. New terms come into force from the moment the new version is posted at MacDictate.pro/legal.

@@ -17,6 +17,7 @@
 | License server unavailable | при валидном snapshot включается grace, без snapshot запись блокируется | Compile-level only |
 | Hung / stderr-heavy `whisper-cli` subprocess | зависший процесс завершается timeout diagnostic, temp audio чистится; большой `stderr` не блокирует успешный subprocess | Verified by `scripts/test_whisper_runner_timeout.sh` |
 | Text improvement model missing | toggle/manual action открывает downloader; automatic dictation не ломается без `.gguf` | Compile-level only |
+| Text improvement model selection | preferred 3B `.gguf` выбирается раньше legacy 1.5B; undersized 3B игнорируется; 1.5B остается fallback | Verified by `scripts/test_text_improvement_runner.sh` |
 | Text improvement runtime missing | app показывает `llama.cpp` diagnostic для второй нейросети, базовая диктовка остается доступной | Compile-level only |
 | Hung / stderr-heavy llama.cpp subprocess | зависший процесс завершается timeout diagnostic; большой `stdout`/`stderr` не блокирует runner | Verified by `scripts/test_text_improvement_runner.sh` |
 | Text improvement editor profile | prompt содержит запрет менять смысл, правила абзацев/списков и доменные термины для Qwen | Verified by `scripts/test_text_improvement_runner.sh` |
@@ -25,6 +26,7 @@
 | Long text improvement input | input > 6 000 символов не отправляется в Qwen и fallback-ится без silent truncation | Verified by `scripts/test_text_improvement_runner.sh` |
 | Real Qwen short correction | локальная Qwen GGUF исправляет короткий русский текст через `TextImprovementRunner` | Verified locally with Homebrew `llama.cpp` + downloaded GGUF |
 | Real Qwen editor profile smoke | Qwen + profile + formatter нормализуют `ChatGPT`, `Qwen`, `EBITDA`, `DaVinci Resolve` и оформляют `во-первых/во-вторых/в-третьих` как numbered list | Verified locally |
+| Real Qwen 3B correction smoke | локальная Qwen2.5-3B Q4_K_M выбирается runtime и улучшает короткий русский текст через `TextImprovementRunner` | Pending until 3B download finishes in this iteration |
 | Debug session logger opt-in | при включенном `MacDictateDebugSessionLoggingEnabled` создается локальная session folder с metadata, events, audio и staged text artifacts; при выключенном режиме logger no-op | Verified by `scripts/test_debug_session_logger.sh` |
 | Transcription fail | user видит различимую диагностическую ошибку | Compile-level only |
 | Paste fail | отображается локально различимая ошибка вставки | Compile-level only |

@@ -23,6 +23,7 @@
 | App/AI | Open | P2 | Quality | M | Project | Накопить реальный корпус пар `raw Whisper text -> desired edited text` и на его базе решить, достаточно ли prompt/profile или нужен LoRA/fine-tune. |
 | App/AI | Open | P2 | Quality / Legal | S | Project | Провести license review HuggingFace copywriting datasets перед любым training/eval использованием; `jaykin01/advertisement-copy` сейчас имеет unknown license на HF card. |
 | App | Open | P2 | Runtime | S | Project | Собрать runtime evidence по экстремально длинным диктовкам и решить, нужен ли user-facing progress/cancel flow. |
+| App/AI | Open | P2 | Runtime / UX | S | Project | После тестов Qwen2.5-3B собрать latency/RAM evidence на M1/16 GB и решить, нужен ли user-facing selector между 3B quality mode и 1.5B fast mode. |
 | App/Diagnostics | Open | P2 | Privacy / Supportability | S | Project | Для debug-сессий добавить user-facing управление: открыть папку логов, отключить logging, удалить старые session folders и/или задать retention policy. |
 
 ## Notes
@@ -30,6 +31,6 @@
 - Исторические TODO уровня `1.1` не удалены по смыслу: часть из них реализована, часть перенесена в таблицу выше.
 - Бесконечное ожидание `whisper-cli` закрыто в `release/1.5.0` через bounded 30-минутный timeout. Оставшийся долг — runtime evidence и UX для экстремально длинных диктовок.
 - Cleanup stale `/tmp/mac_dictate_dist.wav` и `.txt` закрыт в `release/1.5.0` через `RecordingService`.
-- Text improvement добавлен как optional enhancement: отсутствие Qwen/`llama.cpp` runtime не блокирует диктовку, длинный input > 6 000 символов fallback-ится к Whisper-тексту, а редакторское поведение управляется `TextImprovementProfile`; runtime distribution, long-text chunking и corpus-based quality tuning остаются отдельными debt items.
+- Text improvement добавлен как optional enhancement: отсутствие Qwen/`llama.cpp` runtime не блокирует диктовку, длинный input > 6 000 символов fallback-ится к Whisper-тексту, preferred-моделью стала Qwen2.5-3B с fallback на 1.5B, а редакторское поведение управляется `TextImprovementProfile`; runtime distribution, long-text chunking, latency/RAM evidence и corpus-based quality tuning остаются отдельными debt items.
 - Debug session logging добавлен как локальный opt-in инструмент диагностики качества. Он сохраняет чувствительные аудио/текстовые artifacts только на устройстве; user-facing управление retention/cleanup остается отдельным debt item.
 - Каждый крупный спринт должен оставлять след здесь, если появились новые незавершенные риски или остаточные компромиссы.

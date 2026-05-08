@@ -12,7 +12,7 @@
 - project operating model, decision log, smoke matrix и release checklist;
 - release governance layer: `docs/7_Release_Governance.md`, `releases/registry.json`, per-version `RELEASE.md`, локальное хранилище artifacts и `scripts/verify_release_governance.sh`;
 - desktop-local `CLAUDE.md` / `AGENTS.md` с правилами работы будущих агентов;
-- optional локальное улучшение текста второй нейросетью: Qwen2.5-1.5B-Instruct Q4_K_M через `llama.cpp` (`llama-completion`), top-level toggle `Улучшить текст` и такой же toggle в настройках;
+- optional локальное улучшение текста второй нейросетью: preferred Qwen2.5-3B-Instruct Q4_K_M через `llama.cpp` (`llama-completion`) с fallback на Qwen2.5-1.5B-Instruct Q4_K_M, top-level toggle `Улучшить текст` и такой же toggle в настройках;
 - editor profile для второй нейросети: строгие правила сохранения смысла, оформление абзацев/списков, доменные терминологические пакеты и подсказки нормализации речи;
 - deterministic formatter guardrail для очевидных речевых перечислений (`во-первых`, `во-вторых`, `в-третьих`) и частых терминов, если Qwen оставляет их неоформленными;
 - opt-in local debug session logging для сравнения `audio.wav`, raw/cleaned Whisper output, Qwen prompt/raw/cleaned/final output и финального текста вставки в `~/.macdictate/debug-sessions/`;
@@ -27,6 +27,8 @@
 - `build.sh` теперь делает strict codesign verification на clean temporary copy через `ditto --noextattr --noqtn`, чтобы проверять подпись без file-provider/FinderInfo xattrs из рабочей папки;
 - model lookup разделен по типам: Whisper остается `.bin`, а текстовая модель хранится как `.gguf`, чтобы вторая нейросеть не могла случайно подменить ASR-модель.
 - Qwen input теперь предварительно проходит deterministic pre-formatting: частые ASR-ошибки терминов и очевидные `во-первых/во-вторых/в-третьих` перечисления нормализуются до отправки во вторую модель.
+- Вторая нейросеть переключена на промежуточную 3B preferred-модель: downloader качает Qwen2.5-3B-Instruct Q4_K_M (~2.1 GB), а runtime автоматически использует уже установленную 1.5B-модель только как fallback.
+- Для 3B-модели сохранены увеличенные лимиты text-improvement runtime: timeout `10` минут и context window `8_192` tokens.
 
 ### Fixed
 - `WhisperRunner` больше не ждет `whisper-cli` бесконечно: transcription subprocess ограничен timeout `30` минут, после чего процесс завершается, temp-файлы чистятся, а пользователь получает различимую диагностическую ошибку.

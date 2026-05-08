@@ -1,8 +1,17 @@
 import Foundation
 
 enum ModelLocator {
-    static let textImprovementModelFilename = "qwen2.5-1.5b-instruct-q4_k_m.gguf"
-    static let minimumTextImprovementModelBytes: Int64 = 1_100_000_000
+    static let preferredTextImprovementModelFilename = "qwen2.5-3b-instruct-q4_k_m.gguf"
+    static let legacyTextImprovementModelFilename = "qwen2.5-1.5b-instruct-q4_k_m.gguf"
+    static let minimumPreferredTextImprovementModelBytes: Int64 = 2_000_000_000
+    static let minimumLegacyTextImprovementModelBytes: Int64 = 1_100_000_000
+    static let textImprovementModelFilename = preferredTextImprovementModelFilename
+    static let minimumTextImprovementModelBytes = minimumPreferredTextImprovementModelBytes
+
+    private static let textImprovementModelCandidates: [(filename: String, minimumBytes: Int64)] = [
+        (preferredTextImprovementModelFilename, minimumPreferredTextImprovementModelBytes),
+        (legacyTextImprovementModelFilename, minimumLegacyTextImprovementModelBytes)
+    ]
 
     static var modelsDirectoryPath: String {
         FileManager.default.homeDirectoryForCurrentUser.path + "/.macdictate/models"
@@ -29,19 +38,26 @@ enum ModelLocator {
     }
 
     static func hasInstalledTextImprovementModel(in directory: String = modelsDirectoryPath) -> Bool {
-        let modelPath = directory + "/" + textImprovementModelFilename
+        bestAvailableTextImprovementModelPath(in: directory) != nil
+    }
+
+    static func isInstalledTextImprovementModel(_ filename: String, minimumBytes: Int64, in directory: String) -> Bool {
+        let modelPath = directory + "/" + filename
         guard FileManager.default.fileExists(atPath: modelPath),
               let size = (try? FileManager.default.attributesOfItem(atPath: modelPath)[.size]) as? Int64 else {
             return false
         }
 
-        return size > minimumTextImprovementModelBytes
+        return size > minimumBytes
     }
 
     static func bestAvailableTextImprovementModelPath(in directory: String = modelsDirectoryPath) -> String? {
-        hasInstalledTextImprovementModel(in: directory)
-            ? directory + "/" + textImprovementModelFilename
-            : nil
+        for candidate in textImprovementModelCandidates
+            where isInstalledTextImprovementModel(candidate.filename, minimumBytes: candidate.minimumBytes, in: directory) {
+            return directory + "/" + candidate.filename
+        }
+
+        return nil
     }
 
     static func bestAvailableModelPath(in directory: String = modelsDirectoryPath) -> String? {

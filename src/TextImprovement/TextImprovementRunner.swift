@@ -62,10 +62,10 @@ struct TextImprovementTrace {
 }
 
 final class TextImprovementRunner {
-    private static let defaultTimeoutSeconds: TimeInterval = 300
+    private static let defaultTimeoutSeconds: TimeInterval = 600
     private static let defaultTerminationGraceSeconds: TimeInterval = 2
     private static let defaultOutputLimitBytes = 131_072
-    private static let contextTokens = 4_096
+    private static let contextTokens = 8_192
     private static let maximumInputCharacters = 6_000
 
     private let timeoutSeconds: TimeInterval

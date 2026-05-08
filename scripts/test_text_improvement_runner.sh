@@ -105,6 +105,27 @@ let successCli = "$SUCCESS_CLI"
 let timeoutCli = "$TIMEOUT_CLI"
 let failCli = "$FAIL_CLI"
 
+func writeSparseFile(_ path: String, size: Int64) {
+    FileManager.default.createFile(atPath: path, contents: Data())
+    guard let handle = FileHandle(forWritingAtPath: path) else {
+        fputs("Unable to open sparse file \\(path)\\n", stderr)
+        exit(1)
+    }
+    try! handle.truncate(atOffset: UInt64(size))
+    try! handle.close()
+}
+
+let modelSelectionDir = "$TMP_DIR/model-selection"
+try! FileManager.default.createDirectory(atPath: modelSelectionDir, withIntermediateDirectories: true)
+let preferredModelPath = modelSelectionDir + "/" + ModelLocator.preferredTextImprovementModelFilename
+let legacyModelPath = modelSelectionDir + "/" + ModelLocator.legacyTextImprovementModelFilename
+writeSparseFile(legacyModelPath, size: ModelLocator.minimumLegacyTextImprovementModelBytes + 1)
+expect(ModelLocator.bestAvailableTextImprovementModelPath(in: modelSelectionDir) == legacyModelPath, "expected legacy 1.5B fallback before preferred model exists")
+writeSparseFile(preferredModelPath, size: ModelLocator.minimumPreferredTextImprovementModelBytes - 1)
+expect(ModelLocator.bestAvailableTextImprovementModelPath(in: modelSelectionDir) == legacyModelPath, "expected undersized preferred model to be ignored")
+writeSparseFile(preferredModelPath, size: ModelLocator.minimumPreferredTextImprovementModelBytes + 1)
+expect(ModelLocator.bestAvailableTextImprovementModelPath(in: modelSelectionDir) == preferredModelPath, "expected 3B model to be preferred when installed")
+
 let successRunner = TextImprovementRunner(
     timeoutSeconds: 5,
     terminationGraceSeconds: 0.2,
