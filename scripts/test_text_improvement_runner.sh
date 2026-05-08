@@ -214,6 +214,14 @@ expect(ordered.contains("2. Проверить финансы."), "expected seco
 expect(ordered.contains("3. Подготовить контент-план."), "expected third numbered item")
 expect(!ordered.contains("во первых"), "ordered output should remove speech marker")
 
+let orderedWithConjunctionMarkers = TextImprovementFormatter.formatObviousOrderedEnumeration(
+    "вот что я хочу сказать первое сегодня речь пойдет о ChatGPT и второе как дела у Gemini и третье Runway превосходит Kling AI"
+)
+expect(orderedWithConjunctionMarkers.contains("1. Сегодня речь пойдет о ChatGPT."), "expected first item without dangling conjunction")
+expect(orderedWithConjunctionMarkers.contains("2. Как дела у Gemini."), "expected second item")
+expect(orderedWithConjunctionMarkers.contains("3. Runway превосходит Kling AI."), "expected third item")
+expect(!orderedWithConjunctionMarkers.contains(" И."), "expected no dangling conjunction before next marker")
+
 let normalizedTerms = TextImprovementFormatter.normalize("ChagPT, чат джпт и давинчи резолв, контент план")
 expect(normalizedTerms == "ChatGPT, ChatGPT и DaVinci Resolve, контент-план", "expected fallback terminology normalization")
 

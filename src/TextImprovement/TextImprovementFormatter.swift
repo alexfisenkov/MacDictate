@@ -101,7 +101,7 @@ enum TextImprovementFormatter {
     private static func orderedMarkerMatches(in text: String) -> [(range: Range<String.Index>, canonicalIndex: Int)] {
         orderedMarkers.flatMap { marker -> [(range: Range<String.Index>, canonicalIndex: Int)] in
             guard let regex = try? NSRegularExpression(
-                pattern: "(?i)(^|[\\s,.;:])((?:ну,?\\s+а\\s+|а\\s+)?\(marker.pattern))(?=[\\s,.;:])",
+                pattern: "(?i)(^|[\\s,.;:])((?:ну,?\\s+а\\s+|а\\s+|и\\s+)?\(marker.pattern))(?=[\\s,.;:])",
                 options: []
             ) else {
                 return []
