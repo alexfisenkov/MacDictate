@@ -8,7 +8,9 @@
 | No `whisper-cli` | diagnostics показывают `whisper-cli Not Found`, transcription не запускается | Compile-level only |
 | No microphone permission | статус/alerts ведут в privacy settings, запись не стартует | Not runtime-verified |
 | No accessibility permission | hotkey blocked, показан accessibility guidance | Not runtime-verified |
+| Stale temp audio/text at startup | `RecordingService` удаляет старые `/tmp/mac_dictate_dist.wav` и `.txt` | Verified by `scripts/test_recording_temp_cleanup.sh` |
 | License `checking` | double Option не стартует запись, false paywall не показывается | Compile-level only |
+| Machine ID command hangs | startup machine ID resolution быстро уходит в generated cached `MD-*` fallback | Verified by `scripts/test_license_machine_id_timeout.sh` |
 | License `active` | запись разрешена при нормальной среде | Not runtime-verified |
 | License `grace` | запись разрешена до bounded deadline | Compile-level only |
 | License `expired` | запись блокируется, доступна ссылка на оплату | Compile-level only |

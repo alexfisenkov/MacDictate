@@ -17,10 +17,10 @@
 | Repo | Open | P1 | Hygiene | S | Project | Провести отдельную cleanup-итерацию по оставшимся root artifact clutter: icon scratch files и helper scripts. DMG/build logs уже расфасованы в release ledger. |
 | App | Open | P2 | Onboarding | L | Project | Уйти от зависимости на Homebrew `whisper-cli` или хотя бы сделать управляемый bundled runtime path. |
 | App | Open | P2 | Runtime | S | Project | Собрать runtime evidence по экстремально длинным диктовкам и решить, нужен ли user-facing progress/cancel flow. |
-| App | Open | P2 | Diagnostics | S | Project | Добавить cleanup `/tmp/mac_dictate*` при старте после аварийных сценариев. |
 
 ## Notes
 
 - Исторические TODO уровня `1.1` не удалены по смыслу: часть из них реализована, часть перенесена в таблицу выше.
 - Бесконечное ожидание `whisper-cli` закрыто в `release/1.5.0` через bounded 30-минутный timeout. Оставшийся долг — runtime evidence и UX для экстремально длинных диктовок.
+- Cleanup stale `/tmp/mac_dictate_dist.wav` и `.txt` закрыт в `release/1.5.0` через `RecordingService`.
 - Каждый крупный спринт должен оставлять след здесь, если появились новые незавершенные риски или остаточные компромиссы.

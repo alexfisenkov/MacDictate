@@ -16,8 +16,11 @@ final class RecordingService {
     private let tempWavPath: String
     private var audioRecorder: AVAudioRecorder?
 
-    init(tempWavPath: String = "/tmp/mac_dictate_dist.wav") {
+    init(tempWavPath: String = "/tmp/mac_dictate_dist.wav", cleanupStaleFilesOnInit: Bool = true) {
         self.tempWavPath = tempWavPath
+        if cleanupStaleFilesOnInit {
+            cleanupTemporaryFiles()
+        }
     }
 
     var isRecording: Bool {
@@ -29,6 +32,8 @@ final class RecordingService {
     }
 
     func start() -> Result<Void, RecordingFailure> {
+        cleanupTemporaryFiles()
+
         let audioFilename = URL(fileURLWithPath: tempWavPath)
         let settings: [String: Any] = [
             AVFormatIDKey: kAudioFormatLinearPCM,
@@ -57,5 +62,10 @@ final class RecordingService {
     func stop() {
         audioRecorder?.stop()
         audioRecorder = nil
+    }
+
+    func cleanupTemporaryFiles() {
+        try? FileManager.default.removeItem(atPath: tempWavPath)
+        try? FileManager.default.removeItem(atPath: tempWavPath + ".txt")
     }
 }

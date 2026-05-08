@@ -45,3 +45,19 @@ GitHub Actions gate:
 ```bash
 scripts/test_whisper_runner_timeout.sh
 ```
+
+## `test_license_machine_id_timeout.sh`
+
+Компилирует `LicenseService` с fake `ioreg` и проверяет parsing/cache machine ID, а также быстрый generated fallback при зависшем command.
+
+```bash
+scripts/test_license_machine_id_timeout.sh
+```
+
+## `test_recording_temp_cleanup.sh`
+
+Компилирует `RecordingService` и проверяет cleanup stale temp WAV/TXT.
+
+```bash
+scripts/test_recording_temp_cleanup.sh
+```

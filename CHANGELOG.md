@@ -12,7 +12,7 @@
 - project operating model, decision log, smoke matrix и release checklist;
 - release governance layer: `docs/7_Release_Governance.md`, `releases/registry.json`, per-version `RELEASE.md`, локальное хранилище artifacts и `scripts/verify_release_governance.sh`;
 - desktop-local `CLAUDE.md` / `AGENTS.md` с правилами работы будущих агентов;
-- targeted timeout harness `scripts/test_whisper_runner_timeout.sh` для зависшего или stderr-heavy `whisper-cli`.
+- targeted runtime harnesses для зависшего/stderr-heavy `whisper-cli`, machine ID timeout и cleanup stale temp audio.
 
 ### Changed
 - `AppController.swift` превращен в composition root / coordinator, а ключевая логика вынесена в отдельные сервисы;
@@ -24,6 +24,8 @@
 ### Fixed
 - `WhisperRunner` больше не ждет `whisper-cli` бесконечно: transcription subprocess ограничен timeout `30` минут, после чего процесс завершается, temp-файлы чистятся, а пользователь получает различимую диагностическую ошибку.
 - `WhisperRunner` теперь читает `stderr` во время работы subprocess, чтобы шумный `whisper-cli` не блокировался на заполненном pipe.
+- `LicenseService` больше не может подвиснуть на первом `ioreg` при получении machine ID: command ограничен timeout и fallback-кешированием generated ID.
+- `RecordingService` чистит stale `/tmp/mac_dictate_dist.wav` и `.txt` при старте сервиса и перед новой записью.
 
 ### Notes
 - `v1.2` и `v1.3` помечены как reconstructed history: GitHub Releases существуют, но локальные tags отсутствуют, а remote tags указывают на commit `v1.4`.

@@ -26,7 +26,7 @@
   - `LicenseState.swift` — state model (`checking`, `active`, `grace`, `expired`, `serverUnavailable`).
   - `LicenseSnapshot.swift` — кэшируемый snapshot и network response model.
   - `LicenseCache.swift` — bounded offline grace cache.
-  - `LicenseService.swift` — machine ID, `/api/license/status`, refresh loop, state transitions.
+  - `LicenseService.swift` — machine ID с bounded `ioreg` timeout, `/api/license/status`, refresh loop, state transitions.
 
 - `src/Diagnostics/*`
   - `DiagnosticStatus.swift` — типы diagnostic/event state.
@@ -37,7 +37,7 @@
 
 - `src/Transcription/*`
   - `ModelLocator.swift` — поиск и выбор модели.
-  - `RecordingService.swift` — запись WAV.
+  - `RecordingService.swift` — cleanup stale temp audio и запись WAV.
   - `WhisperRunner.swift` — запуск `whisper-cli`, timeout `30` минут, streaming drain `stderr`, controlled termination, cleanup temp files, различимые ошибки.
 
 - `src/Paste/*`
@@ -53,6 +53,7 @@
 - Горячая клавиша не меняется: double `Option` старт, `Option` во время записи стоп.
 - Backend contract не меняется: app продолжает читать `GET /api/license/status`.
 - Offline grace ограничен и больше не является бесконечным fail-open.
+- Machine ID resolution не должен блокировать startup бесконечно: `/usr/sbin/ioreg` ограничен коротким timeout, fallback генерирует и кеширует `MD-*`.
 - Transcription subprocess не должен блокировать app бесконечно: зависший `whisper-cli` завершается после timeout и возвращает runtime diagnostic.
 - `stderr` subprocess читается во время выполнения, чтобы verbose/error-heavy `whisper-cli` не мог заблокироваться на заполненном pipe.
 
@@ -63,3 +64,5 @@
 ## Local Verification Notes
 
 - `scripts/test_whisper_runner_timeout.sh` компилирует `WhisperRunner` с fake `whisper-cli` и проверяет timeout recovery, cleanup temp audio и large-stderr subprocess path.
+- `scripts/test_license_machine_id_timeout.sh` проверяет parsing/cache machine ID и fallback при зависшем fake `ioreg`.
+- `scripts/test_recording_temp_cleanup.sh` проверяет cleanup stale temp WAV/TXT.

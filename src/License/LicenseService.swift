@@ -1,6 +1,10 @@
 import Foundation
+import Darwin
 
 final class LicenseService {
+    private static let machineIDCommandTimeout: TimeInterval = 2
+    private static let machineIDCommandTerminationGrace: TimeInterval = 0.5
+
     private let userDefaults: UserDefaults
     private let cache: LicenseCache
     private let statusURLString: String
@@ -186,36 +190,84 @@ final class LicenseService {
         return formatter.date(from: value)
     }
 
-    private static func resolveMachineID(userDefaults: UserDefaults, machineIDKey: String) -> String {
+    static func resolveMachineID(
+        userDefaults: UserDefaults,
+        machineIDKey: String,
+        ioregPath: String = "/usr/sbin/ioreg",
+        timeoutSeconds: TimeInterval = machineIDCommandTimeout
+    ) -> String {
         if let saved = userDefaults.string(forKey: machineIDKey) {
             return saved
         }
 
-        let task = Process()
-        task.launchPath = "/usr/sbin/ioreg"
-        task.arguments = ["-rd1", "-c", "IOPlatformExpertDevice"]
+        let output = runMachineIDCommand(ioregPath: ioregPath, timeoutSeconds: timeoutSeconds)
+        let uniqueID = parseMachineID(from: output) ?? "MD-\(UUID().uuidString.prefix(8))"
 
+        userDefaults.set(uniqueID, forKey: machineIDKey)
+        return uniqueID
+    }
+
+    private static func runMachineIDCommand(ioregPath: String, timeoutSeconds: TimeInterval) -> String {
+        let task = Process()
         let pipe = Pipe()
+        let terminationSemaphore = DispatchSemaphore(value: 0)
+
+        task.launchPath = ioregPath
+        task.arguments = ["-rd1", "-c", "IOPlatformExpertDevice"]
         task.standardOutput = pipe
-        try? task.run()
+        task.standardError = FileHandle.nullDevice
+        task.terminationHandler = { _ in
+            terminationSemaphore.signal()
+        }
+
+        do {
+            try task.run()
+        } catch {
+            task.terminationHandler = nil
+            return ""
+        }
+
+        if terminationSemaphore.wait(timeout: dispatchDeadline(after: timeoutSeconds)) == .timedOut {
+            stopTimedOutProcess(task, terminationSemaphore: terminationSemaphore)
+            task.terminationHandler = nil
+            return ""
+        }
+
+        task.terminationHandler = nil
 
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8) ?? ""
+        return String(data: data, encoding: .utf8) ?? ""
+    }
 
-        var uniqueID = "MD-UNKNOWN"
+    private static func parseMachineID(from output: String) -> String? {
         if let uuidRange = output.range(of: "\"IOPlatformUUID\" = \"") {
             let substring = output[uuidRange.upperBound...]
             if let endQuote = substring.range(of: "\"") {
                 let hardwareUUID = String(substring[..<endQuote.lowerBound])
-                uniqueID = "MD-" + hardwareUUID.prefix(8)
+                return "MD-" + hardwareUUID.prefix(8)
             }
         }
 
-        if uniqueID == "MD-UNKNOWN" {
-            uniqueID = "MD-\(UUID().uuidString.prefix(8))"
+        return nil
+    }
+
+    private static func stopTimedOutProcess(_ task: Process, terminationSemaphore: DispatchSemaphore) {
+        if task.isRunning {
+            task.terminate()
         }
 
-        userDefaults.set(uniqueID, forKey: machineIDKey)
-        return uniqueID
+        if terminationSemaphore.wait(timeout: dispatchDeadline(after: machineIDCommandTerminationGrace)) == .success {
+            return
+        }
+
+        if task.isRunning {
+            kill(task.processIdentifier, SIGKILL)
+            _ = terminationSemaphore.wait(timeout: dispatchDeadline(after: 1))
+        }
+    }
+
+    private static func dispatchDeadline(after seconds: TimeInterval) -> DispatchTime {
+        let milliseconds = max(0, Int(seconds * 1000))
+        return .now() + .milliseconds(milliseconds)
     }
 }

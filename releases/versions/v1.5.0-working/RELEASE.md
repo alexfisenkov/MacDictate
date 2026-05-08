@@ -16,6 +16,7 @@
 
 - Release ledger/govеrnance введен как обязательный pre-release контур, но `v1.5.0-working` не имеет release asset.
 - `WhisperRunner` получил bounded 30-минутный timeout для зависшего `whisper-cli` и streaming drain `stderr`; сценарии покрыты локальным harness `scripts/test_whisper_runner_timeout.sh`.
+- `LicenseService` получил bounded machine ID command timeout, а `RecordingService` чистит stale temp audio; сценарии покрыты локальными harness scripts.
 - Локальные DMG/build logs остаются ignored artifacts; clean checkout проверка governance допускает их отсутствие, строгая локальная проверка доступна через `scripts/verify_release_governance.sh --strict-local-artifacts`.
 
 ## Release Rule

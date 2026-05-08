@@ -17,6 +17,9 @@
 - Закрыт главный runtime blocker по зависшему `whisper-cli`: `WhisperRunner` получил timeout `30` минут, controlled termination и диагностическую ошибку `timedOut`.
 - `WhisperRunner` теперь читает `stderr` во время работы subprocess, чтобы stderr-heavy `whisper-cli` не зависал на заполненном pipe.
 - Добавлен локальный verification script `scripts/test_whisper_runner_timeout.sh`, который проверяет recovery при зависшем fake `whisper-cli`, cleanup temp audio и успешный проход процесса с большим `stderr`.
+- `LicenseService.resolveMachineID` получил bounded timeout вокруг `/usr/sbin/ioreg`; при сбое или зависании генерируется и кешируется fallback `MD-*`.
+- `RecordingService` теперь чистит stale `/tmp/mac_dictate_dist.wav` и `.txt` при инициализации и перед новой записью.
+- Добавлены targeted harness scripts `scripts/test_license_machine_id_timeout.sh` и `scripts/test_recording_temp_cleanup.sh`.
 
 ## 2026-04-19 — Sprint 1: backend / checkout / product surface hardening
 
