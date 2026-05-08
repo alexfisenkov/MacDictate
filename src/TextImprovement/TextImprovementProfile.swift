@@ -36,6 +36,7 @@ struct TextImprovementProfile {
                 terms: [
                     "AI", "ML", "LLM", "ASR", "NLP", "OCR", "RAG", "LoRA", "fine-tuning", "inference", "embedding", "tokenizer", "transformer", "diffusion model", "vector database",
                     "OpenAI", "ChatGPT", "GPT-4o", "Claude", "Gemini", "Grok", "Qwen", "Qwen2.5", "Llama", "Mistral", "DeepSeek", "Whisper", "WhisperKit",
+                    "Syntx AI",
                     "Hugging Face", "PyTorch", "TensorFlow", "ONNX", "Core ML", "MLX", "Metal", "CUDA", "MPS", "GGUF", "llama.cpp", "whisper.cpp",
                     "Stable Diffusion", "Midjourney", "Runway", "Pika", "Sora", "ComfyUI", "ControlNet"
                 ]
@@ -87,6 +88,7 @@ struct TextImprovementProfile {
             "ChagPT / Chag GPT / ChagJPT -> ChatGPT",
             "ChaiJPT -> ChatGPT; Chai GPT / Чай и GPT / чай джипити -> ChatGPT",
             "Клод от Anthropic / Cloud от Anthropic / Cloud Anthropic -> Claude от Anthropic / Claude Anthropic",
+            "Syntax AI / SyntaxAI / Синтакс AI / синтакс ай -> Syntx AI",
             "опен эй ай / опенэйай -> OpenAI",
             "кьювен / qwen -> Qwen",
             "лама / лама си пи пи -> Llama / llama.cpp по контексту",

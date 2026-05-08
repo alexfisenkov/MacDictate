@@ -193,6 +193,8 @@ expect(profilePrompt.contains("чат джпт -> ChatGPT"), "expected direct Ch
 expect(profilePrompt.contains("ChagPT / Chag GPT / ChagJPT -> ChatGPT"), "expected direct ChagPT speech mapping")
 expect(profilePrompt.contains("ChaiJPT -> ChatGPT"), "expected direct ChaiJPT speech mapping")
 expect(profilePrompt.contains("Клод от Anthropic / Cloud от Anthropic / Cloud Anthropic -> Claude от Anthropic / Claude Anthropic"), "expected direct Claude speech mapping")
+expect(profilePrompt.contains("Syntx AI"), "expected Syntx AI terminology")
+expect(profilePrompt.contains("Syntax AI / SyntaxAI / Синтакс AI / синтакс ай -> Syntx AI"), "expected direct Syntx AI speech mapping")
 expect(!profilePrompt.contains("Вход:"), "runtime prompt should avoid example input labels")
 expect(!profilePrompt.contains("Выход:"), "runtime prompt should avoid example output labels")
 expect(profilePrompt.contains("Не заменяй разговорные слова автора"), "expected conservative wording rule")
@@ -217,6 +219,9 @@ expect(normalizedTerms == "ChatGPT, ChatGPT и DaVinci Resolve, контент-�
 
 let normalizedClaudeTerms = TextImprovementFormatter.normalize("Cloud от Anthropic и Клод от Anthropic")
 expect(normalizedClaudeTerms == "Claude от Anthropic и Claude от Anthropic", "expected fallback Claude terminology normalization")
+
+let normalizedSyntxTerms = TextImprovementFormatter.normalize("Syntax AI, SyntaxAI и синтакс ай")
+expect(normalizedSyntxTerms == "Syntx AI, Syntx AI и Syntx AI", "expected fallback Syntx AI terminology normalization")
 
 let realDebugSessionOutput = TextImprovementFormatter.normalize(
     "Мы недавно собирались с ChaiJPT и Gemini от Google. Вот что мы достигли. Во-первых, мы создали специальный сценарий. Во-вторых, мы создали специальную штуку, которая обрабатывает этот сценарий. Ну, а в-третьих, мы выделили несколько файлов-факторов, которые это все закрывают."

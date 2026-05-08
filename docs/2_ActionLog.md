@@ -43,6 +43,7 @@
 - По real debug-сессии `20260508-233428-E329E82F` найдено, что 3B/Qwen исправляет `ChagPT` только в части контекста. Deterministic formatter расширен вариантами `ChagPT`/`Chag GPT`/`ChagJPT` -> `ChatGPT`, `Клод от Anthropic` -> `Claude от Anthropic`, а list marker cleanup теперь убирает лишнюю точку после `Первое.` / `Второе.`.
 - По real debug-сессии `20260508-234719-983488DD` найдено, что Qwen копирует prompt example labels `Вход` / `Выход` в результат и добавляет декоративный Markdown вокруг названий. Runtime-prompt больше не включает examples block; `TextImprovementRunner.cleanModelOutput` вырезает leaked output scaffold, а plain-text input дополнительно снимает `**bold**` / `__bold__` / inline-code markdown из model output.
 - По новым контрольным debug-сессиям `20260508-235809-076A3FCC` и `20260508-235835-D04967B7` подтверждено, что Qwen 3B выбирается и paste проходит. В `20260508-235835-D04967B7` найден остаточный model boilerplate `Вот исправленный и отформатированный текст:` и `---`; cleaner расширен removal rules для таких preamble/horizontal-rule lines.
+- По пользовательскому уточнению добавлено каноническое написание `Syntx AI`: варианты `Syntax AI` / `SyntaxAI` / `Синтакс AI` / `синтакс ай` нормализуются deterministic formatter и попали в prompt hints.
 
 ## 2026-04-19 — Sprint 1: backend / checkout / product surface hardening
 
