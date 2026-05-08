@@ -31,7 +31,12 @@
 - Добавлен `TextImprovementProfile.professionalCopyEditor`: редакторские правила, запрет на изменение смысла, правила списков/абзацев, терминологические пакеты и speech-normalization hints для Qwen prompt.
 - Добавлен `TextImprovementFormatter` как post-Qwen guardrail для очевидных ordered-list markers и частых терминов; real Qwen smoke подтвердил `ChatGPT`, `Qwen`, `EBITDA`, `DaVinci Resolve` и numbered list output.
 - `build.sh` дополнительно чистит xattrs на root `.app` bundle, проверяет подпись через `codesign --verify --deep`, готовит DMG staging-копию через `ditto --noextattr --noqtn` и запускает `hdiutil verify` для образа; отдельный release debt зафиксирован для strict verification смонтированной/установленной DMG-копии вместе с Developer ID/notarization.
+- После повторной проверки `build.sh` усилен до strict codesign verification на clean temporary copy через `ditto --noextattr --noqtn`; это отделяет реальную подпись bundle от file-provider/FinderInfo xattrs, которые может возвращать локальная папка `Documents`.
 - Проведен реальный local smoke на M1: `llama.cpp` установлен через Homebrew, Qwen GGUF скачан полностью (`1,117,320,736` bytes), `TextImprovementRunner` исправил короткий русский текст через локальную модель.
+- Добавлен opt-in `DebugSessionLogger`: при включенном `MacDictateDebugSessionLoggingEnabled` каждая диктовка сохраняет локальную папку в `~/.macdictate/debug-sessions/` с аудио, raw/cleaned Whisper text, Qwen prompt/raw/cleaned/final output, финальным текстом вставки и `events.jsonl`.
+- `TextImprovementRunner` получил trace API `improveWithTrace(_:)`, чтобы debug-сессия фиксировала не только итог Qwen, но и prompt, raw model output, cleaned output, formatter output и runtime/model arguments.
+- Добавлен targeted harness `scripts/test_debug_session_logger.sh`; `scripts/test_text_improvement_runner.sh` расширен проверкой trace API.
+- Зафиксирована AI corpus strategy: основной будущий training/eval corpus должен идти из утвержденных real dictation debug-сессий, а HuggingFace copywriting datasets остаются secondary style/eval material до license review и контрольных тестов на сохранение смысла.
 
 ## 2026-04-19 — Sprint 1: backend / checkout / product surface hardening
 

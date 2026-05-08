@@ -15,7 +15,8 @@
 - optional локальное улучшение текста второй нейросетью: Qwen2.5-1.5B-Instruct Q4_K_M через `llama.cpp` (`llama-completion`), top-level toggle `Улучшить текст` и такой же toggle в настройках;
 - editor profile для второй нейросети: строгие правила сохранения смысла, оформление абзацев/списков, доменные терминологические пакеты и подсказки нормализации речи;
 - deterministic formatter guardrail для очевидных речевых перечислений (`во-первых`, `во-вторых`, `в-третьих`) и частых терминов, если Qwen оставляет их неоформленными;
-- targeted runtime harnesses для зависшего/stderr-heavy `whisper-cli`, machine ID timeout, cleanup stale temp audio и `TextImprovementRunner`.
+- opt-in local debug session logging для сравнения `audio.wav`, raw/cleaned Whisper output, Qwen prompt/raw/cleaned/final output и финального текста вставки в `~/.macdictate/debug-sessions/`;
+- targeted runtime harnesses для зависшего/stderr-heavy `whisper-cli`, machine ID timeout, cleanup stale temp audio, `TextImprovementRunner` и `DebugSessionLogger`.
 
 ### Changed
 - `AppController.swift` превращен в composition root / coordinator, а ключевая логика вынесена в отдельные сервисы;
@@ -23,6 +24,7 @@
 - сборка `swiftc` теперь подхватывает все `.swift` файлы в `src/` рекурсивно;
 - исторические DMG/build logs разложены из корня проекта в `releases/versions/*/artifacts/` и `releases/archive/*/artifacts/`;
 - `build.sh` теперь кладет обычный DMG output в `build/artifacts/`, не запускает Homebrew install, если `create-dmg` уже доступен, очищает macOS metadata, проверяет подпись `.app` и готовит DMG staging-копию через `ditto` без xattrs;
+- `build.sh` теперь делает strict codesign verification на clean temporary copy через `ditto --noextattr --noqtn`, чтобы проверять подпись без file-provider/FinderInfo xattrs из рабочей папки;
 - model lookup разделен по типам: Whisper остается `.bin`, а текстовая модель хранится как `.gguf`, чтобы вторая нейросеть не могла случайно подменить ASR-модель.
 
 ### Fixed

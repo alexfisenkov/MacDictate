@@ -60,6 +60,7 @@ sign_and_verify_app() {
         if output="$(codesign --force --deep --sign - "$target" 2>&1)"; then
             clean_bundle_metadata "$target"
             if codesign --verify --deep --verbose=2 "$target" >/dev/null 2>&1; then
+                clean_bundle_metadata "$target"
                 return 0
             fi
             output="$(codesign --verify --deep --verbose=2 "$target" 2>&1)" || true
@@ -73,6 +74,17 @@ sign_and_verify_app() {
 
     printf '%s\n' "$output" >&2
     return 1
+}
+
+verify_strict_app_copy() {
+    local target="$1"
+    local tmp_dir
+    tmp_dir="$(mktemp -d)"
+
+    ditto --noextattr --noqtn "$target" "$tmp_dir/$APP_NAME"
+    clean_bundle_metadata "$tmp_dir/$APP_NAME"
+    codesign --verify --deep --strict --verbose=2 "$tmp_dir/$APP_NAME" >/dev/null
+    rm -rf "$tmp_dir"
 }
 
 sign_and_verify_app "$APP_DIR"
@@ -114,6 +126,8 @@ create-dmg \
 sign_and_verify_app "$APP_DIR"
 sign_and_verify_app "$DMG_SRC_DIR/$APP_NAME"
 hdiutil verify "$DMG_PATH" >/dev/null
+verify_strict_app_copy "$APP_DIR"
+verify_strict_app_copy "$DMG_SRC_DIR/$APP_NAME"
 
 echo "✅ ГОТОВО! Ваш нативный профессиональный дистрибутив (с иконками): $DMG_PATH"
 echo "ℹ️  Для release перенесите DMG/build log в releases/versions/<version>/artifacts/ и обновите registry."

@@ -32,6 +32,7 @@
 - `src/Diagnostics/*`
   - `DiagnosticStatus.swift` — типы diagnostic/event state.
   - `EnvironmentDiagnostics.swift` — проверки accessibility, microphone, model и `whisper-cli`.
+  - `DebugSessionLogger.swift` — opt-in local trace recorder для debug-сессий диктовки: копирует `audio.wav`, сохраняет raw/cleaned Whisper output, Qwen prompt/raw/cleaned/final output, финальный текст и `events.jsonl` в `~/.macdictate/debug-sessions/`.
 
 - `src/Hotkeys/*`
   - `HotkeyMonitor.swift` — double `Option` start и single `Option` stop.
@@ -46,6 +47,9 @@
   - `TextImprovementProfile.swift` — prompt profile для Qwen: editorial rules, list/paragraph formatting rules, terminology packs и speech-normalization hints.
   - `TextImprovementFormatter.swift` — узкий deterministic post-processor для очевидных ordered-list markers и частых терминов, когда Qwen оставляет их в сыром виде.
   - `TextImprovementRunner.swift` — запуск `llama.cpp` runtime для Qwen, timeout `5` минут, streaming drain `stdout`/`stderr`, controlled termination и fallback-friendly ошибки.
+
+- `docs/8_AI_Corpus_Strategy.md`
+  - Канон по будущему обучению/eval второй нейросети: primary corpus строится из real dictation debug-сессий, а рекламные/copywriting датасеты HuggingFace считаются secondary style/eval material, не базовым correction corpus.
 
 - `src/Paste/*`
   - `PasteService.swift` — pasteboard write / restore и simulated `Cmd+V`.
@@ -69,6 +73,7 @@
 - После Qwen применяется `TextImprovementFormatter.normalize` как guardrail: он не пересказывает текст, а только нормализует заранее известные терминологические варианты и очевидные `во-первых/во-вторых` перечисления.
 - Для защиты от silent truncation Qwen-улучшение ограничено короткими/средними фрагментами: input больше `6_000` символов fallback-ится к исходному cleaned Whisper text.
 - Команда `Улучшить текст` в главном меню является toggle режима второй нейросети: когда галочка включена, cleaned Whisper text перед вставкой проходит через `TextImprovementRunner`; когда выключена, вставляется исходный cleaned Whisper text.
+- Debug session logging является только локальным opt-in диагностическим режимом (`MacDictateDebugSessionLoggingEnabled`). Он не должен менять результат диктовки и не должен отправлять аудио, текст, prompt или model output на сервер.
 
 ## Build note
 
@@ -80,3 +85,4 @@
 - `scripts/test_license_machine_id_timeout.sh` проверяет parsing/cache machine ID и fallback при зависшем fake `ioreg`.
 - `scripts/test_recording_temp_cleanup.sh` проверяет cleanup stale temp WAV/TXT.
 - `scripts/test_text_improvement_runner.sh` компилирует `TextImprovementRunner` с fake llama.cpp executable и проверяет profile prompt content, formatter guardrails, success cleanup, timeout recovery, missing runtime/model, safe input limit и non-zero stderr diagnostics.
+- `scripts/test_debug_session_logger.sh` компилирует `DebugSessionLogger` и проверяет opt-in создание session folder, `metadata.json`, `events.jsonl`, `audio.wav`, staged text artifacts и disabled-mode no-op.

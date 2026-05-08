@@ -8,6 +8,7 @@ final class AppController: NSObject {
     private lazy var diagnostics = EnvironmentDiagnostics(whisperRunner: whisperRunner)
     private let recordingService = RecordingService()
     private let pasteService = PasteService()
+    private let debugSessionLogger = DebugSessionLogger()
 
     private var statusItem: NSStatusItem!
     private var menuComponents: AppMenuComponents!
@@ -16,6 +17,7 @@ final class AppController: NSObject {
     private var wakeObserver: NSObjectProtocol?
     private var textImprovementWindowController: NSWindowController?
     private var activeTextImprovementDownloader: ModelDownloader?
+    private var activeDebugSession: DebugSession?
 
     private var runtimeDiagnostic: RuntimeDiagnostic?
     private var isProcessing = false
@@ -285,6 +287,12 @@ final class AppController: NSObject {
     private func startRecording() {
         switch recordingService.start() {
         case .success:
+            activeDebugSession = debugSessionLogger.startSession(context: DebugSessionContext(
+                appVersion: appVersionString(),
+                textImprovementEnabled: TextImprovementSettings.isEnabled(),
+                machineID: licenseService.machineID
+            ))
+            activeDebugSession?.record("recording_started")
             recordDiagnostic(nil)
             setStatus("Listening...", icon: "🔴")
             NSSound(named: "Blow")?.play()
@@ -304,21 +312,34 @@ final class AppController: NSObject {
         NSSound(named: "Pop")?.play()
 
         let audioPath = recordingService.recordingPath
+        let debugSession = activeDebugSession
+        activeDebugSession = nil
+        debugSession?.record("recording_stopped")
+        debugSession?.copyAudio(from: audioPath)
+
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self else { return }
 
+            debugSession?.record("whisper_started")
             let transcription = self.whisperRunner.transcribe(audioPath: audioPath)
             let textResult: Result<(text: String, warning: String?), TranscriptionFailure>
 
             switch transcription {
             case .success(let text):
+                debugSession?.record("whisper_finished", details: ["rawCharacters": String(text.count)])
+                debugSession?.writeTextFile("01_whisper_raw.txt", text)
                 let cleaned = self.whisperRunner.cleanOutput(text)
+                debugSession?.writeTextFile("02_whisper_cleaned.txt", cleaned)
                 if cleaned.isEmpty {
+                    debugSession?.record("whisper_cleaned_empty")
                     textResult = .success((text: "", warning: nil))
                 } else {
-                    textResult = .success(self.improveTextForAutomaticPipeline(cleaned))
+                    textResult = .success(self.improveTextForAutomaticPipeline(cleaned, debugSession: debugSession))
                 }
             case .failure(let error):
+                debugSession?.record("whisper_failed", details: ["error": error.localizedDescription])
+                debugSession?.writeTextFile("errors.txt", "Whisper: \(error.localizedDescription)\n")
+                debugSession?.finish(finalText: "", warning: error.localizedDescription)
                 textResult = .failure(error)
             }
 
@@ -328,16 +349,21 @@ final class AppController: NSObject {
                 switch textResult {
                 case .success(let result):
                     if result.text.isEmpty {
+                        debugSession?.finish(finalText: "", warning: result.warning)
                         self.recordDiagnostic(nil)
                     } else {
                         switch self.pasteService.paste(result.text) {
                         case .success:
+                            debugSession?.record("paste_succeeded")
+                            debugSession?.finish(finalText: result.text, warning: result.warning)
                             if let warning = result.warning {
                                 self.recordDiagnostic(warning, severity: .warning)
                             } else {
                                 self.recordDiagnostic(nil)
                             }
                         case .failure(let error):
+                            debugSession?.record("paste_failed", details: ["error": error.localizedDescription])
+                            debugSession?.finish(finalText: result.text, warning: error.localizedDescription)
                             self.recordDiagnostic(error.localizedDescription, severity: .error)
                         }
                     }
@@ -351,8 +377,9 @@ final class AppController: NSObject {
         }
     }
 
-    private func improveTextForAutomaticPipeline(_ text: String) -> (text: String, warning: String?) {
+    private func improveTextForAutomaticPipeline(_ text: String, debugSession: DebugSession?) -> (text: String, warning: String?) {
         guard TextImprovementSettings.isEnabled() else {
+            debugSession?.record("qwen_skipped", details: ["reason": "text improvement disabled"])
             return (text, nil)
         }
 
@@ -360,12 +387,37 @@ final class AppController: NSObject {
             self.setStatus("Improving text...", icon: "✨")
         }
 
-        switch textImprovementRunner.improve(text) {
-        case .success(let improved):
-            return (improved, nil)
+        debugSession?.writeTextFile("03_qwen_input.txt", text)
+        debugSession?.record("qwen_started", details: ["inputCharacters": String(text.count)])
+
+        switch textImprovementRunner.improveWithTrace(text) {
+        case .success(let output):
+            debugSession?.record("qwen_finished", details: [
+                "inputCharacters": String(output.trace.input.count),
+                "rawCharacters": String(output.trace.rawOutput.count),
+                "cleanedCharacters": String(output.trace.cleanedOutput.count),
+                "finalCharacters": String(output.trace.finalOutput.count),
+                "modelPath": output.trace.modelPath,
+                "runtimePath": output.trace.runtimePath
+            ])
+            debugSession?.writeTextFile("04_qwen_prompt.txt", output.trace.prompt)
+            debugSession?.writeTextFile("05_qwen_raw_output.txt", output.trace.rawOutput)
+            debugSession?.writeTextFile("06_qwen_cleaned_output.txt", output.trace.cleanedOutput)
+            debugSession?.writeTextFile("06b_qwen_final_after_formatter.txt", output.trace.finalOutput)
+            debugSession?.writeTextFile("qwen_arguments.txt", output.trace.arguments.joined(separator: "\n"))
+            return (output.text, nil)
         case .failure(let error):
+            debugSession?.record("qwen_failed", details: ["error": error.localizedDescription])
+            debugSession?.writeTextFile("errors.txt", "Qwen: \(error.localizedDescription)\n")
             return (text, error.localizedDescription)
         }
+    }
+
+    private func appVersionString() -> String {
+        let info = Bundle.main.infoDictionary
+        let shortVersion = info?["CFBundleShortVersionString"] as? String ?? "unknown"
+        let build = info?["CFBundleVersion"] as? String ?? "unknown"
+        return "\(shortVersion) (\(build))"
     }
 
     private func recordDiagnostic(_ message: String?, severity: DiagnosticSeverity = .warning) {

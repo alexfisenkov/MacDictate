@@ -7,6 +7,8 @@ This Policy regulates the collection, use, and protection of personal and techni
 **1.1. Local Speech and Text Processing:** The main principle of MacDictate is ABSOLUTE PRIVACY. The application uses the offline neural network OpenAI Whisper for speech recognition and may use a local Qwen model for improving recognized text.
 Your voice, audio recordings, background noise, transcribed text, and text passed to the improvement feature are processed EXCLUSIVELY on your device's processor (locally on macOS). **Not a single byte of dictation audio or text is sent to our servers or third-party servers.**
 
+**1.2. Local Diagnostic Logs:** During testing, the user or support may explicitly enable a local debug mode. In this mode, the application stores diagnostic dictation files on the device: a copy of the audio, Whisper output, the prompt and outputs of the local Qwen model, the final inserted text, and service events. These files are stored locally in `~/.macdictate/debug-sessions/`, are not sent to any server, and may contain sensitive information that the user dictated or processed. When debug mode is disabled, these session files are not created.
+
 ## 2. WHAT DATA WE COLLECT AND WHY
 To ensure the operation of the license, the trial period mechanism, and the payment process, we collect the minimum necessary set of data:
 

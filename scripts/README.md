@@ -69,3 +69,11 @@ scripts/test_recording_temp_cleanup.sh
 ```bash
 scripts/test_text_improvement_runner.sh
 ```
+
+## `test_debug_session_logger.sh`
+
+Компилирует `DebugSessionLogger` и проверяет opt-in debug session folder, `metadata.json`, `events.jsonl`, `audio.wav`, staged text artifacts и disabled-mode no-op.
+
+```bash
+scripts/test_debug_session_logger.sh
+```

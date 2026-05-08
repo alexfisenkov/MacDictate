@@ -80,3 +80,11 @@
 - **Решение:** улучшение качества второй нейросети сначала делается через `TextImprovementProfile.professionalCopyEditor`: prompt rules, terminology packs и speech-normalization hints. Настоящий LoRA/fine-tune откладывается до появления реального корпуса пар `raw Whisper text -> desired edited text`.
 - **Почему:** GGUF-модель внутри app не дообучается напрямую. Prompt/profile слой быстрее, локальнее, проверяемее и безопаснее для смысла текста. Fine-tune без корпуса пользовательских диктовок будет дороже, медленнее и менее контролируем.
 - **Ограничение:** терминологические пакеты не являются исчерпывающей энциклопедией. Они задают канонические написания и контекстные подсказки; новые термины должны добавляться по мере реальных ошибок.
+
+## D-014 — Copywriting datasets are secondary quality material, not the main correction corpus
+
+- **Дата:** 2026-05-08
+- **Решение:** рекламные/copywriting датасеты HuggingFace (`jaykin01/advertisement-copy`, `smangrul/ad-copy-generation`, `PeterBrendan/Ads_Creative_Text_Programmatic`, `RafaM97/marketing_social_media`) не используются как прямой первый fine-tune для MacDictate text improvement. Основной корпус должен собираться из реальных debug-сессий диктовки и утвержденных пар `raw Whisper text -> desired corrected text`.
+- **Почему:** задача MacDictate — исправлять диктовку, оформлять абзацы/списки и сохранять смысл. Датасеты рекламной генерации учат модель писать продающий copy и могут усилить нежелательное переписывание, добавление фактов, CTA и маркетингового тона.
+- **Как использовать:** после license review и фильтрации эти датасеты можно применять как вторичный материал для style/eval наборов или отдельных экспериментов, но не смешивать с базовым корректором без контрольных тестов на смысловую сохранность.
+- **Источники:** `https://huggingface.co/datasets/jaykin01/advertisement-copy`, `https://huggingface.co/datasets/smangrul/ad-copy-generation`, `https://huggingface.co/datasets/PeterBrendan/Ads_Creative_Text_Programmatic`, `https://huggingface.co/datasets/RafaM97/marketing_social_media`.

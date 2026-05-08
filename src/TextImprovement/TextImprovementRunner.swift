@@ -44,6 +44,22 @@ enum TextImprovementFailure: LocalizedError {
     }
 }
 
+struct TextImprovementOutput {
+    let text: String
+    let trace: TextImprovementTrace
+}
+
+struct TextImprovementTrace {
+    let input: String
+    let prompt: String
+    let rawOutput: String
+    let cleanedOutput: String
+    let finalOutput: String
+    let modelPath: String
+    let runtimePath: String
+    let arguments: [String]
+}
+
 final class TextImprovementRunner {
     private static let defaultTimeoutSeconds: TimeInterval = 300
     private static let defaultTerminationGraceSeconds: TimeInterval = 2
@@ -106,9 +122,23 @@ final class TextImprovementRunner {
     }
 
     func improve(_ text: String) -> Result<String, TextImprovementFailure> {
+        improveWithTrace(text).map { $0.text }
+    }
+
+    func improveWithTrace(_ text: String) -> Result<TextImprovementOutput, TextImprovementFailure> {
         let input = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !input.isEmpty else {
-            return .success("")
+            let trace = TextImprovementTrace(
+                input: "",
+                prompt: "",
+                rawOutput: "",
+                cleanedOutput: "",
+                finalOutput: "",
+                modelPath: "",
+                runtimePath: "",
+                arguments: []
+            )
+            return .success(TextImprovementOutput(text: "", trace: trace))
         }
 
         guard input.count <= Self.maximumInputCharacters else {
@@ -123,9 +153,10 @@ final class TextImprovementRunner {
             return .failure(.llamaCliMissing)
         }
 
+        let prompt = profile.prompt(for: input)
         let promptPath: String
         do {
-            promptPath = try writePromptFile(for: input)
+            promptPath = try writePromptFile(prompt)
         } catch {
             return .failure(.promptWriteFailed(error.localizedDescription))
         }
@@ -140,8 +171,7 @@ final class TextImprovementRunner {
         let terminationSemaphore = DispatchSemaphore(value: 0)
 
         let task = Process()
-        task.launchPath = llamaCli
-        task.arguments = [
+        let arguments = [
             "-m", modelPath,
             "-f", promptPath,
             "-c", "\(Self.contextTokens)",
@@ -152,6 +182,8 @@ final class TextImprovementRunner {
             "-no-cnv",
             "-ngl", "99"
         ]
+        task.launchPath = llamaCli
+        task.arguments = arguments
         task.standardOutput = stdoutPipe
         task.standardError = stderrPipe
 
@@ -198,12 +230,24 @@ final class TextImprovementRunner {
                 return .failure(.nonZeroExit(task.terminationStatus, stderrText))
             }
 
-            let improved = TextImprovementFormatter.normalize(Self.cleanModelOutput(stdoutCollector.text()))
+            let rawOutput = stdoutCollector.text()
+            let cleanedOutput = Self.cleanModelOutput(rawOutput)
+            let improved = TextImprovementFormatter.normalize(cleanedOutput)
             guard !improved.isEmpty else {
                 return .failure(.outputMissing)
             }
 
-            return .success(improved)
+            let trace = TextImprovementTrace(
+                input: input,
+                prompt: prompt,
+                rawOutput: rawOutput,
+                cleanedOutput: cleanedOutput,
+                finalOutput: improved,
+                modelPath: modelPath,
+                runtimePath: llamaCli,
+                arguments: arguments
+            )
+            return .success(TextImprovementOutput(text: improved, trace: trace))
         } catch {
             stdoutHandle.readabilityHandler = nil
             stderrHandle.readabilityHandler = nil
@@ -239,8 +283,7 @@ final class TextImprovementRunner {
         return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    private func writePromptFile(for input: String) throws -> String {
-        let prompt = profile.prompt(for: input)
+    private func writePromptFile(_ prompt: String) throws -> String {
         let promptURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("macdictate-text-improvement-\(UUID().uuidString).txt")
         try prompt.write(to: promptURL, atomically: true, encoding: .utf8)

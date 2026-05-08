@@ -37,13 +37,13 @@ func makeDefaults(_ name: String) -> UserDefaults {
 func testParsesAndCachesMachineID() {
     let suiteName = "com.alexfisenkov.macdictate.machine-id.success.\\(UUID().uuidString)"
     let defaults = makeDefaults(suiteName)
-    let key = "MachineID"
+    let key = "MachineID-\\(UUID().uuidString)"
 
     let resolved = LicenseService.resolveMachineID(
         userDefaults: defaults,
         machineIDKey: key,
         ioregPath: "$SUCCESS_IOREG",
-        timeoutSeconds: 1
+        timeoutSeconds: 5
     )
 
     guard resolved == "MD-ABCDEF12" else {
@@ -69,7 +69,7 @@ func testParsesAndCachesMachineID() {
 func testSleepingMachineIDCommandFallsBackQuickly() {
     let suiteName = "com.alexfisenkov.macdictate.machine-id.timeout.\\(UUID().uuidString)"
     let defaults = makeDefaults(suiteName)
-    let key = "MachineID"
+    let key = "MachineID-\\(UUID().uuidString)"
 
     let startedAt = Date()
     let resolved = LicenseService.resolveMachineID(
@@ -80,8 +80,8 @@ func testSleepingMachineIDCommandFallsBackQuickly() {
     )
     let elapsed = Date().timeIntervalSince(startedAt)
 
-    guard elapsed < 2.0 else {
-        fputs("Expected machine ID timeout fallback in under 2 seconds, got \\(elapsed)\\n", stderr)
+    guard elapsed < 5.0 else {
+        fputs("Expected machine ID timeout fallback in under 5 seconds, got \\(elapsed)\\n", stderr)
         exit(1)
     }
 

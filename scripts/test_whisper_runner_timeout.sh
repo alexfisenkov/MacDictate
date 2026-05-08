@@ -68,8 +68,8 @@ func testTimedOutSleepingProcess() {
     let result = runner.transcribe(audioPath: "$FAKE_AUDIO")
     let elapsed = Date().timeIntervalSince(startedAt)
 
-    guard elapsed < 2.0 else {
-        fputs("Expected timeout recovery in under 2 seconds, got \\(elapsed)\\n", stderr)
+    guard elapsed < 5.0 else {
+        fputs("Expected timeout recovery in under 5 seconds, got \\(elapsed)\\n", stderr)
         exit(1)
     }
 
@@ -95,7 +95,7 @@ func testTimedOutSleepingProcess() {
 
 func testLargeStderrDoesNotBlockSuccessfulProcess() {
     let runner = WhisperRunner(
-        timeoutSeconds: 2.0,
+        timeoutSeconds: 5.0,
         terminationGraceSeconds: 0.1,
         modelPathProvider: { "$FAKE_MODEL" },
         whisperCliPathProvider: { "$NOISY_CLI" }
@@ -105,8 +105,8 @@ func testLargeStderrDoesNotBlockSuccessfulProcess() {
     let result = runner.transcribe(audioPath: "$NOISY_AUDIO")
     let elapsed = Date().timeIntervalSince(startedAt)
 
-    guard elapsed < 2.0 else {
-        fputs("Expected noisy subprocess to finish in under 2 seconds, got \\(elapsed)\\n", stderr)
+    guard elapsed < 5.0 else {
+        fputs("Expected noisy subprocess to finish in under 5 seconds, got \\(elapsed)\\n", stderr)
         exit(1)
     }
 

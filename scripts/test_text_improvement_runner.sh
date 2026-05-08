@@ -99,6 +99,21 @@ case .failure(let error):
     exit(1)
 }
 
+switch successRunner.improveWithTrace("превет мир") {
+case .success(let output):
+    expect(output.text == "Привет, мир.", "expected traced improved text")
+    expect(output.trace.input == "превет мир", "expected trace input")
+    expect(output.trace.prompt.contains("превет мир"), "expected trace prompt")
+    expect(output.trace.rawOutput.contains("Исправленный текст:"), "expected raw model output")
+    expect(output.trace.cleanedOutput == "Привет, мир.", "expected cleaned model output in trace")
+    expect(output.trace.finalOutput == "Привет, мир.", "expected final model output in trace")
+    expect(output.trace.modelPath == fakeModel, "expected model path in trace")
+    expect(output.trace.runtimePath == successCli, "expected runtime path in trace")
+case .failure(let error):
+    fputs("Expected trace success, got \\(error.localizedDescription)\\n", stderr)
+    exit(1)
+}
+
 expect(
     TextImprovementRunner.cleanModelOutput("Improved text:\\nHello world.\\n[end of text]\\n<|endoftext|>") == "Hello world.",
     "expected English prefix cleanup"
