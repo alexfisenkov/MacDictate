@@ -37,6 +37,7 @@
 - `TextImprovementRunner` получил trace API `improveWithTrace(_:)`, чтобы debug-сессия фиксировала не только итог Qwen, но и prompt, raw model output, cleaned output, formatter output и runtime/model arguments.
 - Добавлен targeted harness `scripts/test_debug_session_logger.sh`; `scripts/test_text_improvement_runner.sh` расширен проверкой trace API.
 - Зафиксирована AI corpus strategy: основной будущий training/eval corpus должен идти из утвержденных real dictation debug-сессий, а HuggingFace copywriting datasets остаются secondary style/eval material до license review и контрольных тестов на сохранение смысла.
+- По real debug-сессии `20260508-212657-03DCBFBB` найдено, что Whisper дал `ChaiJPT`, Qwen не исправил термин и потерял часть list markers. Пайплайн усилен pre-formatting шагом перед Qwen: `ChaiJPT`/`Чай и GPT` -> `ChatGPT`, heading cues перед `во-первых/во-вторых/в-третьих` превращаются в заголовок с двоеточием и numbered list.
 
 ## 2026-04-19 — Sprint 1: backend / checkout / product surface hardening
 

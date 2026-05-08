@@ -30,8 +30,8 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-if [ -z "$PROMPT_FILE" ] || ! grep -q "превет мир" "$PROMPT_FILE"; then
-  echo "prompt did not contain source text" >&2
+if [ -z "$PROMPT_FILE" ]; then
+  echo "prompt file missing" >&2
   exit 9
 fi
 
@@ -42,17 +42,39 @@ for required in "не меняй смысл" "DaVinci Resolve" "ChatGPT" "EBITDA
   fi
 done
 
+if grep -q "ChaiJPT и Gemini" "$PROMPT_FILE"; then
+  echo "prompt was not preformatted before Qwen" >&2
+  exit 11
+fi
+
 i=0
 while [ "$i" -lt 5000 ]; do
   printf "stderr noise %04d\n" "$i" >&2
   i=$((i + 1))
 done
 
-cat <<'OUT'
+if grep -q "превет мир" "$PROMPT_FILE"; then
+  cat <<'OUT'
 Исправленный текст:
 Привет, мир.
 <|im_end|>
 OUT
+elif grep -q "1. Мы создали специальный сценарий." "$PROMPT_FILE"; then
+  cat <<'OUT'
+Исправленный текст:
+Мы недавно собирались вместе с ChatGPT и Gemini от Google.
+
+И вот к чему пришли:
+
+1. Мы создали специальный сценарий.
+2. Создали специальную штуку, которая обрабатывает этот сценарий.
+3. Мы выделили несколько файлов-факторов, которые это все закрывают.
+<|im_end|>
+OUT
+else
+  echo "prompt did not contain expected source text" >&2
+  exit 9
+fi
 SH
 
 cat > "$TIMEOUT_CLI" <<'SH'
@@ -103,6 +125,7 @@ switch successRunner.improveWithTrace("превет мир") {
 case .success(let output):
     expect(output.text == "Привет, мир.", "expected traced improved text")
     expect(output.trace.input == "превет мир", "expected trace input")
+    expect(output.trace.preparedInput == "превет мир", "expected trace prepared input")
     expect(output.trace.prompt.contains("превет мир"), "expected trace prompt")
     expect(output.trace.rawOutput.contains("Исправленный текст:"), "expected raw model output")
     expect(output.trace.cleanedOutput == "Привет, мир.", "expected cleaned model output in trace")
@@ -111,6 +134,23 @@ case .success(let output):
     expect(output.trace.runtimePath == successCli, "expected runtime path in trace")
 case .failure(let error):
     fputs("Expected trace success, got \\(error.localizedDescription)\\n", stderr)
+    exit(1)
+}
+
+let rawDebugSessionInput = "Мы тут недавно собирались вместе с ChaiJPT и Gemini от Google. И вот к чему пришли. Во-первых, мы создали специальный сценарий. Во-вторых, создали специальную штуку, которая обрабатывает этот сценарий. Ну, а в-третьих, мы выделили несколько файлов-факторов, которые это все закрывают."
+switch successRunner.improveWithTrace(rawDebugSessionInput) {
+case .success(let output):
+    expect(output.trace.input.contains("ChaiJPT"), "expected raw trace input to preserve original Whisper text")
+    expect(!output.trace.preparedInput.contains("ChaiJPT"), "expected prepared input to fix ChaiJPT before Qwen")
+    expect(output.trace.preparedInput.contains("ChatGPT"), "expected prepared input to contain ChatGPT")
+    expect(output.trace.preparedInput.contains("И вот к чему пришли:"), "expected prepared input heading")
+    expect(output.trace.preparedInput.contains("1. Мы создали специальный сценарий."), "expected prepared input numbered list")
+    expect(output.trace.prompt.contains("1. Мы создали специальный сценарий."), "expected Qwen prompt to use prepared numbered list")
+    expect(output.text.contains("ChatGPT и Gemini от Google."), "expected real debug text to normalize ChatGPT")
+    expect(output.text.contains("И вот к чему пришли:"), "expected real debug text heading")
+    expect(output.text.contains("2. Создали специальную штуку, которая обрабатывает этот сценарий."), "expected real debug text to preserve conversational wording")
+case .failure(let error):
+    fputs("Expected real debug trace success, got \\(error.localizedDescription)\\n", stderr)
     exit(1)
 }
 
@@ -129,6 +169,8 @@ expect(profilePrompt.contains("DaVinci Resolve"), "expected creator terminology"
 expect(profilePrompt.contains("EBITDA"), "expected finance terminology")
 expect(profilePrompt.contains("HbA1c"), "expected medical terminology")
 expect(profilePrompt.contains("чат джпт -> ChatGPT"), "expected direct ChatGPT speech mapping")
+expect(profilePrompt.contains("ChaiJPT -> ChatGPT"), "expected direct ChaiJPT speech mapping")
+expect(profilePrompt.contains("Не заменяй разговорные слова автора"), "expected conservative wording rule")
 expect(profilePrompt.contains("давинчи резолв -> DaVinci Resolve"), "expected direct DaVinci speech mapping")
 expect(profilePrompt.contains("во-первых"), "expected ordered-list speech cue")
 expect(profilePrompt.contains("не оставляй слова «во первых»"), "expected strict ordered-list replacement rule")
@@ -145,6 +187,16 @@ expect(!ordered.contains("во первых"), "ordered output should remove spe
 
 let normalizedTerms = TextImprovementFormatter.normalize("чат джпт и давинчи резолв, контент план")
 expect(normalizedTerms == "ChatGPT и DaVinci Resolve, контент-план", "expected fallback terminology normalization")
+
+let realDebugSessionOutput = TextImprovementFormatter.normalize(
+    "Мы недавно собирались с ChaiJPT и Gemini от Google. Вот что мы достигли. Во-первых, мы создали специальный сценарий. Во-вторых, мы создали специальную штуку, которая обрабатывает этот сценарий. Ну, а в-третьих, мы выделили несколько файлов-факторов, которые это все закрывают."
+)
+expect(realDebugSessionOutput.contains("ChatGPT и Gemini от Google."), "expected ChaiJPT to normalize to ChatGPT")
+expect(realDebugSessionOutput.contains("Вот что мы достигли:"), "expected achievement cue to become list heading")
+expect(realDebugSessionOutput.contains("1. Мы создали специальный сценарий."), "expected first real debug item")
+expect(realDebugSessionOutput.contains("2. Мы создали специальную штуку, которая обрабатывает этот сценарий."), "expected second real debug item")
+expect(realDebugSessionOutput.contains("3. Мы выделили несколько файлов-факторов, которые это все закрывают."), "expected third real debug item")
+expect(!realDebugSessionOutput.contains("Во-первых"), "expected speech markers removed from real debug output")
 
 let missingModelRunner = TextImprovementRunner(
     modelPathProvider: { nil },

@@ -51,6 +51,7 @@ struct TextImprovementOutput {
 
 struct TextImprovementTrace {
     let input: String
+    let preparedInput: String
     let prompt: String
     let rawOutput: String
     let cleanedOutput: String
@@ -130,6 +131,7 @@ final class TextImprovementRunner {
         guard !input.isEmpty else {
             let trace = TextImprovementTrace(
                 input: "",
+                preparedInput: "",
                 prompt: "",
                 rawOutput: "",
                 cleanedOutput: "",
@@ -153,7 +155,8 @@ final class TextImprovementRunner {
             return .failure(.llamaCliMissing)
         }
 
-        let prompt = profile.prompt(for: input)
+        let preparedInput = TextImprovementFormatter.normalize(input)
+        let prompt = profile.prompt(for: preparedInput)
         let promptPath: String
         do {
             promptPath = try writePromptFile(prompt)
@@ -239,6 +242,7 @@ final class TextImprovementRunner {
 
             let trace = TextImprovementTrace(
                 input: input,
+                preparedInput: preparedInput,
                 prompt: prompt,
                 rawOutput: rawOutput,
                 cleanedOutput: cleanedOutput,

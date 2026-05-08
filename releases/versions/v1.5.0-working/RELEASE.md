@@ -24,6 +24,7 @@
 - Реальный local smoke Qwen на M1 выполнен: `qwen2.5-1.5b-instruct-q4_k_m.gguf` скачан полностью (`1,117,320,736` bytes), короткий русский текст исправлен через `TextImprovementRunner`.
 - Добавлен opt-in local debug session logging: при включенном `MacDictateDebugSessionLoggingEnabled` диктовка сохраняет `audio.wav`, Whisper raw/cleaned text, Qwen prompt/raw/cleaned/final output, финальный inserted text и `events.jsonl` в `~/.macdictate/debug-sessions/`; покрыто `scripts/test_debug_session_logger.sh`.
 - Добавлен `docs/8_AI_Corpus_Strategy.md`: будущий fine-tune/eval второй нейросети должен опираться на утвержденные real dictation correction pairs, а не на рекламные generation datasets как базовое поведение.
+- По debug-сессии длинной диктовки усилен text-improvement pipeline: deterministic pre-formatting теперь исправляет `ChaiJPT`/`Чай и GPT` в `ChatGPT` и превращает heading cue + `во-первых/во-вторых/в-третьих` в numbered list до отправки текста в Qwen.
 - Локальные DMG/build logs остаются ignored artifacts; clean checkout проверка governance допускает их отсутствие, строгая локальная проверка доступна через `scripts/verify_release_governance.sh --strict-local-artifacts`.
 
 ## Release Rule

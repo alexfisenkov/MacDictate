@@ -401,6 +401,7 @@ final class AppController: NSObject {
                 "runtimePath": output.trace.runtimePath
             ])
             debugSession?.writeTextFile("04_qwen_prompt.txt", output.trace.prompt)
+            debugSession?.writeTextFile("04b_qwen_preformatted_input.txt", output.trace.preparedInput)
             debugSession?.writeTextFile("05_qwen_raw_output.txt", output.trace.rawOutput)
             debugSession?.writeTextFile("06_qwen_cleaned_output.txt", output.trace.cleanedOutput)
             debugSession?.writeTextFile("06b_qwen_final_after_formatter.txt", output.trace.finalOutput)

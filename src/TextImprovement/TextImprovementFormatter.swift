@@ -6,9 +6,19 @@ enum TextImprovementFormatter {
         ("премьер про", "Adobe Premiere Pro"),
         ("давинчи резолв", "DaVinci Resolve"),
         ("файн кат про", "Final Cut Pro"),
+        ("ChaiJPT", "ChatGPT"),
+        ("ChaiGPT", "ChatGPT"),
+        ("Chai JPT", "ChatGPT"),
+        ("Chai GPT", "ChatGPT"),
+        ("Chai-GPT", "ChatGPT"),
+        ("Чай и GPT", "ChatGPT"),
+        ("чай gpt", "ChatGPT"),
+        ("чай джипити", "ChatGPT"),
+        ("чайджипити", "ChatGPT"),
         ("чат джипити", "ChatGPT"),
         ("чат джпт", "ChatGPT"),
         ("чат gpt", "ChatGPT"),
+        ("Cloud Anthropic", "Claude Anthropic"),
         ("контент план", "контент-план"),
         ("миджорни", "Midjourney"),
         ("капкат", "CapCut"),
@@ -65,10 +75,7 @@ enum TextImprovementFormatter {
             return text
         }
 
-        var sections: [String] = []
-        if !intro.isEmpty {
-            sections.append(sentenceCasedWithPeriod(intro))
-        }
+        var sections = introSections(for: intro)
 
         let list = items.enumerated()
             .map { "\($0.offset + 1). \($0.element)" }
@@ -81,7 +88,7 @@ enum TextImprovementFormatter {
     private static func orderedMarkerMatches(in text: String) -> [(range: Range<String.Index>, canonicalIndex: Int)] {
         orderedMarkers.flatMap { marker -> [(range: Range<String.Index>, canonicalIndex: Int)] in
             guard let regex = try? NSRegularExpression(
-                pattern: "(?i)(^|[\\s,.;:])(\(marker.pattern))(?=\\s)",
+                pattern: "(?i)(^|[\\s,.;:])((?:ну,?\\s+а\\s+|а\\s+)?\(marker.pattern))(?=[\\s,.;:])",
                 options: []
             ) else {
                 return []
@@ -115,6 +122,88 @@ enum TextImprovementFormatter {
         }
     }
 
+    private static func introSections(for intro: String) -> [String] {
+        let cleaned = intro.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleaned.isEmpty else { return [] }
+
+        if let headingSplit = splitTrailingListHeading(cleaned) {
+            var sections: [String] = []
+            if !headingSplit.lead.isEmpty {
+                sections.append(sentenceCasedWithPeriod(headingSplit.lead))
+            }
+            sections.append(sentenceCasedWithColon(headingSplit.heading))
+            return sections
+        }
+
+        return [sentenceCasedWithPeriod(cleaned)]
+    }
+
+    private static func splitTrailingListHeading(_ text: String) -> (lead: String, heading: String)? {
+        let boundary = lastSentenceBoundary(in: text)
+        let lead: String
+        let headingCandidate: String
+
+        if let boundary {
+            lead = String(text[..<boundary]).trimmingCharacters(in: .whitespacesAndNewlines)
+            headingCandidate = String(text[boundary...]).trimmingCharacters(in: .whitespacesAndNewlines)
+        } else {
+            lead = ""
+            headingCandidate = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        let normalizedHeading = headingCandidate
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ".!?…"))
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard isListHeadingCue(normalizedHeading) else {
+            return nil
+        }
+
+        return (lead, normalizedHeading)
+    }
+
+    private static func lastSentenceBoundary(in text: String) -> String.Index? {
+        var lastBoundary: String.Index?
+        var index = text.startIndex
+
+        while index < text.endIndex {
+            if ".!?…".contains(text[index]) {
+                let next = text.index(after: index)
+                if next < text.endIndex, text[next].isWhitespace {
+                    lastBoundary = text.index(after: next)
+                }
+            }
+            index = text.index(after: index)
+        }
+
+        return lastBoundary
+    }
+
+    private static func isListHeadingCue(_ text: String) -> Bool {
+        let normalized = text
+            .lowercased()
+            .replacingOccurrences(of: "ё", with: "е")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return [
+            "вот к чему пришли",
+            "и вот к чему пришли",
+            "вот что мы достигли",
+            "и вот что мы достигли",
+            "вот чего мы достигли",
+            "и вот чего мы достигли",
+            "вот чего достигли",
+            "и вот чего достигли",
+            "вот что получилось",
+            "и вот что получилось",
+            "вот что сделали",
+            "и вот что сделали",
+            "вот что мы сделали",
+            "и вот что мы сделали"
+        ].contains(normalized)
+    }
+
     private static func sentenceCasedWithPeriod(_ text: String) -> String {
         var cleaned = text
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -130,5 +219,18 @@ enum TextImprovementFormatter {
             return cleaned
         }
         return cleaned + "."
+    }
+
+    private static func sentenceCasedWithColon(_ text: String) -> String {
+        var cleaned = text
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ".!?…:"))
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if let first = cleaned.first, first.isLowercase {
+            cleaned.replaceSubrange(cleaned.startIndex...cleaned.startIndex, with: String(first).uppercased())
+        }
+
+        return cleaned + ":"
     }
 }

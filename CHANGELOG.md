@@ -26,6 +26,7 @@
 - `build.sh` теперь кладет обычный DMG output в `build/artifacts/`, не запускает Homebrew install, если `create-dmg` уже доступен, очищает macOS metadata, проверяет подпись `.app` и готовит DMG staging-копию через `ditto` без xattrs;
 - `build.sh` теперь делает strict codesign verification на clean temporary copy через `ditto --noextattr --noqtn`, чтобы проверять подпись без file-provider/FinderInfo xattrs из рабочей папки;
 - model lookup разделен по типам: Whisper остается `.bin`, а текстовая модель хранится как `.gguf`, чтобы вторая нейросеть не могла случайно подменить ASR-модель.
+- Qwen input теперь предварительно проходит deterministic pre-formatting: частые ASR-ошибки терминов и очевидные `во-первых/во-вторых/в-третьих` перечисления нормализуются до отправки во вторую модель.
 
 ### Fixed
 - `WhisperRunner` больше не ждет `whisper-cli` бесконечно: transcription subprocess ограничен timeout `30` минут, после чего процесс завершается, temp-файлы чистятся, а пользователь получает различимую диагностическую ошибку.
@@ -34,6 +35,7 @@
 - `RecordingService` чистит stale `/tmp/mac_dictate_dist.wav` и `.txt` при старте сервиса и перед новой записью.
 - Ошибка/отсутствие второй нейросети больше не ломает диктовку: при включенном улучшении MacDictate вставляет исходный Whisper-текст и показывает warning diagnostic.
 - Длинные тексты больше не отправляются в Qwen вслепую: input > 6 000 символов fallback-ится без риска silent truncation.
+- `ChaiJPT` / `Chai GPT` / `Чай и GPT` / `чай джипити` нормализуются в `ChatGPT`; heading cues вроде `И вот к чему пришли` / `Вот что мы достигли` перед перечислением превращаются в отдельный заголовок с двоеточием и numbered list.
 
 ### Notes
 - `v1.2` и `v1.3` помечены как reconstructed history: GitHub Releases существуют, но локальные tags отсутствуют, а remote tags указывают на commit `v1.4`.

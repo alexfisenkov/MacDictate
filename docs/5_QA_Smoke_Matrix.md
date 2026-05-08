@@ -21,6 +21,7 @@
 | Hung / stderr-heavy llama.cpp subprocess | зависший процесс завершается timeout diagnostic; большой `stdout`/`stderr` не блокирует runner | Verified by `scripts/test_text_improvement_runner.sh` |
 | Text improvement editor profile | prompt содержит запрет менять смысл, правила абзацев/списков и доменные термины для Qwen | Verified by `scripts/test_text_improvement_runner.sh` |
 | Text improvement formatter guardrail | явные `во-первых/во-вторых` перечисления превращаются в numbered list; частые термины нормализуются | Verified by `scripts/test_text_improvement_runner.sh` |
+| Text improvement real debug regression | `ChaiJPT` нормализуется в `ChatGPT`, `И вот к чему пришли` становится heading с двоеточием, `во-первых/во-вторых/в-третьих` превращаются в numbered list до Qwen prompt | Verified by `scripts/test_text_improvement_runner.sh` and real Qwen local smoke |
 | Long text improvement input | input > 6 000 символов не отправляется в Qwen и fallback-ится без silent truncation | Verified by `scripts/test_text_improvement_runner.sh` |
 | Real Qwen short correction | локальная Qwen GGUF исправляет короткий русский текст через `TextImprovementRunner` | Verified locally with Homebrew `llama.cpp` + downloaded GGUF |
 | Real Qwen editor profile smoke | Qwen + profile + formatter нормализуют `ChatGPT`, `Qwen`, `EBITDA`, `DaVinci Resolve` и оформляют `во-первых/во-вторых/в-третьих` как numbered list | Verified locally |
