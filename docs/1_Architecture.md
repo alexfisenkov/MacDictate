@@ -64,7 +64,7 @@
 - Text improvement является optional enhancement, а не блокером базовой диктовки. Если Qwen/`llama.cpp` runtime отсутствует или падает при включенном toggle, app вставляет cleaned Whisper-текст и показывает warning diagnostic.
 - Вторая модель хранится только как `qwen2.5-1.5b-instruct-q4_k_m.gguf`; `.gguf` не участвует в выборе Whisper model.
 - Для защиты от silent truncation Qwen-улучшение ограничено короткими/средними фрагментами: input больше `6_000` символов fallback-ится к исходному cleaned Whisper text.
-- Ручная команда `Улучшить текст` работает с текстом из буфера обмена и вставляет улучшенный результат через существующий `PasteService`.
+- Команда `Улучшить текст` в главном меню является toggle режима второй нейросети: когда галочка включена, cleaned Whisper text перед вставкой проходит через `TextImprovementRunner`; когда выключена, вставляется исходный cleaned Whisper text.
 
 ## Build note
 

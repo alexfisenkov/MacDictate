@@ -23,6 +23,7 @@
 - Добавлен optional second-AI layer: `TextImprovementRunner` запускает Qwen2.5-1.5B-Instruct Q4_K_M через `llama.cpp` runtime после Whisper, если включен toggle.
 - `ModelLocator` разделяет Whisper `.bin` и text-improvement `.gguf`, чтобы вторая модель не могла сломать ASR model selection.
 - В меню добавлены `Улучшить текст`, persisted toggle `Улучшать текст после диктовки` и downloader для Qwen model.
+- Top-level `Улучшить текст` уточнен как toggle режима второй нейросети, а не ручная обработка буфера обмена.
 - Download/reinstall Qwen model больше не включает automatic improvement сам по себе; автокоррекция включается только toggle-flow.
 - Downloader валидирует минимальный размер модели перед сохранением, а повторный запуск downloader поднимает уже открытое окно вместо второго параллельного download task.
 - Text improvement ограничен `6_000` символов input, чтобы длинная диктовка не могла быть тихо усечена generation cap; automatic pipeline fallback-ится к Whisper-тексту.

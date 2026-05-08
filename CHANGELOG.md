@@ -12,7 +12,7 @@
 - project operating model, decision log, smoke matrix и release checklist;
 - release governance layer: `docs/7_Release_Governance.md`, `releases/registry.json`, per-version `RELEASE.md`, локальное хранилище artifacts и `scripts/verify_release_governance.sh`;
 - desktop-local `CLAUDE.md` / `AGENTS.md` с правилами работы будущих агентов;
-- optional локальное улучшение текста второй нейросетью: Qwen2.5-1.5B-Instruct Q4_K_M через `llama.cpp` (`llama-completion`), toggle в настройках и ручная команда `Улучшить текст`;
+- optional локальное улучшение текста второй нейросетью: Qwen2.5-1.5B-Instruct Q4_K_M через `llama.cpp` (`llama-completion`), top-level toggle `Улучшить текст` и такой же toggle в настройках;
 - targeted runtime harnesses для зависшего/stderr-heavy `whisper-cli`, machine ID timeout, cleanup stale temp audio и `TextImprovementRunner`.
 
 ### Changed

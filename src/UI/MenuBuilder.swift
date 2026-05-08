@@ -33,7 +33,7 @@ enum MenuBuilder {
         helpItem.target = controller
         menu.addItem(helpItem)
 
-        let improveTextItem = NSMenuItem(title: "✨ Улучшить текст", action: #selector(AppController.improveTextFromClipboard), keyEquivalent: "")
+        let improveTextItem = NSMenuItem(title: "✨ Улучшить текст", action: #selector(AppController.toggleTextImprovement), keyEquivalent: "")
         improveTextItem.target = controller
         menu.addItem(improveTextItem)
         menu.addItem(NSMenuItem.separator())

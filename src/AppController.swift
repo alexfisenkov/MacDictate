@@ -113,6 +113,8 @@ final class AppController: NSObject {
             hasModel: hasModel,
             hasRuntime: hasRuntime
         )
+        menuComponents.improveTextItem.title = "✨ Улучшить текст"
+        menuComponents.improveTextItem.state = isEnabled ? .on : .off
         menuComponents.textImprovementToggleItem.state = isEnabled ? .on : .off
         menuComponents.textImprovementDownloadItem.title = hasModel
             ? "Переустановить модель улучшения текста"
@@ -404,57 +406,6 @@ final class AppController: NSObject {
     @objc func openLicensePage() {
         if let url = licenseService.purchaseURL() {
             NSWorkspace.shared.open(url)
-        }
-    }
-
-    @objc func improveTextFromClipboard() {
-        guard !isProcessing else { return }
-
-        guard ensureTextImprovementReadyForInteractive(enableAfterDownload: false) else {
-            return
-        }
-
-        let pasteboard = NSPasteboard.general
-        guard let rawText = pasteboard.string(forType: .string)?
-            .trimmingCharacters(in: .whitespacesAndNewlines),
-              !rawText.isEmpty else {
-            presentTextImprovementAlert(
-                title: "Нет текста для улучшения",
-                message: "Скопируйте текст в буфер обмена и нажмите «Улучшить текст» ещё раз."
-            )
-            return
-        }
-
-        isProcessing = true
-        refreshTextImprovementMenuItems()
-        setStatus("Improving text...", icon: "✨")
-
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            guard let self else { return }
-            let result = self.textImprovementRunner.improve(rawText)
-
-            DispatchQueue.main.async {
-                self.isProcessing = false
-
-                switch result {
-                case .success(let improved):
-                    switch self.pasteService.paste(improved) {
-                    case .success:
-                        self.recordDiagnostic(nil)
-                    case .failure(let error):
-                        self.recordDiagnostic(error.localizedDescription, severity: .error)
-                    }
-                case .failure(let error):
-                    self.recordDiagnostic(error.localizedDescription, severity: .error)
-                    self.presentTextImprovementAlert(
-                        title: "Не удалось улучшить текст",
-                        message: error.localizedDescription
-                    )
-                }
-
-                self.refreshTextImprovementMenuItems()
-                self.refreshIdlePresentation()
-            }
         }
     }
 
