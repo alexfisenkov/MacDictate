@@ -248,6 +248,23 @@ expect(
     "expected leaked prompt scaffold cleanup"
 )
 
+let modelPreambleWithRules = """
+Вот исправленный и отформатированный текст:
+
+---
+
+Тут смысл в чем? Смотрите.
+
+1. Установить ChatGPT.
+2. Проверить аккаунт.
+
+---
+"""
+expect(
+    TextImprovementRunner.cleanModelOutput(modelPreambleWithRules) == "Тут смысл в чем? Смотрите.\n\n1. Установить ChatGPT.\n2. Проверить аккаунт.",
+    "expected model preamble and horizontal rules cleanup"
+)
+
 expect(
     TextImprovementRunner.stripDecorativeMarkdownIfSourceWasPlain(
         "Gemini, **Claude** и __ChatGPT__.",

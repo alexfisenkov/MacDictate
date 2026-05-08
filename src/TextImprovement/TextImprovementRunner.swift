@@ -276,6 +276,12 @@ final class TextImprovementRunner {
         let removablePrefixes = [
             "Исправленный текст:",
             "Улучшенный текст:",
+            "Исправленный и отформатированный текст:",
+            "Вот исправленный текст:",
+            "Вот улучшенный текст:",
+            "Вот исправленный и отформатированный текст:",
+            "Отредактированный текст:",
+            "Готовый текст:",
             "Corrected text:",
             "Improved text:"
         ]
@@ -289,6 +295,7 @@ final class TextImprovementRunner {
         }
 
         cleaned = Self.extractOutputFromLeakedPromptScaffold(cleaned)
+        cleaned = Self.removeStandaloneMarkdownRuleLines(cleaned)
 
         return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
     }
@@ -350,6 +357,17 @@ final class TextImprovementRunner {
         }
 
         return output
+    }
+
+    private static func removeStandaloneMarkdownRuleLines(_ output: String) -> String {
+        output
+            .split(separator: "\n", omittingEmptySubsequences: false)
+            .filter { line in
+                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                return trimmed.range(of: #"^[-*_]{3,}$"#, options: .regularExpression) == nil
+            }
+            .joined(separator: "\n")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func writePromptFile(_ prompt: String) throws -> String {
