@@ -192,11 +192,15 @@ expect(profilePrompt.contains("HbA1c"), "expected medical terminology")
 expect(profilePrompt.contains("чат джпт -> ChatGPT"), "expected direct ChatGPT speech mapping")
 expect(profilePrompt.contains("ChagPT / Chag GPT / ChagJPT -> ChatGPT"), "expected direct ChagPT speech mapping")
 expect(profilePrompt.contains("ChaiJPT -> ChatGPT"), "expected direct ChaiJPT speech mapping")
-expect(profilePrompt.contains("Клод от Anthropic / Cloud Anthropic -> Claude от Anthropic / Claude Anthropic"), "expected direct Claude speech mapping")
+expect(profilePrompt.contains("Клод от Anthropic / Cloud от Anthropic / Cloud Anthropic -> Claude от Anthropic / Claude Anthropic"), "expected direct Claude speech mapping")
+expect(!profilePrompt.contains("Вход:"), "runtime prompt should avoid example input labels")
+expect(!profilePrompt.contains("Выход:"), "runtime prompt should avoid example output labels")
 expect(profilePrompt.contains("Не заменяй разговорные слова автора"), "expected conservative wording rule")
 expect(profilePrompt.contains("давинчи резолв -> DaVinci Resolve"), "expected direct DaVinci speech mapping")
 expect(profilePrompt.contains("во-первых"), "expected ordered-list speech cue")
+expect(profilePrompt.contains("несколько раз повторяется «дальше»"), "expected repeated дальше list cue")
 expect(profilePrompt.contains("не оставляй слова «во первых»"), "expected strict ordered-list replacement rule")
+expect(profilePrompt.contains("не добавляй жирность"), "expected no decorative markdown rule")
 expect(profilePrompt.count < 12_000, "profile prompt should stay compact")
 
 let ordered = TextImprovementFormatter.formatObviousOrderedEnumeration(
@@ -210,6 +214,9 @@ expect(!ordered.contains("во первых"), "ordered output should remove spe
 
 let normalizedTerms = TextImprovementFormatter.normalize("ChagPT, чат джпт и давинчи резолв, контент план")
 expect(normalizedTerms == "ChatGPT, ChatGPT и DaVinci Resolve, контент-план", "expected fallback terminology normalization")
+
+let normalizedClaudeTerms = TextImprovementFormatter.normalize("Cloud от Anthropic и Клод от Anthropic")
+expect(normalizedClaudeTerms == "Claude от Anthropic и Claude от Anthropic", "expected fallback Claude terminology normalization")
 
 let realDebugSessionOutput = TextImprovementFormatter.normalize(
     "Мы недавно собирались с ChaiJPT и Gemini от Google. Вот что мы достигли. Во-первых, мы создали специальный сценарий. Во-вторых, мы создали специальную штуку, которая обрабатывает этот сценарий. Ну, а в-третьих, мы выделили несколько файлов-факторов, которые это все закрывают."
@@ -229,6 +236,32 @@ expect(chagPTLogRegression.contains("1. Я создал ChatGPT с нуля. С�
 expect(chagPTLogRegression.contains("2. Я преобразовал Gemini от Google в реально крутую игрушку."), "expected second list item")
 expect(!chagPTLogRegression.contains("ChagPT"), "expected no ChagPT after formatter")
 expect(!chagPTLogRegression.contains("1. ."), "expected numbered marker punctuation cleanup")
+
+let leakedPromptScaffold = """
+1. Вход: исходный текст, который модель не должна копировать.
+2. Выход:
+- Правильный первый абзац.
+- Правильный второй абзац.
+"""
+expect(
+    TextImprovementRunner.cleanModelOutput(leakedPromptScaffold) == "Правильный первый абзац.\nПравильный второй абзац.",
+    "expected leaked prompt scaffold cleanup"
+)
+
+expect(
+    TextImprovementRunner.stripDecorativeMarkdownIfSourceWasPlain(
+        "Gemini, **Claude** и __ChatGPT__.",
+        source: "Gemini, Claude и ChatGPT."
+    ) == "Gemini, Claude и ChatGPT.",
+    "expected decorative markdown stripped when source is plain"
+)
+expect(
+    TextImprovementRunner.stripDecorativeMarkdownIfSourceWasPlain(
+        "**ChatGPT** остается выделенным.",
+        source: "**ChatGPT** уже был выделен."
+    ) == "**ChatGPT** остается выделенным.",
+    "expected markdown preserved when source already uses markdown"
+)
 
 let missingModelRunner = TextImprovementRunner(
     modelPathProvider: { nil },

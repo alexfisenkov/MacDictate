@@ -41,6 +41,7 @@
 - Preferred text-improvement model переключена с Qwen2.5-1.5B-Instruct Q4_K_M на промежуточную Qwen2.5-3B-Instruct Q4_K_M (~2.1 GB): 7B убрана из default-пути как слишком рискованная для M1/16 GB после пользовательского runtime-сбоя, 1.5B оставлена как automatic fallback.
 - `TextImprovementRunner` сохраняет увеличенные лимиты под 3B: timeout `10` минут и context `8_192` tokens.
 - По real debug-сессии `20260508-233428-E329E82F` найдено, что 3B/Qwen исправляет `ChagPT` только в части контекста. Deterministic formatter расширен вариантами `ChagPT`/`Chag GPT`/`ChagJPT` -> `ChatGPT`, `Клод от Anthropic` -> `Claude от Anthropic`, а list marker cleanup теперь убирает лишнюю точку после `Первое.` / `Второе.`.
+- По real debug-сессии `20260508-234719-983488DD` найдено, что Qwen копирует prompt example labels `Вход` / `Выход` в результат и добавляет декоративный Markdown вокруг названий. Runtime-prompt больше не включает examples block; `TextImprovementRunner.cleanModelOutput` вырезает leaked output scaffold, а plain-text input дополнительно снимает `**bold**` / `__bold__` / inline-code markdown из model output.
 
 ## 2026-04-19 — Sprint 1: backend / checkout / product surface hardening
 

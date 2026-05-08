@@ -24,6 +24,7 @@ enum TextImprovementFormatter {
         ("чат джипити", "ChatGPT"),
         ("чат джпт", "ChatGPT"),
         ("чат gpt", "ChatGPT"),
+        ("Cloud от Anthropic", "Claude от Anthropic"),
         ("Cloud Anthropic", "Claude Anthropic"),
         ("Клод от Anthropic", "Claude от Anthropic"),
         ("Клод Anthropic", "Claude Anthropic"),

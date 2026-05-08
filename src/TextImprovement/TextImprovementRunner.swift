@@ -235,7 +235,11 @@ final class TextImprovementRunner {
 
             let rawOutput = stdoutCollector.text()
             let cleanedOutput = Self.cleanModelOutput(rawOutput)
-            let improved = TextImprovementFormatter.normalize(cleanedOutput)
+            let markdownAdjustedOutput = Self.stripDecorativeMarkdownIfSourceWasPlain(
+                cleanedOutput,
+                source: preparedInput
+            )
+            let improved = TextImprovementFormatter.normalize(markdownAdjustedOutput)
             guard !improved.isEmpty else {
                 return .failure(.outputMissing)
             }
@@ -245,7 +249,7 @@ final class TextImprovementRunner {
                 preparedInput: preparedInput,
                 prompt: prompt,
                 rawOutput: rawOutput,
-                cleanedOutput: cleanedOutput,
+                cleanedOutput: markdownAdjustedOutput,
                 finalOutput: improved,
                 modelPath: modelPath,
                 runtimePath: llamaCli,
@@ -284,7 +288,68 @@ final class TextImprovementRunner {
             }
         }
 
+        cleaned = Self.extractOutputFromLeakedPromptScaffold(cleaned)
+
         return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    static func stripDecorativeMarkdownIfSourceWasPlain(_ output: String, source: String) -> String {
+        guard !source.contains("**"),
+              !source.contains("__"),
+              !source.contains("`") else {
+            return output
+        }
+
+        return output
+            .replacingOccurrences(
+                of: #"\*\*([^*\n]+)\*\*"#,
+                with: "$1",
+                options: .regularExpression
+            )
+            .replacingOccurrences(
+                of: #"__([^_\n]+)__"#,
+                with: "$1",
+                options: .regularExpression
+            )
+            .replacingOccurrences(
+                of: #"`([^`\n]+)`"#,
+                with: "$1",
+                options: .regularExpression
+            )
+    }
+
+    private static func extractOutputFromLeakedPromptScaffold(_ output: String) -> String {
+        let outputMarkers = [
+            "Выход:",
+            "Результат:",
+            "Исправленный текст:",
+            "Улучшенный текст:",
+            "Output:",
+            "Corrected text:",
+            "Improved text:"
+        ]
+
+        for marker in outputMarkers {
+            if let range = output.range(of: marker, options: [.caseInsensitive, .backwards]) {
+                let extracted = String(output[range.upperBound...])
+                    .split(separator: "\n", omittingEmptySubsequences: false)
+                    .map { line in
+                        String(line).replacingOccurrences(
+                            of: #"^\s*[-*]\s+"#,
+                            with: "",
+                            options: .regularExpression
+                        )
+                    }
+                    .joined(separator: "\n")
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+
+                if !extracted.isEmpty {
+                    return extracted
+                }
+            }
+        }
+
+        return output
     }
 
     private func writePromptFile(_ prompt: String) throws -> String {

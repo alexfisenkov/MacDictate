@@ -38,6 +38,7 @@
 - Ошибка/отсутствие второй нейросети больше не ломает диктовку: при включенном улучшении MacDictate вставляет исходный Whisper-текст и показывает warning diagnostic.
 - Длинные тексты больше не отправляются в Qwen вслепую: input > 6 000 символов fallback-ится без риска silent truncation.
 - `ChaiJPT` / `ChagPT` / `Chai GPT` / `Чай и GPT` / `чай джипити` нормализуются в `ChatGPT`; `Клод от Anthropic` нормализуется в `Claude от Anthropic`; heading cues вроде `И вот к чему пришли` / `Вот что мы достигли` перед перечислением превращаются в отдельный заголовок с двоеточием и numbered list.
+- Runtime-prompt второй нейросети больше не содержит примерные метки `Вход` / `Выход`, чтобы Qwen не копировала их в итог; если такие метки всё же появятся, post-processing вырезает leaked scaffold и снимает декоративный Markdown, когда исходный текст был plain text.
 
 ### Notes
 - `v1.2` и `v1.3` помечены как reconstructed history: GitHub Releases существуют, но локальные tags отсутствуют, а remote tags указывают на commit `v1.4`.
