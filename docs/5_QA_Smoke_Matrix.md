@@ -13,6 +13,7 @@
 | License `grace` | запись разрешена до bounded deadline | Compile-level only |
 | License `expired` | запись блокируется, доступна ссылка на оплату | Compile-level only |
 | License server unavailable | при валидном snapshot включается grace, без snapshot запись блокируется | Compile-level only |
+| Hung `whisper-cli` subprocess | transcription завершается timeout diagnostic, процесс останавливается, temp audio чистится | Verified by `scripts/test_whisper_runner_timeout.sh` |
 | Transcription fail | user видит различимую диагностическую ошибку | Compile-level only |
 | Paste fail | отображается локально различимая ошибка вставки | Compile-level only |
 | Payment initiated via site/app path | `uid` / pricing path совпадают с current product contract | Backend/web smoke verified in Sprint 1 |

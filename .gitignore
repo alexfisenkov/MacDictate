@@ -6,6 +6,7 @@ models/
 # Артефакты сборки
 build/
 build_log*.txt
+build_v*_log.txt
 
 # MacOS
 .DS_Store
@@ -17,6 +18,15 @@ build_log*.txt
 
 # Игнорируем релизы (DMG)
 *.dmg
+
+# Локальное хранилище release artifacts.
+# В git попадают только манифесты, registry и описания версий.
+releases/versions/*/artifacts/*
+releases/archive/*/artifacts/*
+!releases/versions/*/artifacts/ARTIFACTS.md
+!releases/versions/*/artifacts/SHA256SUMS
+!releases/archive/*/artifacts/ARTIFACTS.md
+!releases/archive/*/artifacts/SHA256SUMS
 
 # Локальные env / secrets
 .env

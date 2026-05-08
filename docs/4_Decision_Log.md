@@ -35,3 +35,33 @@
 - **Дата:** 2026-04-19
 - **Решение:** app-side fallback работает через bounded cached grace.
 - **Почему:** нужен компромисс между UX при кратковременном outage и защитой от бесконечного бесплатного доступа при сетевых ошибках.
+
+## D-007 — Desktop releases are governed by a release ledger
+
+- **Дата:** 2026-05-08
+- **Решение:** все desktop-версии MacDictate ведутся через `docs/7_Release_Governance.md`, `releases/registry.json` и `releases/versions/<version>/RELEASE.md`.
+- **Почему:** исторические DMG, tags и GitHub Releases уже расходились; будущим агентам нужен единый канон, а не реконструкция по случайным файлам.
+
+## D-008 — Binary artifacts are local/archive assets, not code source of truth
+
+- **Дата:** 2026-05-08
+- **Решение:** локальные DMG/build logs хранятся в `releases/versions/*/artifacts/` или `releases/archive/*/artifacts/`, игнорируются git и описываются через манифест/checksum.
+- **Почему:** Git source должен оставаться управляемым, а публичным каналом распространения DMG является GitHub Release asset.
+
+## D-009 — Historical version uncertainty is explicit
+
+- **Дата:** 2026-05-08
+- **Решение:** `v1.2`, `v1.3`, `v1.4.1-local` и локальный `v1.4.2` DMG помечаются с уровнем доверия и оговорками в registry/RELEASE.md.
+- **Почему:** лучше честно показать reconstructed/local-only историю, чем выдавать непроверенные артефакты за полноценный канон.
+
+## D-010 — Release structure is locked by policy and verification
+
+- **Дата:** 2026-05-08
+- **Решение:** новые desktop-версии запрещено вести вне схемы `releases/versions/<version>/` + одноименная запись в `releases/registry.json`; нарушение считается блокирующим состоянием проекта.
+- **Почему:** текстовых правил недостаточно для длинной истории релизов. Структура должна быть машинно проверяемой, чтобы будущие люди и агенты не создавали параллельные каталоги, локальные "релизы" и неучтенные артефакты.
+
+## D-011 — Release governance check runs in GitHub Actions
+
+- **Дата:** 2026-05-08
+- **Решение:** `.github/workflows/release-governance.yml` запускает `scripts/verify_release_governance.sh` на push/PR в основные рабочие ветки.
+- **Почему:** локальная дисциплина полезна, но запрет на нарушение структуры должен быть виден и на GitHub, чтобы pull request не проходил без актуального release ledger.

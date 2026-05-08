@@ -40,18 +40,31 @@ swiftc -O -target arm64-apple-macosx11.0 \
 
 # 5. Ad-Hoc подпись бинарников
 echo "🔐 Подписание приложения..."
-xattr -cr "$APP_DIR"
-find "$APP_DIR" -name ".DS_Store" -type f -delete
-xattr -cr "$APP_DIR"
-codesign --force --deep --sign - "$APP_DIR"
+clean_bundle_metadata() {
+    find "$APP_DIR" \( -name ".DS_Store" -o -name "._*" \) -type f -delete
+    dot_clean -m "$APP_DIR" >/dev/null 2>&1 || true
+    xattr -cr "$APP_DIR" >/dev/null 2>&1 || true
+    xattr -dr com.apple.FinderInfo "$APP_DIR" >/dev/null 2>&1 || true
+}
+
+clean_bundle_metadata
+if ! codesign --force --deep --sign - "$APP_DIR"; then
+    echo "⚠️  Повторная очистка metadata перед codesign..."
+    clean_bundle_metadata
+    codesign --force --deep --sign - "$APP_DIR"
+fi
 
 # 6. Сборка легкого DMG-образа
 DMG_NAME="MacDictate_Final_v1.4.2.dmg"
-DMG_PATH="$PROJECT_DIR/$DMG_NAME"
+DMG_OUTPUT_DIR="$BUILD_DIR/artifacts"
+mkdir -p "$DMG_OUTPUT_DIR"
+DMG_PATH="$DMG_OUTPUT_DIR/$DMG_NAME"
 rm -f "$DMG_PATH"
 
-echo "💿 Установка create-dmg (утилита AppleScript для DMG)..."
-brew install create-dmg > /dev/null 2>&1 || true
+if ! command -v create-dmg >/dev/null 2>&1; then
+    echo "💿 Установка create-dmg (утилита AppleScript для DMG)..."
+    brew install create-dmg
+fi
 
 echo "💿 Упаковка в DMG-образ..."
 # Создаем фолдер для сборки DMG
@@ -75,3 +88,4 @@ create-dmg \
   "$DMG_SRC_DIR"
 
 echo "✅ ГОТОВО! Ваш нативный профессиональный дистрибутив (с иконками): $DMG_PATH"
+echo "ℹ️  Для release перенесите DMG/build log в releases/versions/<version>/artifacts/ и обновите registry."

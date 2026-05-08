@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 1,
+  "product": "MacDictate macOS desktop",
+  "registryUpdatedAt": "2026-05-08",
+  "governanceDocument": "docs/7_Release_Governance.md",
+  "current": {
+    "publicStable": "v1.4.2",
+    "workingLine": "v1.5.0-working",
+    "developmentBranch": "release/1.5.0",
+    "bundleShortVersion": "1.4.2",
+    "bundleVersion": "9"
+  },
+  "versions": [
+    {
+      "version": "v1.0",
+      "status": "local_only",
+      "channel": "legacy",
+      "bundle": {
+        "shortVersion": "1.0",
+        "build": "1"
+      },
+      "git": {
+        "commit": "b402420467e4a3a06fe9b081e2c3c868371258fc",
+        "localTag": null,
+        "remoteTags": [],
+        "tagRequiredLocally": false
+      },
+      "github": {
+        "releaseUrl": null,
+        "assetName": null,
+        "githubAssetSha256": null,
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.0",
+        "artifactPath": "releases/versions/v1.0/artifacts/MacDictate_Final_Auto.dmg",
+        "localArtifactSha256": "ff11fe3ef5d01e0c3c17ee095141e95b456d4de0e19c31caab90a26c954946ca",
+        "buildLogPath": "releases/versions/v1.0/artifacts/build_log_v1.txt"
+      },
+      "summary": "Первый native Swift/AppKit desktop build: local Whisper via Homebrew, permissions, uninstaller.",
+      "sourceConfidence": "confirmed_local_artifact"
+    },
+    {
+      "version": "v1.1",
+      "status": "public_release",
+      "channel": "stable_history",
+      "bundle": {
+        "shortVersion": "1.1",
+        "build": "2"
+      },
+      "git": {
+        "commit": "7b895cf50a72e9fc8f85aeb609a8813e4b88488e",
+        "localTag": "v1.1",
+        "remoteTags": ["v1.1"],
+        "tagRequiredLocally": true
+      },
+      "github": {
+        "releaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.1",
+        "assetName": "MacDictate_Final_v1.1.dmg",
+        "githubAssetSha256": null,
+        "publishedAt": "2026-04-01T03:12:20Z"
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.1",
+        "artifactPath": "releases/versions/v1.1/artifacts/MacDictate_Final_v1.1.dmg",
+        "localArtifactSha256": "070d74f2e840c4df911329552489a9d04a02f5c0d7ed7af56f63c7e8fc54b62f",
+        "buildLogPath": "releases/versions/v1.1/artifacts/build_v1.1_log.txt"
+      },
+      "summary": "Reliable relaunch, visual login items through AppleScript fallback, early OTA updater.",
+      "sourceConfidence": "confirmed_git_and_github"
+    },
+    {
+      "version": "v1.2",
+      "status": "public_release",
+      "channel": "stable_history",
+      "bundle": {
+        "shortVersion": "1.2",
+        "build": "3"
+      },
+      "git": {
+        "commit": "cb6db00839c0f00d3f7f681706ded082b235013a",
+        "localTag": null,
+        "remoteTags": ["v1.2"],
+        "tagRequiredLocally": false
+      },
+      "github": {
+        "releaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.2",
+        "assetName": "MacDictate_Final_v1.2.dmg",
+        "githubAssetSha256": null,
+        "publishedAt": "2026-04-01T03:13:18Z"
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.2",
+        "artifactPath": "releases/versions/v1.2/artifacts/MacDictate_Final_v1.2.dmg",
+        "localArtifactSha256": "4f6b35e56e951603449316de0e8a9aca4051b1327cb9f3a6528048843745e977",
+        "buildLogPath": "releases/versions/v1.2/artifacts/build_log_v1.2.txt"
+      },
+      "summary": "GitHub release notes: first standalone release. Remote tag currently aliases the v1.4 commit.",
+      "sourceConfidence": "reconstructed_from_artifact_and_github"
+    },
+    {
+      "version": "v1.3",
+      "status": "public_release",
+      "channel": "stable_history",
+      "bundle": {
+        "shortVersion": "1.3",
+        "build": "5"
+      },
+      "git": {
+        "commit": "cb6db00839c0f00d3f7f681706ded082b235013a",
+        "localTag": null,
+        "remoteTags": ["v1.3"],
+        "tagRequiredLocally": false
+      },
+      "github": {
+        "releaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.3",
+        "assetName": "MacDictate_Final_v1.3.dmg",
+        "githubAssetSha256": null,
+        "publishedAt": "2026-04-01T03:13:56Z"
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.3",
+        "artifactPath": "releases/versions/v1.3/artifacts/MacDictate_Final_v1.3.dmg",
+        "localArtifactSha256": "a22a80eeeae0e64000857359abcbe566177135dc9827e9fd3941eef2452714e7",
+        "buildLogPath": null
+      },
+      "summary": "GitHub release notes: submenu settings and TCC polling. Remote tag currently aliases the v1.4 commit.",
+      "sourceConfidence": "reconstructed_from_artifact_and_github"
+    },
+    {
+      "version": "v1.4",
+      "status": "public_release",
+      "channel": "stable_history",
+      "bundle": {
+        "shortVersion": "1.4",
+        "build": "7"
+      },
+      "git": {
+        "commit": "cb6db00839c0f00d3f7f681706ded082b235013a",
+        "localTag": "v1.4",
+        "remoteTags": ["v1.4"],
+        "tagRequiredLocally": true
+      },
+      "github": {
+        "releaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.4",
+        "assetName": "MacDictate_Final_v1.4.dmg",
+        "githubAssetSha256": null,
+        "publishedAt": "2026-04-01T02:31:15Z"
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.4",
+        "artifactPath": "releases/versions/v1.4/artifacts/MacDictate_Final_v1.4.dmg",
+        "localArtifactSha256": "4dda7d66a110cf7b14e306a5bceac15b040328c4e5dd37c1b1c09a6684e3db51",
+        "buildLogPath": "releases/versions/v1.4/artifacts/build_log_v1.4.txt"
+      },
+      "summary": "Refined native settings submenu, TCC ghost permission guidance, Dangerous Zone uninstall return.",
+      "sourceConfidence": "confirmed_git_and_github"
+    },
+    {
+      "version": "v1.4.1-local",
+      "status": "local_only",
+      "channel": "legacy",
+      "bundle": {
+        "shortVersion": "1.4.1",
+        "build": "8"
+      },
+      "git": {
+        "commit": null,
+        "localTag": null,
+        "remoteTags": [],
+        "tagRequiredLocally": false
+      },
+      "github": {
+        "releaseUrl": null,
+        "assetName": null,
+        "githubAssetSha256": null,
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.4.1-local",
+        "artifactPath": "releases/versions/v1.4.1-local/artifacts/MacDictate_Final_v1.4.1.dmg",
+        "localArtifactSha256": "84aed1e3974bc82b2f3c2124409078a1110358da1808c80f09ade231fe20f2d3",
+        "buildLogPath": "releases/versions/v1.4.1-local/artifacts/build_log_v1.4.1.txt"
+      },
+      "summary": "Локальная промежуточная сборка build 8. Публичный GitHub Release/tag не найден.",
+      "sourceConfidence": "confirmed_local_artifact"
+    },
+    {
+      "version": "v1.4.2",
+      "status": "public_stable",
+      "channel": "stable",
+      "bundle": {
+        "shortVersion": "1.4.2",
+        "build": "9"
+      },
+      "git": {
+        "commit": "4a2fa2a3eebd392f4f336080df2b3c84d0884d26",
+        "localTag": "v1.4.2",
+        "remoteTags": ["v1.4.2"],
+        "tagRequiredLocally": true
+      },
+      "github": {
+        "releaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.4.2",
+        "assetName": "MacDictate_Final_v1.4.2.dmg",
+        "githubAssetSha256": "7c63e4d3d29cb99ab4cf557e070a53e55cb62347dcbff3ae412839529a4464f5",
+        "publishedAt": "2026-04-05T07:34:57Z"
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.4.2",
+        "artifactPath": "releases/versions/v1.4.2/artifacts/MacDictate_Final_v1.4.2.dmg",
+        "localArtifactSha256": "8f86246ea0b823a2f1b106e96f7a14014a06fd252df3055a5de5e6d8ae166ddb",
+        "buildLogPath": "releases/versions/v1.4.2/artifacts/build_log_v1.4.2.txt"
+      },
+      "summary": "Current public stable: GitHub OTA update check and paste success sound.",
+      "sourceConfidence": "confirmed_git_and_github"
+    },
+    {
+      "version": "v1.5.0-working",
+      "status": "working_line",
+      "channel": "development",
+      "bundle": {
+        "shortVersion": "1.4.2",
+        "build": "9"
+      },
+      "git": {
+        "commit": "9c138a794135e564d49ac2f03d179bf75ae5e974",
+        "localTag": null,
+        "remoteTags": [],
+        "tagRequiredLocally": false,
+        "branch": "release/1.5.0"
+      },
+      "github": {
+        "releaseUrl": null,
+        "assetName": null,
+        "githubAssetSha256": null,
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.5.0-working",
+        "artifactPath": null,
+        "localArtifactSha256": null,
+        "buildLogPath": null
+      },
+      "summary": "Active 1.5.0 development line: backend checkout hardening, license state machine, diagnostics, modular app architecture, release governance.",
+      "sourceConfidence": "confirmed_working_line"
+    }
+  ],
+  "checkpoints": [
+    {
+      "tag": "checkpoint/1.5.0-sprint1",
+      "commit": "60fcf45",
+      "summary": "Backend checkout and product surface hardening."
+    },
+    {
+      "tag": "checkpoint/1.5.0-sprint2",
+      "commit": "0aac0f8",
+      "summary": "App license state machine and diagnostics."
+    },
+    {
+      "tag": "checkpoint/1.5.0-pre-architecture",
+      "commit": "0aac0f8",
+      "summary": "Pre-refactor checkpoint before app-layer modularization."
+    },
+    {
+      "tag": "checkpoint/1.5.0-architecture-foundation",
+      "commit": "9c138a7",
+      "summary": "App-layer modularization and initial project governance."
+    }
+  ],
+  "archiveArtifacts": [
+    {
+      "bucket": "legacy-test-images",
+      "path": "releases/archive/legacy-test-images/artifacts",
+      "status": "scratch",
+      "summary": "Old test/rw disk images retained locally but not treated as product releases."
+    },
+    {
+      "bucket": "legacy-build-experiments",
+      "path": "releases/archive/legacy-build-experiments/artifacts",
+      "status": "scratch",
+      "summary": "Old generic build logs without one-to-one release status."
+    }
+  ]
+}

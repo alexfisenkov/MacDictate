@@ -2,6 +2,21 @@
 
 Этот журнал фиксирует инженерные шаги и checkpoints, а не маркетинговое описание релиза.
 
+## 2026-05-08 — Release governance foundation
+
+- Создан desktop release ledger: `releases/registry.json`, `releases/README.md`, per-version `RELEASE.md`.
+- Исторические DMG/build logs перенесены из корня `macos/` в `releases/versions/*/artifacts/` и `releases/archive/*/artifacts/`.
+- Зафиксированы статусы `public_stable`, `public_release`, `local_only`, `working_line`, `checkpoint`, `scratch`.
+- Добавлен `docs/7_Release_Governance.md` с правилами versioning, Git tags, GitHub Releases, local artifact storage и rollback.
+- Добавлен `scripts/verify_release_governance.sh` для проверки registry, `Info.plist`, checksums, папок версий и обязательных tags.
+- Добавлены desktop-local `CLAUDE.md` и `AGENTS.md`, чтобы будущие агенты начинали работу с release ledger.
+- По результату newcomer-аудита исправлен `build.sh`: обычный DMG output уходит в `build/artifacts/`, `create-dmg` не провоцирует Homebrew auto-update при уже установленной утилите, metadata cleanup перед `codesign` стал устойчивее.
+- По результату повторного newcomer-аудита добавлен `Structure Lock`: будущие версии обязаны сохранять схему `releases/versions/<version>/` + registry entry, а `verify_release_governance.sh` теперь падает на orphan-папках, orphan-registry entries, неверных именах и расхождении статусов.
+- Проверка release governance адаптирована под clean checkout: локальные ignored DMG/build logs не обязательны для GitHub Actions, но могут проверяться через `--strict-local-artifacts`.
+- Добавлен GitHub Actions gate `.github/workflows/release-governance.yml`, который запускает release governance verification на push/PR в основные рабочие ветки.
+- Закрыт главный runtime blocker по зависшему `whisper-cli`: `WhisperRunner` получил timeout `180` секунд, controlled termination и диагностическую ошибку `timedOut`.
+- Добавлен локальный verification script `scripts/test_whisper_runner_timeout.sh`, который проверяет recovery при зависшем fake `whisper-cli` и cleanup temp audio.
+
 ## 2026-04-19 — Sprint 1: backend / checkout / product surface hardening
 
 - Добавлен server-authoritative plan catalog и `GET /api/plans`.
