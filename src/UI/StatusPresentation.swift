@@ -103,6 +103,34 @@ enum StatusPresentation {
         }
     }
 
+    static func textImprovementMenuTitle(
+        isEnabled: Bool,
+        hasModel: Bool,
+        hasRuntime: Bool
+    ) -> String {
+        if isEnabled, hasModel, hasRuntime {
+            return "✨ Улучшение текста: включено"
+        }
+
+        if isEnabled, !hasModel {
+            return "✨ Улучшение текста: нужна модель Qwen"
+        }
+
+        if isEnabled, !hasRuntime {
+            return "✨ Улучшение текста: нужен llama.cpp"
+        }
+
+        if hasModel, hasRuntime {
+            return "✨ Улучшение текста: выключено"
+        }
+
+        if !hasModel {
+            return "✨ Улучшение текста: модель не скачана"
+        }
+
+        return "✨ Улучшение текста: нужен llama.cpp"
+    }
+
     static func shortDateTime(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .short

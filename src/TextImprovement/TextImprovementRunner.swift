@@ -1,0 +1,327 @@
+import Foundation
+import Darwin
+
+enum TextImprovementFailure: LocalizedError {
+    case modelMissing
+    case llamaCliMissing
+    case inputTooLong(Int)
+    case promptWriteFailed(String)
+    case launchFailed(String)
+    case nonZeroExit(Int32, String)
+    case outputMissing
+    case timedOut(TimeInterval)
+
+    var errorDescription: String? {
+        switch self {
+        case .modelMissing:
+            return "Модель улучшения текста не найдена."
+        case .llamaCliMissing:
+            return "Не найден llama.cpp runtime для локального улучшения текста."
+        case .inputTooLong(let limit):
+            return "Текст слишком длинный для безопасного улучшения второй нейросетью (лимит \(limit) символов)."
+        case .promptWriteFailed(let detail):
+            return "Не удалось подготовить текст для улучшения: \(detail)"
+        case .launchFailed(let detail):
+            return "Не удалось запустить llama.cpp runtime: \(detail)"
+        case .nonZeroExit(let code, let detail):
+            if detail.isEmpty {
+                return "llama.cpp runtime завершился с ошибкой (код \(code))."
+            }
+            return "llama.cpp runtime завершился с ошибкой (код \(code)): \(detail)"
+        case .outputMissing:
+            return "Модель улучшения текста не вернула результат."
+        case .timedOut(let timeout):
+            return "Улучшение текста не завершилось за \(Self.formatDuration(timeout)). MacDictate остановил зависший процесс."
+        }
+    }
+
+    private static func formatDuration(_ seconds: TimeInterval) -> String {
+        let roundedSeconds = max(0, Int(seconds.rounded()))
+        if roundedSeconds >= 60, roundedSeconds % 60 == 0 {
+            return "\(roundedSeconds / 60) мин"
+        }
+        return "\(roundedSeconds) сек"
+    }
+}
+
+final class TextImprovementRunner {
+    private static let defaultTimeoutSeconds: TimeInterval = 300
+    private static let defaultTerminationGraceSeconds: TimeInterval = 2
+    private static let defaultOutputLimitBytes = 131_072
+    private static let contextTokens = 4_096
+    private static let maximumInputCharacters = 6_000
+
+    private let timeoutSeconds: TimeInterval
+    private let terminationGraceSeconds: TimeInterval
+    private let outputLimitBytes: Int
+    private let modelPathProvider: () -> String?
+    private let llamaCliPathProvider: () -> String?
+
+    init(
+        bundle: Bundle = .main,
+        timeoutSeconds: TimeInterval = TextImprovementRunner.defaultTimeoutSeconds,
+        terminationGraceSeconds: TimeInterval = TextImprovementRunner.defaultTerminationGraceSeconds,
+        outputLimitBytes: Int = TextImprovementRunner.defaultOutputLimitBytes,
+        modelPathProvider: (() -> String?)? = nil,
+        llamaCliPathProvider: (() -> String?)? = nil
+    ) {
+        self.timeoutSeconds = timeoutSeconds
+        self.terminationGraceSeconds = terminationGraceSeconds
+        self.outputLimitBytes = outputLimitBytes
+        self.modelPathProvider = modelPathProvider ?? {
+            ModelLocator.bestAvailableTextImprovementModelPath()
+        }
+        self.llamaCliPathProvider = llamaCliPathProvider ?? {
+            TextImprovementRunner.findLlamaCliPath(in: bundle)
+        }
+    }
+
+    func availableModelPath() -> String? {
+        modelPathProvider()
+    }
+
+    func availableLlamaCliPath() -> String? {
+        llamaCliPathProvider()
+    }
+
+    static func findLlamaCliPath(in bundle: Bundle) -> String? {
+        var candidates: [String] = []
+        if let resourcePath = bundle.resourcePath {
+            candidates.append(resourcePath + "/bin/llama-completion")
+            candidates.append(resourcePath + "/bin/llama-cli")
+        }
+        candidates.append("/opt/homebrew/bin/llama-completion")
+        candidates.append("/opt/homebrew/bin/llama-cli")
+        candidates.append("/usr/local/bin/llama-completion")
+        candidates.append("/usr/local/bin/llama-cli")
+
+        for candidate in candidates where FileManager.default.isExecutableFile(atPath: candidate) {
+            return candidate
+        }
+
+        return nil
+    }
+
+    func improve(_ text: String) -> Result<String, TextImprovementFailure> {
+        let input = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !input.isEmpty else {
+            return .success("")
+        }
+
+        guard input.count <= Self.maximumInputCharacters else {
+            return .failure(.inputTooLong(Self.maximumInputCharacters))
+        }
+
+        guard let modelPath = modelPathProvider() else {
+            return .failure(.modelMissing)
+        }
+
+        guard let llamaCli = llamaCliPathProvider() else {
+            return .failure(.llamaCliMissing)
+        }
+
+        let promptPath: String
+        do {
+            promptPath = try writePromptFile(for: input)
+        } catch {
+            return .failure(.promptWriteFailed(error.localizedDescription))
+        }
+        defer { try? FileManager.default.removeItem(atPath: promptPath) }
+
+        let stdoutPipe = Pipe()
+        let stderrPipe = Pipe()
+        let stdoutHandle = stdoutPipe.fileHandleForReading
+        let stderrHandle = stderrPipe.fileHandleForReading
+        let stdoutCollector = TextProcessOutputCollector(limitBytes: outputLimitBytes)
+        let stderrCollector = TextProcessOutputCollector(limitBytes: 16_384)
+        let terminationSemaphore = DispatchSemaphore(value: 0)
+
+        let task = Process()
+        task.launchPath = llamaCli
+        task.arguments = [
+            "-m", modelPath,
+            "-f", promptPath,
+            "-c", "\(Self.contextTokens)",
+            "-n", "\(Self.maxGeneratedTokens(for: input))",
+            "--temp", "0.1",
+            "--top-p", "0.9",
+            "--no-display-prompt",
+            "-no-cnv",
+            "-ngl", "99"
+        ]
+        task.standardOutput = stdoutPipe
+        task.standardError = stderrPipe
+
+        stdoutHandle.readabilityHandler = { handle in
+            let data = handle.availableData
+            if data.isEmpty {
+                handle.readabilityHandler = nil
+                return
+            }
+            stdoutCollector.append(data)
+        }
+        stderrHandle.readabilityHandler = { handle in
+            let data = handle.availableData
+            if data.isEmpty {
+                handle.readabilityHandler = nil
+                return
+            }
+            stderrCollector.append(data)
+        }
+        task.terminationHandler = { _ in
+            terminationSemaphore.signal()
+        }
+
+        do {
+            try task.run()
+
+            if terminationSemaphore.wait(timeout: dispatchDeadline(after: timeoutSeconds)) == .timedOut {
+                stopTimedOutProcess(task, terminationSemaphore: terminationSemaphore)
+                stdoutHandle.readabilityHandler = nil
+                stderrHandle.readabilityHandler = nil
+                task.terminationHandler = nil
+                return .failure(.timedOut(timeoutSeconds))
+            }
+
+            stdoutHandle.readabilityHandler = nil
+            stderrHandle.readabilityHandler = nil
+            task.terminationHandler = nil
+
+            stdoutCollector.append(stdoutHandle.readDataToEndOfFile())
+            stderrCollector.append(stderrHandle.readDataToEndOfFile())
+
+            let stderrText = stderrCollector.text()
+            guard task.terminationStatus == 0 else {
+                return .failure(.nonZeroExit(task.terminationStatus, stderrText))
+            }
+
+            let improved = Self.cleanModelOutput(stdoutCollector.text())
+            guard !improved.isEmpty else {
+                return .failure(.outputMissing)
+            }
+
+            return .success(improved)
+        } catch {
+            stdoutHandle.readabilityHandler = nil
+            stderrHandle.readabilityHandler = nil
+            task.terminationHandler = nil
+            return .failure(.launchFailed(error.localizedDescription))
+        }
+    }
+
+    static func cleanModelOutput(_ output: String) -> String {
+        var cleaned = output
+            .replacingOccurrences(of: "<|im_end|>", with: "")
+            .replacingOccurrences(of: "<|endoftext|>", with: "")
+            .replacingOccurrences(of: "[end of text]", with: "")
+            .replacingOccurrences(of: "```text", with: "")
+            .replacingOccurrences(of: "```", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let removablePrefixes = [
+            "Исправленный текст:",
+            "Улучшенный текст:",
+            "Corrected text:",
+            "Improved text:"
+        ]
+
+        for prefix in removablePrefixes {
+            if cleaned.localizedCaseInsensitiveContains(prefix),
+               let range = cleaned.range(of: prefix, options: [.caseInsensitive, .anchored]) {
+                cleaned.removeSubrange(range)
+                cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+        }
+
+        return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func writePromptFile(for input: String) throws -> String {
+        let prompt = Self.prompt(for: input)
+        let promptURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("macdictate-text-improvement-\(UUID().uuidString).txt")
+        try prompt.write(to: promptURL, atomically: true, encoding: .utf8)
+        return promptURL.path
+    }
+
+    private static func prompt(for input: String) -> String {
+        """
+        <|im_start|>system
+        Ты локальный редактор диктовки MacDictate. Исправь только орфографию, пунктуацию, очевидные ошибки распознавания речи и разбей текст на логичные абзацы. Не добавляй новые факты, не меняй смысл, не делай пересказ и не объясняй свои действия. Сохраняй язык исходного текста. Верни только готовый исправленный текст.
+        <|im_end|>
+        <|im_start|>user
+        \(input)
+        <|im_end|>
+        <|im_start|>assistant
+        """
+    }
+
+    private static func maxGeneratedTokens(for input: String) -> Int {
+        let estimatedTokens = input.unicodeScalars.count / 3
+        return min(2_048, max(256, estimatedTokens + 128))
+    }
+
+    private func stopTimedOutProcess(_ task: Process, terminationSemaphore: DispatchSemaphore) {
+        if task.isRunning {
+            task.terminate()
+        }
+
+        if terminationSemaphore.wait(timeout: dispatchDeadline(after: terminationGraceSeconds)) == .success {
+            return
+        }
+
+        if task.isRunning {
+            kill(task.processIdentifier, SIGKILL)
+            _ = terminationSemaphore.wait(timeout: dispatchDeadline(after: 1))
+        }
+    }
+
+    private func dispatchDeadline(after seconds: TimeInterval) -> DispatchTime {
+        let milliseconds = max(0, Int(seconds * 1000))
+        return .now() + .milliseconds(milliseconds)
+    }
+}
+
+private final class TextProcessOutputCollector {
+    private let limitBytes: Int
+    private let queue = DispatchQueue(label: "com.alexfisenkov.macdictate.text-process-output")
+    private var buffer = Data()
+    private var truncated = false
+
+    init(limitBytes: Int) {
+        self.limitBytes = max(0, limitBytes)
+    }
+
+    func append(_ data: Data) {
+        guard !data.isEmpty else { return }
+
+        queue.sync {
+            guard buffer.count < limitBytes else {
+                truncated = true
+                return
+            }
+
+            let remaining = limitBytes - buffer.count
+            if data.count <= remaining {
+                buffer.append(data)
+            } else {
+                buffer.append(data.prefix(remaining))
+                truncated = true
+            }
+        }
+    }
+
+    func text() -> String {
+        queue.sync {
+            var text = String(data: buffer, encoding: .utf8)?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+            if truncated {
+                let suffix = "[output truncated]"
+                text = text.isEmpty ? suffix : "\(text)\n\(suffix)"
+            }
+
+            return text
+        }
+    }
+}

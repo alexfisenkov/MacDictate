@@ -41,18 +41,41 @@ swiftc -O -target arm64-apple-macosx11.0 \
 # 5. Ad-Hoc подпись бинарников
 echo "🔐 Подписание приложения..."
 clean_bundle_metadata() {
-    find "$APP_DIR" \( -name ".DS_Store" -o -name "._*" \) -type f -delete
-    dot_clean -m "$APP_DIR" >/dev/null 2>&1 || true
-    xattr -cr "$APP_DIR" >/dev/null 2>&1 || true
-    xattr -dr com.apple.FinderInfo "$APP_DIR" >/dev/null 2>&1 || true
+    local target="$1"
+    find "$target" \( -name ".DS_Store" -o -name "._*" \) -type f -delete
+    dot_clean -m "$target" >/dev/null 2>&1 || true
+    xattr -cr "$target" >/dev/null 2>&1 || true
+    xattr -c "$target" >/dev/null 2>&1 || true
+    xattr -dr com.apple.FinderInfo "$target" >/dev/null 2>&1 || true
+    xattr -d com.apple.FinderInfo "$target" >/dev/null 2>&1 || true
 }
 
-clean_bundle_metadata
-if ! codesign --force --deep --sign - "$APP_DIR"; then
-    echo "⚠️  Повторная очистка metadata перед codesign..."
-    clean_bundle_metadata
-    codesign --force --deep --sign - "$APP_DIR"
-fi
+sign_and_verify_app() {
+    local target="$1"
+    local output=""
+    local attempt=1
+
+    while [ "$attempt" -le 3 ]; do
+        clean_bundle_metadata "$target"
+        if output="$(codesign --force --deep --sign - "$target" 2>&1)"; then
+            clean_bundle_metadata "$target"
+            if codesign --verify --deep --verbose=2 "$target" >/dev/null 2>&1; then
+                return 0
+            fi
+            output="$(codesign --verify --deep --verbose=2 "$target" 2>&1)" || true
+        fi
+
+        if [ "$attempt" -lt 3 ]; then
+            sleep 0.2
+        fi
+        attempt=$((attempt + 1))
+    done
+
+    printf '%s\n' "$output" >&2
+    return 1
+}
+
+sign_and_verify_app "$APP_DIR"
 
 # 6. Сборка легкого DMG-образа
 DMG_NAME="MacDictate_Final_v1.4.2.dmg"
@@ -70,7 +93,8 @@ echo "💿 Упаковка в DMG-образ..."
 # Создаем фолдер для сборки DMG
 DMG_SRC_DIR="$BUILD_DIR/dmg_src"
 mkdir -p "$DMG_SRC_DIR"
-cp -R "$APP_DIR" "$DMG_SRC_DIR/"
+ditto --noextattr --noqtn "$APP_DIR" "$DMG_SRC_DIR/$APP_NAME"
+sign_and_verify_app "$DMG_SRC_DIR/$APP_NAME"
 
 cd "$PROJECT_DIR"
 create-dmg \
@@ -86,6 +110,10 @@ create-dmg \
   --no-internet-enable \
   "$DMG_PATH" \
   "$DMG_SRC_DIR"
+
+sign_and_verify_app "$APP_DIR"
+sign_and_verify_app "$DMG_SRC_DIR/$APP_NAME"
+hdiutil verify "$DMG_PATH" >/dev/null
 
 echo "✅ ГОТОВО! Ваш нативный профессиональный дистрибутив (с иконками): $DMG_PATH"
 echo "ℹ️  Для release перенесите DMG/build log в releases/versions/<version>/artifacts/ и обновите registry."

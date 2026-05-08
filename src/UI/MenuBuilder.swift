@@ -6,8 +6,12 @@ struct AppMenuComponents {
     let statusItem: NSMenuItem
     let licenseItem: NSMenuItem
     let diagnosticsItem: NSMenuItem
+    let improveTextItem: NSMenuItem
     let accessibilityStateItem: NSMenuItem
     let microphoneStateItem: NSMenuItem
+    let textImprovementStateItem: NSMenuItem
+    let textImprovementToggleItem: NSMenuItem
+    let textImprovementDownloadItem: NSMenuItem
 }
 
 enum MenuBuilder {
@@ -28,6 +32,10 @@ enum MenuBuilder {
         let helpItem = NSMenuItem(title: "📖 Инструкция", action: #selector(AppController.showInstructions), keyEquivalent: "")
         helpItem.target = controller
         menu.addItem(helpItem)
+
+        let improveTextItem = NSMenuItem(title: "✨ Улучшить текст", action: #selector(AppController.improveTextFromClipboard), keyEquivalent: "")
+        improveTextItem.target = controller
+        menu.addItem(improveTextItem)
         menu.addItem(NSMenuItem.separator())
 
         let settingsMenuItem = NSMenuItem(title: "⚙️ Настройки", action: nil, keyEquivalent: "")
@@ -47,6 +55,18 @@ enum MenuBuilder {
         let microphoneAction = NSMenuItem(title: "Открыть настройки микрофона", action: #selector(AppController.openMicrophoneSettings), keyEquivalent: "")
         microphoneAction.target = controller
         settingsSubmenu.addItem(microphoneAction)
+        settingsSubmenu.addItem(NSMenuItem.separator())
+
+        let textImprovementStateItem = NSMenuItem(title: "✨ Улучшение текста: проверка...", action: nil, keyEquivalent: "")
+        settingsSubmenu.addItem(textImprovementStateItem)
+
+        let textImprovementToggleItem = NSMenuItem(title: "Улучшать текст после диктовки", action: #selector(AppController.toggleTextImprovement), keyEquivalent: "")
+        textImprovementToggleItem.target = controller
+        settingsSubmenu.addItem(textImprovementToggleItem)
+
+        let textImprovementDownloadItem = NSMenuItem(title: "Скачать модель улучшения текста", action: #selector(AppController.downloadTextImprovementModel), keyEquivalent: "")
+        textImprovementDownloadItem.target = controller
+        settingsSubmenu.addItem(textImprovementDownloadItem)
         settingsSubmenu.addItem(NSMenuItem.separator())
 
         if #available(macOS 13.0, *) {
@@ -83,8 +103,12 @@ enum MenuBuilder {
             statusItem: statusItem,
             licenseItem: licenseItem,
             diagnosticsItem: diagnosticsItem,
+            improveTextItem: improveTextItem,
             accessibilityStateItem: accessibilityStateItem,
-            microphoneStateItem: microphoneStateItem
+            microphoneStateItem: microphoneStateItem,
+            textImprovementStateItem: textImprovementStateItem,
+            textImprovementToggleItem: textImprovementToggleItem,
+            textImprovementDownloadItem: textImprovementDownloadItem
         )
     }
 }

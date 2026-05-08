@@ -4,8 +4,8 @@ For MacDictate Software and MacDictate.pro website
 This Policy regulates the collection, use, and protection of personal and technical data of Users of the "MacDictate" application and visitors of the MacDictate.pro website.
 
 ## 1. INTRODUCTION AND ARCHITECTURE (IMPORTANT!)
-**1.1. Local Speech Processing:** The main principle of MacDictate is ABSOLUTE PRIVACY. The application uses the offline neural network OpenAI Whisper.
-Your voice, audio recordings, background noise, and transcribed text are processed EXCLUSIVELY on your device's processor (locally on macOS). **Not a single byte of audio is sent to our servers or third-party servers.**
+**1.1. Local Speech and Text Processing:** The main principle of MacDictate is ABSOLUTE PRIVACY. The application uses the offline neural network OpenAI Whisper for speech recognition and may use a local Qwen model for improving recognized text.
+Your voice, audio recordings, background noise, transcribed text, and text passed to the improvement feature are processed EXCLUSIVELY on your device's processor (locally on macOS). **Not a single byte of dictation audio or text is sent to our servers or third-party servers.**
 
 ## 2. WHAT DATA WE COLLECT AND WHY
 To ensure the operation of the license, the trial period mechanism, and the payment process, we collect the minimum necessary set of data:

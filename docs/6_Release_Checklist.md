@@ -25,6 +25,7 @@
 - [ ] `scripts/test_whisper_runner_timeout.sh` проходит.
 - [ ] `scripts/test_license_machine_id_timeout.sh` проходит.
 - [ ] `scripts/test_recording_temp_cleanup.sh` проходит.
+- [ ] `scripts/test_text_improvement_runner.sh` проходит.
 - [ ] `node --check backend/*.js` проходит.
 - [ ] `./build.sh` проходит на чистой рабочей копии.
 - [ ] Ясно, какой DMG является release source of truth.

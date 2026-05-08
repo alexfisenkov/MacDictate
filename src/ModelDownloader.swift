@@ -1,44 +1,85 @@
 import Cocoa
 
+struct ModelDownloadConfiguration {
+    let windowTitle: String
+    let title: String
+    let description: String
+    let buttonTitle: String
+    let statusReady: String
+    let statusConnecting: String
+    let statusFinished: String
+    let destinationFilename: String
+    let modelURL: URL
+    let minimumBytes: Int64
+
+    static let whisper = ModelDownloadConfiguration(
+        windowTitle: "Настройка MacDictate",
+        title: "Добро пожаловать в MacDictate!",
+        description: "Для первого запуска необходимо скачать модель распознавания речи (Whisper). \n\n🔒 100% Локально и безопасно: ваши аудио обрабатываются только на процессоре вашего Mac и никуда не отправляются.",
+        buttonTitle: "Скачать модель",
+        statusReady: "Нажмите 'Скачать' для старта",
+        statusConnecting: "Подключение к серверам HuggingFace...",
+        statusFinished: "Загрузка завершена! Настройка окружения...",
+        destinationFilename: "ggml-large-v3-turbo.bin",
+        modelURL: URL(string: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin")!,
+        minimumBytes: 50_000_000
+    )
+
+    static let textImprovement = ModelDownloadConfiguration(
+        windowTitle: "Улучшение текста MacDictate",
+        title: "Скачать вторую нейросеть?",
+        description: "MacDictate может локально улучшать текст после Whisper: исправлять пунктуацию, орфографию и разбивать диктовку на абзацы. \n\nМодель Qwen2.5-1.5B-Instruct Q4_K_M занимает около 1.1 GB и работает на вашем Mac.",
+        buttonTitle: "Скачать Qwen",
+        statusReady: "Нажмите 'Скачать Qwen' для старта",
+        statusConnecting: "Подключение к HuggingFace для загрузки Qwen...",
+        statusFinished: "Модель улучшения текста загружена.",
+        destinationFilename: ModelLocator.textImprovementModelFilename,
+        modelURL: URL(string: "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf")!,
+        minimumBytes: ModelLocator.minimumTextImprovementModelBytes
+    )
+}
+
 class ModelDownloader {
     let modelsDir: String
     let completion: (Bool) -> Void
+    let configuration: ModelDownloadConfiguration
     
     var progressIndicator: NSProgressIndicator!
     var statusLabel: NSTextField!
     var downloadButton: NSButton!
-    
-    // Модель по умолчанию
-    let modelURL = URL(string: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin")!
-    
-    init(modelsDir: String, completion: @escaping (Bool) -> Void) {
+
+    init(
+        modelsDir: String,
+        configuration: ModelDownloadConfiguration = .whisper,
+        completion: @escaping (Bool) -> Void
+    ) {
         self.modelsDir = modelsDir
+        self.configuration = configuration
         self.completion = completion
     }
     
     func createWindow() -> NSWindow {
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 450, height: 250),
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 450, height: 280),
                               styleMask: [.titled, .closable],
                               backing: .buffered, defer: false)
         window.center()
-        window.title = "Настройка MacDictate"
+        window.title = configuration.windowTitle
         
         // Визуальный контейнер
-        let view = NSView(frame: NSRect(x: 0, y: 0, width: 450, height: 250))
+        let view = NSView(frame: NSRect(x: 0, y: 0, width: 450, height: 280))
         
-        let titleLabel = NSTextField(labelWithString: "Добро пожаловать в MacDictate!")
-        titleLabel.frame = NSRect(x: 50, y: 190, width: 350, height: 30)
+        let titleLabel = NSTextField(labelWithString: configuration.title)
+        titleLabel.frame = NSRect(x: 50, y: 220, width: 350, height: 30)
         titleLabel.font = NSFont.boldSystemFont(ofSize: 20)
         titleLabel.alignment = .center
         view.addSubview(titleLabel)
         
-        let infoText = "Для первого запуска необходимо скачать модель распознавания речи (Whisper). \n\n🔒 100% Локально и безопасно: ваши аудио обрабатываются только на процессоре вашего Mac и никуда не отправляются."
-        let infoLabel = NSTextField(wrappingLabelWithString: infoText)
-        infoLabel.frame = NSRect(x: 40, y: 120, width: 370, height: 60)
+        let infoLabel = NSTextField(wrappingLabelWithString: configuration.description)
+        infoLabel.frame = NSRect(x: 40, y: 125, width: 370, height: 85)
         infoLabel.alignment = .center
         view.addSubview(infoLabel)
         
-        progressIndicator = NSProgressIndicator(frame: NSRect(x: 50, y: 90, width: 350, height: 20))
+        progressIndicator = NSProgressIndicator(frame: NSRect(x: 50, y: 95, width: 350, height: 20))
         progressIndicator.style = .bar
         progressIndicator.isIndeterminate = false
         progressIndicator.minValue = 0
@@ -46,14 +87,14 @@ class ModelDownloader {
         progressIndicator.doubleValue = 0
         view.addSubview(progressIndicator)
         
-        statusLabel = NSTextField(labelWithString: "Нажмите 'Скачать' для старта")
-        statusLabel.frame = NSRect(x: 50, y: 65, width: 350, height: 20)
+        statusLabel = NSTextField(labelWithString: configuration.statusReady)
+        statusLabel.frame = NSRect(x: 50, y: 70, width: 350, height: 20)
         statusLabel.textColor = .secondaryLabelColor
         statusLabel.alignment = .center
         view.addSubview(statusLabel)
         
-        downloadButton = NSButton(title: "Скачать модель", target: self, action: #selector(startDownload))
-        downloadButton.frame = NSRect(x: 150, y: 20, width: 150, height: 32)
+        downloadButton = NSButton(title: configuration.buttonTitle, target: self, action: #selector(startDownload))
+        downloadButton.frame = NSRect(x: 150, y: 25, width: 150, height: 32)
         downloadButton.bezelStyle = .rounded
         view.addSubview(downloadButton)
         
@@ -63,16 +104,16 @@ class ModelDownloader {
     
     @objc func startDownload() {
         downloadButton.isEnabled = false
-        statusLabel.stringValue = "Подключение к серверам HuggingFace..."
+        statusLabel.stringValue = configuration.statusConnecting
         progressIndicator.isIndeterminate = true
         progressIndicator.startAnimation(nil)
         
-        let destURL = URL(fileURLWithPath: modelsDir + "/ggml-large-v3-turbo.bin")
+        let destURL = URL(fileURLWithPath: modelsDir + "/" + configuration.destinationFilename)
         
         let sessionConfig = URLSessionConfiguration.default
         let session = URLSession(configuration: sessionConfig, delegate: DownloadDelegate(downloader: self, destURL: destURL), delegateQueue: OperationQueue.main)
         
-        let task = session.downloadTask(with: modelURL)
+        let task = session.downloadTask(with: configuration.modelURL)
         task.resume()
     }
 }
@@ -107,11 +148,19 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         do {
+            let size = (try? FileManager.default.attributesOfItem(atPath: location.path)[.size]) as? Int64 ?? 0
+            guard size >= downloader.configuration.minimumBytes else {
+                downloader.statusLabel.stringValue = "Файл модели слишком маленький или поврежден. Проверьте интернет/VPN и попробуйте снова."
+                downloader.downloadButton.isEnabled = true
+                downloader.progressIndicator.doubleValue = 0
+                return
+            }
+
             if FileManager.default.fileExists(atPath: destURL.path) {
                 try FileManager.default.removeItem(at: destURL)
             }
             try FileManager.default.moveItem(at: location, to: destURL)
-            downloader.statusLabel.stringValue = "Загрузка завершена! Настройка окружения..."
+            downloader.statusLabel.stringValue = downloader.configuration.statusFinished
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 self.downloader.completion(true)

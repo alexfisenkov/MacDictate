@@ -20,6 +20,15 @@
 - `LicenseService.resolveMachineID` получил bounded timeout вокруг `/usr/sbin/ioreg`; при сбое или зависании генерируется и кешируется fallback `MD-*`.
 - `RecordingService` теперь чистит stale `/tmp/mac_dictate_dist.wav` и `.txt` при инициализации и перед новой записью.
 - Добавлены targeted harness scripts `scripts/test_license_machine_id_timeout.sh` и `scripts/test_recording_temp_cleanup.sh`.
+- Добавлен optional second-AI layer: `TextImprovementRunner` запускает Qwen2.5-1.5B-Instruct Q4_K_M через `llama.cpp` runtime после Whisper, если включен toggle.
+- `ModelLocator` разделяет Whisper `.bin` и text-improvement `.gguf`, чтобы вторая модель не могла сломать ASR model selection.
+- В меню добавлены `Улучшить текст`, persisted toggle `Улучшать текст после диктовки` и downloader для Qwen model.
+- Download/reinstall Qwen model больше не включает automatic improvement сам по себе; автокоррекция включается только toggle-flow.
+- Downloader валидирует минимальный размер модели перед сохранением, а повторный запуск downloader поднимает уже открытое окно вместо второго параллельного download task.
+- Text improvement ограничен `6_000` символов input, чтобы длинная диктовка не могла быть тихо усечена generation cap; automatic pipeline fallback-ится к Whisper-тексту.
+- Добавлен targeted harness `scripts/test_text_improvement_runner.sh` для timeout, stderr/stdout drain, missing runtime/model и non-zero exit.
+- `build.sh` дополнительно чистит xattrs на root `.app` bundle, проверяет подпись через `codesign --verify --deep`, готовит DMG staging-копию через `ditto --noextattr --noqtn` и запускает `hdiutil verify` для образа; отдельный release debt зафиксирован для strict verification смонтированной/установленной DMG-копии вместе с Developer ID/notarization.
+- Проведен реальный local smoke на M1: `llama.cpp` установлен через Homebrew, Qwen GGUF скачан полностью (`1,117,320,736` bytes), `TextImprovementRunner` исправил короткий русский текст через локальную модель.
 
 ## 2026-04-19 — Sprint 1: backend / checkout / product surface hardening
 

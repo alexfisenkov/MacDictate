@@ -65,3 +65,11 @@
 - **Дата:** 2026-05-08
 - **Решение:** `.github/workflows/release-governance.yml` запускает `scripts/verify_release_governance.sh` на push/PR в основные рабочие ветки.
 - **Почему:** локальная дисциплина полезна, но запрет на нарушение структуры должен быть виден и на GitHub, чтобы pull request не проходил без актуального release ledger.
+
+## D-012 — Text improvement uses optional Qwen GGUF via llama.cpp
+
+- **Дата:** 2026-05-08
+- **Решение:** вторую локальную нейросеть для коррекции текста строим как optional layer: `Qwen2.5-1.5B-Instruct-GGUF` quantization `Q4_K_M` запускается через `llama.cpp` runtime (`llama-completion` в актуальном Homebrew), а модель хранится отдельным `.gguf` файлом `qwen2.5-1.5b-instruct-q4_k_m.gguf`. Для первого внедрения Qwen получает только input до `6_000` символов; длинные тексты fallback-ятся к cleaned Whisper text без попытки генерации.
+- **Почему:** Qwen2.5-1.5B достаточно легкий для M1/16 GB, официально мультиязычный, поддерживает instruct-following и structured output, а GGUF/llama.cpp повторяет уже принятый в MacDictate паттерн внешнего локального CLI-процесса. 7B/8B варианты дают лучшее качество, но увеличивают cold-start, RAM/disk footprint и риск UX-регрессии для фоновой диктовки.
+- **Источники:** `https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF`, `https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct`, `https://www.mintlify.com/ggml-org/llama.cpp/installation`.
+- **Ограничение:** отсутствие Qwen/`llama.cpp` runtime не блокирует базовую диктовку. При failure automatic text improvement должен fallback-ить к cleaned Whisper text.

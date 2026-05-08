@@ -12,20 +12,24 @@
 - project operating model, decision log, smoke matrix и release checklist;
 - release governance layer: `docs/7_Release_Governance.md`, `releases/registry.json`, per-version `RELEASE.md`, локальное хранилище artifacts и `scripts/verify_release_governance.sh`;
 - desktop-local `CLAUDE.md` / `AGENTS.md` с правилами работы будущих агентов;
-- targeted runtime harnesses для зависшего/stderr-heavy `whisper-cli`, machine ID timeout и cleanup stale temp audio.
+- optional локальное улучшение текста второй нейросетью: Qwen2.5-1.5B-Instruct Q4_K_M через `llama.cpp` (`llama-completion`), toggle в настройках и ручная команда `Улучшить текст`;
+- targeted runtime harnesses для зависшего/stderr-heavy `whisper-cli`, machine ID timeout, cleanup stale temp audio и `TextImprovementRunner`.
 
 ### Changed
 - `AppController.swift` превращен в composition root / coordinator, а ключевая логика вынесена в отдельные сервисы;
 - `README.md` и docs теперь описывают весь product surface: `app`, `backend`, `web-landing`, `legal`, `docs`;
 - сборка `swiftc` теперь подхватывает все `.swift` файлы в `src/` рекурсивно;
 - исторические DMG/build logs разложены из корня проекта в `releases/versions/*/artifacts/` и `releases/archive/*/artifacts/`;
-- `build.sh` теперь кладет обычный DMG output в `build/artifacts/`, не запускает Homebrew install, если `create-dmg` уже доступен, и повторно очищает macOS metadata перед `codesign`.
+- `build.sh` теперь кладет обычный DMG output в `build/artifacts/`, не запускает Homebrew install, если `create-dmg` уже доступен, очищает macOS metadata, проверяет подпись `.app` и готовит DMG staging-копию через `ditto` без xattrs;
+- model lookup разделен по типам: Whisper остается `.bin`, а текстовая модель хранится как `.gguf`, чтобы вторая нейросеть не могла случайно подменить ASR-модель.
 
 ### Fixed
 - `WhisperRunner` больше не ждет `whisper-cli` бесконечно: transcription subprocess ограничен timeout `30` минут, после чего процесс завершается, temp-файлы чистятся, а пользователь получает различимую диагностическую ошибку.
 - `WhisperRunner` теперь читает `stderr` во время работы subprocess, чтобы шумный `whisper-cli` не блокировался на заполненном pipe.
 - `LicenseService` больше не может подвиснуть на первом `ioreg` при получении machine ID: command ограничен timeout и fallback-кешированием generated ID.
 - `RecordingService` чистит stale `/tmp/mac_dictate_dist.wav` и `.txt` при старте сервиса и перед новой записью.
+- Ошибка/отсутствие второй нейросети больше не ломает диктовку: при включенном улучшении MacDictate вставляет исходный Whisper-текст и показывает warning diagnostic.
+- Длинные тексты больше не отправляются в Qwen вслепую: input > 6 000 символов fallback-ится без риска silent truncation.
 
 ### Notes
 - `v1.2` и `v1.3` помечены как reconstructed history: GitHub Releases существуют, но локальные tags отсутствуют, а remote tags указывают на commit `v1.4`.

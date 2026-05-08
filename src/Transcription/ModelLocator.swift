@@ -1,8 +1,15 @@
 import Foundation
 
 enum ModelLocator {
+    static let textImprovementModelFilename = "qwen2.5-1.5b-instruct-q4_k_m.gguf"
+    static let minimumTextImprovementModelBytes: Int64 = 1_100_000_000
+
     static var modelsDirectoryPath: String {
         FileManager.default.homeDirectoryForCurrentUser.path + "/.macdictate/models"
+    }
+
+    static var textImprovementModelPath: String {
+        modelsDirectoryPath + "/" + textImprovementModelFilename
     }
 
     static func ensureModelsDirectoryExists() {
@@ -19,6 +26,22 @@ enum ModelLocator {
         }
 
         return files.contains { $0.hasSuffix(".bin") }
+    }
+
+    static func hasInstalledTextImprovementModel(in directory: String = modelsDirectoryPath) -> Bool {
+        let modelPath = directory + "/" + textImprovementModelFilename
+        guard FileManager.default.fileExists(atPath: modelPath),
+              let size = (try? FileManager.default.attributesOfItem(atPath: modelPath)[.size]) as? Int64 else {
+            return false
+        }
+
+        return size > minimumTextImprovementModelBytes
+    }
+
+    static func bestAvailableTextImprovementModelPath(in directory: String = modelsDirectoryPath) -> String? {
+        hasInstalledTextImprovementModel(in: directory)
+            ? directory + "/" + textImprovementModelFilename
+            : nil
     }
 
     static func bestAvailableModelPath(in directory: String = modelsDirectoryPath) -> String? {

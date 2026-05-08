@@ -4,6 +4,7 @@ import ServiceManagement
 final class AppController: NSObject {
     private let licenseService = LicenseService()
     private let whisperRunner = WhisperRunner()
+    private let textImprovementRunner = TextImprovementRunner()
     private lazy var diagnostics = EnvironmentDiagnostics(whisperRunner: whisperRunner)
     private let recordingService = RecordingService()
     private let pasteService = PasteService()
@@ -13,6 +14,8 @@ final class AppController: NSObject {
     private var hotkeyMonitor: HotkeyMonitor?
     private var permissionTimer: Timer?
     private var wakeObserver: NSObjectProtocol?
+    private var textImprovementWindowController: NSWindowController?
+    private var activeTextImprovementDownloader: ModelDownloader?
 
     private var runtimeDiagnostic: RuntimeDiagnostic?
     private var isProcessing = false
@@ -79,6 +82,7 @@ final class AppController: NSObject {
         licenseService.normalizeStateIfNeeded()
         refreshLicenseMenuItem()
         refreshPermissionMenuItems()
+        refreshTextImprovementMenuItems()
         refreshDiagnosticsMenuItem()
         refreshIdlePresentation()
     }
@@ -97,6 +101,23 @@ final class AppController: NSObject {
         menuComponents.microphoneStateItem.title = StatusPresentation.microphoneMenuTitle(
             state: diagnostics.currentMicrophonePermissionState()
         )
+    }
+
+    private func refreshTextImprovementMenuItems() {
+        let isEnabled = TextImprovementSettings.isEnabled()
+        let hasModel = textImprovementRunner.availableModelPath() != nil
+        let hasRuntime = textImprovementRunner.availableLlamaCliPath() != nil
+
+        menuComponents.textImprovementStateItem.title = StatusPresentation.textImprovementMenuTitle(
+            isEnabled: isEnabled,
+            hasModel: hasModel,
+            hasRuntime: hasRuntime
+        )
+        menuComponents.textImprovementToggleItem.state = isEnabled ? .on : .off
+        menuComponents.textImprovementDownloadItem.title = hasModel
+            ? "Переустановить модель улучшения текста"
+            : "Скачать модель улучшения текста"
+        menuComponents.improveTextItem.isEnabled = !isProcessing
     }
 
     private func refreshDiagnosticsMenuItem() {
@@ -285,19 +306,35 @@ final class AppController: NSObject {
             guard let self else { return }
 
             let transcription = self.whisperRunner.transcribe(audioPath: audioPath)
+            let textResult: Result<(text: String, warning: String?), TranscriptionFailure>
+
+            switch transcription {
+            case .success(let text):
+                let cleaned = self.whisperRunner.cleanOutput(text)
+                if cleaned.isEmpty {
+                    textResult = .success((text: "", warning: nil))
+                } else {
+                    textResult = .success(self.improveTextForAutomaticPipeline(cleaned))
+                }
+            case .failure(let error):
+                textResult = .failure(error)
+            }
 
             DispatchQueue.main.async {
                 self.isProcessing = false
 
-                switch transcription {
-                case .success(let text):
-                    let cleaned = self.whisperRunner.cleanOutput(text)
-                    if cleaned.isEmpty {
+                switch textResult {
+                case .success(let result):
+                    if result.text.isEmpty {
                         self.recordDiagnostic(nil)
                     } else {
-                        switch self.pasteService.paste(cleaned) {
+                        switch self.pasteService.paste(result.text) {
                         case .success:
-                            self.recordDiagnostic(nil)
+                            if let warning = result.warning {
+                                self.recordDiagnostic(warning, severity: .warning)
+                            } else {
+                                self.recordDiagnostic(nil)
+                            }
                         case .failure(let error):
                             self.recordDiagnostic(error.localizedDescription, severity: .error)
                         }
@@ -309,6 +346,23 @@ final class AppController: NSObject {
 
                 self.refreshIdlePresentation()
             }
+        }
+    }
+
+    private func improveTextForAutomaticPipeline(_ text: String) -> (text: String, warning: String?) {
+        guard TextImprovementSettings.isEnabled() else {
+            return (text, nil)
+        }
+
+        DispatchQueue.main.async {
+            self.setStatus("Improving text...", icon: "✨")
+        }
+
+        switch textImprovementRunner.improve(text) {
+        case .success(let improved):
+            return (improved, nil)
+        case .failure(let error):
+            return (text, error.localizedDescription)
         }
     }
 
@@ -351,6 +405,150 @@ final class AppController: NSObject {
         if let url = licenseService.purchaseURL() {
             NSWorkspace.shared.open(url)
         }
+    }
+
+    @objc func improveTextFromClipboard() {
+        guard !isProcessing else { return }
+
+        guard ensureTextImprovementReadyForInteractive(enableAfterDownload: false) else {
+            return
+        }
+
+        let pasteboard = NSPasteboard.general
+        guard let rawText = pasteboard.string(forType: .string)?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+              !rawText.isEmpty else {
+            presentTextImprovementAlert(
+                title: "Нет текста для улучшения",
+                message: "Скопируйте текст в буфер обмена и нажмите «Улучшить текст» ещё раз."
+            )
+            return
+        }
+
+        isProcessing = true
+        refreshTextImprovementMenuItems()
+        setStatus("Improving text...", icon: "✨")
+
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self else { return }
+            let result = self.textImprovementRunner.improve(rawText)
+
+            DispatchQueue.main.async {
+                self.isProcessing = false
+
+                switch result {
+                case .success(let improved):
+                    switch self.pasteService.paste(improved) {
+                    case .success:
+                        self.recordDiagnostic(nil)
+                    case .failure(let error):
+                        self.recordDiagnostic(error.localizedDescription, severity: .error)
+                    }
+                case .failure(let error):
+                    self.recordDiagnostic(error.localizedDescription, severity: .error)
+                    self.presentTextImprovementAlert(
+                        title: "Не удалось улучшить текст",
+                        message: error.localizedDescription
+                    )
+                }
+
+                self.refreshTextImprovementMenuItems()
+                self.refreshIdlePresentation()
+            }
+        }
+    }
+
+    @objc func toggleTextImprovement(_ sender: NSMenuItem) {
+        if TextImprovementSettings.isEnabled() {
+            TextImprovementSettings.setEnabled(false)
+            refreshTextImprovementMenuItems()
+            refreshIdlePresentation()
+            return
+        }
+
+        guard ensureTextImprovementReadyForInteractive(enableAfterDownload: true) else {
+            refreshTextImprovementMenuItems()
+            return
+        }
+
+        TextImprovementSettings.setEnabled(true)
+        refreshTextImprovementMenuItems()
+        refreshIdlePresentation()
+    }
+
+    @objc func downloadTextImprovementModel() {
+        showTextImprovementModelDownloader(enableAfterDownload: false)
+    }
+
+    private func ensureTextImprovementReadyForInteractive(enableAfterDownload: Bool) -> Bool {
+        guard textImprovementRunner.availableModelPath() != nil else {
+            showTextImprovementModelDownloader(enableAfterDownload: enableAfterDownload)
+            return false
+        }
+
+        guard textImprovementRunner.availableLlamaCliPath() != nil else {
+            presentTextImprovementRuntimeAlert()
+            return false
+        }
+
+        return true
+    }
+
+    private func showTextImprovementModelDownloader(enableAfterDownload: Bool) {
+        ModelLocator.ensureModelsDirectoryExists()
+
+        if let existingWindow = textImprovementWindowController?.window {
+            existingWindow.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        let downloader = ModelDownloader(
+            modelsDir: ModelLocator.modelsDirectoryPath,
+            configuration: .textImprovement
+        ) { [weak self] success in
+            guard let self else { return }
+
+            self.textImprovementWindowController?.close()
+            self.activeTextImprovementDownloader = nil
+
+            if success, enableAfterDownload {
+                if self.textImprovementRunner.availableLlamaCliPath() != nil {
+                    TextImprovementSettings.setEnabled(true)
+                    self.recordDiagnostic(nil)
+                } else {
+                    TextImprovementSettings.setEnabled(false)
+                    self.presentTextImprovementRuntimeAlert()
+                }
+            }
+
+            self.refreshTextImprovementMenuItems()
+            self.refreshIdlePresentation()
+        }
+
+        activeTextImprovementDownloader = downloader
+        let window = downloader.createWindow()
+        let windowController = NSWindowController(window: window)
+        textImprovementWindowController = windowController
+        windowController.showWindow(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func presentTextImprovementRuntimeAlert() {
+        presentTextImprovementAlert(
+            title: "Нужен llama.cpp",
+            message: "Для второй локальной нейросети установите llama.cpp: brew install llama.cpp. После этого MacDictate сможет запускать Qwen локально."
+        )
+    }
+
+    private func presentTextImprovementAlert(title: String, message: String) {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "ОК")
+        NSApp.activate(ignoringOtherApps: true)
+        alert.runModal()
     }
 
     @objc func confirmUninstall() {
