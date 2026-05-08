@@ -46,7 +46,7 @@
 - Bundle в `assets/Info.plist`: `1.4.2` / build `9`.
 - Рабочая линия: `release/1.5.0`.
 - `v1.5.0` не считается релизом до tag, GitHub Release, registry update, DMG asset и smoke evidence.
-- В рабочей линии `1.5.0` `WhisperRunner` ограничивает зависший `whisper-cli` timeout `180` секунд; локальная проверка: `scripts/test_whisper_runner_timeout.sh`.
+- В рабочей линии `1.5.0` `WhisperRunner` ограничивает зависший `whisper-cli` timeout `30` минут и читает `stderr` во время работы процесса; локальная проверка: `scripts/test_whisper_runner_timeout.sh`.
 
 ## Version Folder Contract
 

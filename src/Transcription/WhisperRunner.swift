@@ -25,26 +25,41 @@ enum TranscriptionFailure: LocalizedError {
         case .outputMissing:
             return "Whisper не вернул результат распознавания."
         case .timedOut(let timeout):
-            return "Распознавание не завершилось за \(Int(timeout)) сек. MacDictate остановил зависший процесс."
+            return "Распознавание не завершилось за \(Self.formatDuration(timeout)). MacDictate остановил зависший процесс."
         }
+    }
+
+    private static func formatDuration(_ seconds: TimeInterval) -> String {
+        let roundedSeconds = max(0, Int(seconds.rounded()))
+        if roundedSeconds >= 60, roundedSeconds % 60 == 0 {
+            return "\(roundedSeconds / 60) мин"
+        }
+        return "\(roundedSeconds) сек"
     }
 }
 
 final class WhisperRunner {
+    private static let defaultTimeoutSeconds: TimeInterval = 1_800
+    private static let defaultTerminationGraceSeconds: TimeInterval = 2
+    private static let defaultStderrLimitBytes = 16_384
+
     private let timeoutSeconds: TimeInterval
     private let terminationGraceSeconds: TimeInterval
+    private let stderrLimitBytes: Int
     private let modelPathProvider: () -> String?
     private let whisperCliPathProvider: () -> String?
 
     init(
         bundle: Bundle = .main,
-        timeoutSeconds: TimeInterval = 180,
-        terminationGraceSeconds: TimeInterval = 2,
+        timeoutSeconds: TimeInterval = WhisperRunner.defaultTimeoutSeconds,
+        terminationGraceSeconds: TimeInterval = WhisperRunner.defaultTerminationGraceSeconds,
+        stderrLimitBytes: Int = WhisperRunner.defaultStderrLimitBytes,
         modelPathProvider: (() -> String?)? = nil,
         whisperCliPathProvider: (() -> String?)? = nil
     ) {
         self.timeoutSeconds = timeoutSeconds
         self.terminationGraceSeconds = terminationGraceSeconds
+        self.stderrLimitBytes = stderrLimitBytes
         self.modelPathProvider = modelPathProvider ?? {
             ModelLocator.bestAvailableModelPath()
         }
@@ -85,12 +100,22 @@ final class WhisperRunner {
 
         let task = Process()
         let stderrPipe = Pipe()
+        let stderrHandle = stderrPipe.fileHandleForReading
+        let stderrCollector = ProcessOutputCollector(limitBytes: stderrLimitBytes)
         let terminationSemaphore = DispatchSemaphore(value: 0)
 
         task.launchPath = whisperCli
         task.arguments = ["-m", modelPath, "-f", audioPath, "-l", "ru", "-nt", "-otxt"]
         task.standardOutput = FileHandle.nullDevice
         task.standardError = stderrPipe
+        stderrHandle.readabilityHandler = { handle in
+            let data = handle.availableData
+            if data.isEmpty {
+                handle.readabilityHandler = nil
+                return
+            }
+            stderrCollector.append(data)
+        }
         task.terminationHandler = { _ in
             terminationSemaphore.signal()
         }
@@ -100,16 +125,17 @@ final class WhisperRunner {
 
             if terminationSemaphore.wait(timeout: dispatchDeadline(after: timeoutSeconds)) == .timedOut {
                 stopTimedOutProcess(task, terminationSemaphore: terminationSemaphore)
+                stderrHandle.readabilityHandler = nil
                 task.terminationHandler = nil
                 cleanupTemporaryFiles(audioPath: audioPath)
                 return .failure(.timedOut(timeoutSeconds))
             }
 
+            stderrHandle.readabilityHandler = nil
             task.terminationHandler = nil
 
-            let stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
-            let stderrText = String(data: stderrData, encoding: .utf8)?
-                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            stderrCollector.append(stderrHandle.readDataToEndOfFile())
+            let stderrText = stderrCollector.text()
 
             guard task.terminationStatus == 0 else {
                 cleanupTemporaryFiles(audioPath: audioPath)
@@ -126,6 +152,7 @@ final class WhisperRunner {
             cleanupTemporaryFiles(audioPath: audioPath)
             return .success(transcribedResult)
         } catch {
+            stderrHandle.readabilityHandler = nil
             task.terminationHandler = nil
             cleanupTemporaryFiles(audioPath: audioPath)
             return .failure(.launchFailed(error.localizedDescription))
@@ -165,5 +192,49 @@ final class WhisperRunner {
     private func dispatchDeadline(after seconds: TimeInterval) -> DispatchTime {
         let milliseconds = max(0, Int(seconds * 1000))
         return .now() + .milliseconds(milliseconds)
+    }
+}
+
+private final class ProcessOutputCollector {
+    private let limitBytes: Int
+    private let queue = DispatchQueue(label: "com.alexfisenkov.macdictate.process-output")
+    private var buffer = Data()
+    private var truncated = false
+
+    init(limitBytes: Int) {
+        self.limitBytes = max(0, limitBytes)
+    }
+
+    func append(_ data: Data) {
+        guard !data.isEmpty else { return }
+
+        queue.sync {
+            guard buffer.count < limitBytes else {
+                truncated = true
+                return
+            }
+
+            let remaining = limitBytes - buffer.count
+            if data.count <= remaining {
+                buffer.append(data)
+            } else {
+                buffer.append(data.prefix(remaining))
+                truncated = true
+            }
+        }
+    }
+
+    func text() -> String {
+        queue.sync {
+            var text = String(data: buffer, encoding: .utf8)?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+            if truncated {
+                let suffix = "[stderr truncated]"
+                text = text.isEmpty ? suffix : "\(text)\n\(suffix)"
+            }
+
+            return text
+        }
     }
 }

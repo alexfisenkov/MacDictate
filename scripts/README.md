@@ -40,7 +40,7 @@ GitHub Actions gate:
 
 ## `test_whisper_runner_timeout.sh`
 
-Компилирует `WhisperRunner` с fake `whisper-cli`, который зависает, и проверяет, что transcription timeout возвращает диагностическую ошибку, останавливает subprocess и чистит temp audio.
+Компилирует `WhisperRunner` с fake `whisper-cli` и проверяет, что transcription timeout возвращает диагностическую ошибку, останавливает subprocess, чистит temp audio и не блокируется на большом `stderr`.
 
 ```bash
 scripts/test_whisper_runner_timeout.sh

@@ -38,7 +38,7 @@
 - `src/Transcription/*`
   - `ModelLocator.swift` — поиск и выбор модели.
   - `RecordingService.swift` — запись WAV.
-  - `WhisperRunner.swift` — запуск `whisper-cli`, timeout `180` секунд, controlled termination, cleanup temp files, различимые ошибки.
+  - `WhisperRunner.swift` — запуск `whisper-cli`, timeout `30` минут, streaming drain `stderr`, controlled termination, cleanup temp files, различимые ошибки.
 
 - `src/Paste/*`
   - `PasteService.swift` — pasteboard write / restore и simulated `Cmd+V`.
@@ -54,6 +54,7 @@
 - Backend contract не меняется: app продолжает читать `GET /api/license/status`.
 - Offline grace ограничен и больше не является бесконечным fail-open.
 - Transcription subprocess не должен блокировать app бесконечно: зависший `whisper-cli` завершается после timeout и возвращает runtime diagnostic.
+- `stderr` subprocess читается во время выполнения, чтобы verbose/error-heavy `whisper-cli` не мог заблокироваться на заполненном pipe.
 
 ## Build note
 
@@ -61,4 +62,4 @@
 
 ## Local Verification Notes
 
-- `scripts/test_whisper_runner_timeout.sh` компилирует `WhisperRunner` с fake `whisper-cli`, который зависает, и проверяет timeout recovery + cleanup temp audio.
+- `scripts/test_whisper_runner_timeout.sh` компилирует `WhisperRunner` с fake `whisper-cli` и проверяет timeout recovery, cleanup temp audio и large-stderr subprocess path.
