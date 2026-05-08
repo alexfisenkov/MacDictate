@@ -71,6 +71,22 @@ elif grep -q "1. Мы создали специальный сценарий." "
 3. Мы выделили несколько файлов-факторов, которые это все закрывают.
 <|im_end|>
 OUT
+elif grep -q "1. Это только установить Charger 5." "$PROMPT_FILE"; then
+  cat <<'OUT'
+Ваш текст уже практически готов, но есть несколько небольших исправлений и дополнений, чтобы он был более грамотным и аккуратным:
+
+1. Это только установить Charger 5.
+2. Это нормально справиться с этой задачей.
+
+Исправления:
+- Убрали лишние пробелы и запятые.
+- Уточнили пунктуацию после "5".
+
+Текст выглядит следующим образом:
+
+1. Это только установить Charger 5.
+2. Это нормально справиться с этой задачей. [end of text]
+OUT
 else
   echo "prompt did not contain expected source text" >&2
   exit 9
@@ -175,6 +191,21 @@ case .failure(let error):
     exit(1)
 }
 
+let editorialReportRegressionInput = "Как будто бы сейчас тесты проходят нормально. И, наверное, больше ничего делать не надо. Как минимум. Ну, первое, это только установить Charger 5. И второе, это нормально справиться с этой задачей."
+switch successRunner.improveWithTrace(editorialReportRegressionInput) {
+case .success(let output):
+    expect(!output.text.contains("Ваш текст уже"), "expected editorial report preamble to be blocked")
+    expect(!output.text.contains("Исправления:"), "expected editorial report section to be blocked")
+    expect(output.text.contains("Как будто бы сейчас тесты проходят нормально."), "expected fallback to preserve original intro")
+    expect(output.text.contains("1. Это только установить Charger 5."), "expected fallback to preserve first formatted item")
+    expect(output.text.contains("2. Это нормально справиться с этой задачей."), "expected fallback to preserve second formatted item")
+    expect(output.trace.rawOutput.contains("Ваш текст уже"), "expected raw trace to retain model report for debugging")
+    expect(output.trace.cleanedOutput == output.trace.preparedInput, "expected cleaned trace to use safe prepared input after commentary fallback")
+case .failure(let error):
+    fputs("Expected editorial report regression success, got \\(error.localizedDescription)\\n", stderr)
+    exit(1)
+}
+
 expect(
     TextImprovementRunner.cleanModelOutput("Improved text:\\nHello world.\\n[end of text]\\n<|endoftext|>") == "Hello world.",
     "expected English prefix cleanup"
@@ -276,6 +307,31 @@ let modelPreambleWithRules = """
 expect(
     TextImprovementRunner.cleanModelOutput(modelPreambleWithRules) == "Тут смысл в чем? Смотрите.\n\n1. Установить ChatGPT.\n2. Проверить аккаунт.",
     "expected model preamble and horizontal rules cleanup"
+)
+
+let editorialReportOutput = """
+Ваш текст уже практически готов, но есть несколько небольших исправлений:
+
+Исправления:
+- Убрали лишние пробелы.
+
+Текст выглядит следующим образом:
+
+1. Это только установить Charger 5.
+2. Это нормально справиться с этой задачей.
+"""
+let editorialReportSource = """
+Как будто бы сейчас тесты проходят нормально.
+
+1. Это только установить Charger 5.
+2. Это нормально справиться с этой задачей.
+"""
+expect(
+    TextImprovementRunner.fallbackToSourceIfOutputLooksLikeEditorialCommentary(
+        editorialReportOutput,
+        source: editorialReportSource
+    ) == editorialReportSource.trimmingCharacters(in: .whitespacesAndNewlines),
+    "expected editorial commentary output to fallback to source"
 )
 
 expect(

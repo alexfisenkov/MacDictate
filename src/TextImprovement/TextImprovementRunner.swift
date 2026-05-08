@@ -239,7 +239,11 @@ final class TextImprovementRunner {
                 cleanedOutput,
                 source: preparedInput
             )
-            let improved = TextImprovementFormatter.normalize(markdownAdjustedOutput)
+            let guardedOutput = Self.fallbackToSourceIfOutputLooksLikeEditorialCommentary(
+                markdownAdjustedOutput,
+                source: preparedInput
+            )
+            let improved = TextImprovementFormatter.normalize(guardedOutput)
             guard !improved.isEmpty else {
                 return .failure(.outputMissing)
             }
@@ -249,7 +253,7 @@ final class TextImprovementRunner {
                 preparedInput: preparedInput,
                 prompt: prompt,
                 rawOutput: rawOutput,
-                cleanedOutput: markdownAdjustedOutput,
+                cleanedOutput: guardedOutput,
                 finalOutput: improved,
                 modelPath: modelPath,
                 runtimePath: llamaCli,
@@ -325,6 +329,33 @@ final class TextImprovementRunner {
             )
     }
 
+    static func fallbackToSourceIfOutputLooksLikeEditorialCommentary(_ output: String, source: String) -> String {
+        let trimmedOutput = output.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedSource = source.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedOutput.isEmpty, !trimmedSource.isEmpty else {
+            return output
+        }
+
+        let normalizedOutput = normalizeForCommentaryDetection(trimmedOutput)
+        let normalizedSource = normalizeForCommentaryDetection(trimmedSource)
+        let editorialMarkers = [
+            "ваш текст уже",
+            "исправления:",
+            "текст выглядит следующим образом:",
+            "текст выглядит так:",
+            "ниже исправленный текст:",
+            "ниже улучшенный текст:",
+            "я исправил",
+            "я отредактировал"
+        ]
+
+        let hasAddedEditorialCommentary = editorialMarkers.contains { marker in
+            normalizedOutput.contains(marker) && !normalizedSource.contains(marker)
+        }
+
+        return hasAddedEditorialCommentary ? trimmedSource : output
+    }
+
     private static func extractOutputFromLeakedPromptScaffold(_ output: String) -> String {
         let outputMarkers = [
             "Выход:",
@@ -357,6 +388,11 @@ final class TextImprovementRunner {
         }
 
         return output
+    }
+
+    private static func normalizeForCommentaryDetection(_ text: String) -> String {
+        text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "ru_RU"))
+            .lowercased()
     }
 
     private static func removeStandaloneMarkdownRuleLines(_ output: String) -> String {
