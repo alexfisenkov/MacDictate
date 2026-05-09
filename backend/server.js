@@ -166,7 +166,7 @@ app.get('/api/license/status', licenseStatusLimiter, async (req, res) => {
         const device = await getOrCreateDevice(deviceId);
         const expires = new Date(device.expires_at);
         const now = new Date();
-        const isActive = device.is_paid || expires > now;
+        const isActive = Boolean(device.is_paid) || expires > now;
         
         res.json({
             deviceId: device.device_id,

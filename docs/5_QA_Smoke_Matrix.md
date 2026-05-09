@@ -15,6 +15,7 @@
 | License `grace` | запись разрешена до bounded deadline | Compile-level only |
 | License `expired` | запись блокируется, доступна ссылка на оплату | Compile-level only |
 | License server unavailable | при валидном snapshot включается grace, без snapshot запись блокируется | Compile-level only |
+| License status boolean compatibility | live/legacy backend values `true/false`, `1/0` и boolean-like strings декодируются без false `serverUnavailable` | Verified by `scripts/test_license_status_response.sh` and live endpoint curl |
 | Hung / stderr-heavy `whisper-cli` subprocess | зависший процесс завершается timeout diagnostic, temp audio чистится; большой `stderr` не блокирует успешный subprocess | Verified by `scripts/test_whisper_runner_timeout.sh` |
 | Text improvement model missing | toggle/manual action открывает downloader; automatic dictation не ломается без `.gguf` | Compile-level only |
 | Text improvement model selection | preferred 3B `.gguf` выбирается раньше legacy 1.5B; undersized 3B игнорируется; 1.5B остается fallback | Verified by `scripts/test_text_improvement_runner.sh` |
