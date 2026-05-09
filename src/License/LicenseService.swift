@@ -4,6 +4,7 @@ import Darwin
 final class LicenseService {
     private static let machineIDCommandTimeout: TimeInterval = 2
     private static let machineIDCommandTerminationGrace: TimeInterval = 0.5
+    private static let licenseRequestTimeout: TimeInterval = 20
 
     private let userDefaults: UserDefaults
     private let cache: LicenseCache
@@ -92,7 +93,7 @@ final class LicenseService {
         }
 
         var request = URLRequest(url: url)
-        request.timeoutInterval = 8
+        request.timeoutInterval = Self.licenseRequestTimeout
 
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self else { return }
@@ -146,20 +147,22 @@ final class LicenseService {
            let deadline = cache.graceDeadline(for: snapshot),
            deadline > Date() {
             state = .grace(snapshot, deadline)
+            runtimeDiagnostic = nil
         } else if case .expired(let previousExpired) = state {
             state = .expired(previousExpired)
+            runtimeDiagnostic = nil
         } else {
             state = .serverUnavailable(cachedSnapshot)
-        }
 
-        let baseMessage = "Сервер лицензий временно недоступен."
-        if let error {
-            runtimeDiagnostic = RuntimeDiagnostic(
-                severity: .warning,
-                message: "\(baseMessage) \(error.localizedDescription)"
-            )
-        } else {
-            runtimeDiagnostic = RuntimeDiagnostic(severity: .warning, message: baseMessage)
+            let baseMessage = "Сервер лицензий временно недоступен."
+            if let error {
+                runtimeDiagnostic = RuntimeDiagnostic(
+                    severity: .warning,
+                    message: "\(baseMessage) \(error.localizedDescription)"
+                )
+            } else {
+                runtimeDiagnostic = RuntimeDiagnostic(severity: .warning, message: baseMessage)
+            }
         }
 
         onChange?()

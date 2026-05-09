@@ -45,6 +45,7 @@
 - Если Qwen возвращает редакторский отчет с преамбулой `Ваш текст...`, блоком `Исправления:` или похожими служебными комментариями, MacDictate теперь fallback-ится к безопасному preformatted Whisper-тексту вместо вставки комментариев модели.
 - Если Qwen существенно сокращает исходный текст и теряет значимые слова, MacDictate теперь fallback-ится к preformatted Whisper-тексту; добавлена нормализация `Cling AI` / `клинг ай` -> `Kling AI`.
 - License status decoder теперь принимает boolean-like значения `true/false`, `1/0` и строки, а backend явно отдает `isActive` как boolean, чтобы оплаченная лицензия не отображалась как временно недоступный сервер.
+- License refresh стал терпимее к кратким сетевым сбоям: timeout увеличен до 20 секунд, а transient failure при валидном cached snapshot переводит app в grace без тревожного runtime-warning в статус-баре.
 
 ### Notes
 - `v1.2` и `v1.3` помечены как reconstructed history: GitHub Releases существуют, но локальные tags отсутствуют, а remote tags указывают на commit `v1.4`.

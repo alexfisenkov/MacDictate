@@ -46,12 +46,12 @@
 - Bundle в `assets/Info.plist`: `1.4.2` / build `9`.
 - Рабочая линия: `release/1.5.0`.
 - `v1.5.0` не считается релизом до tag, GitHub Release, registry update, DMG asset и smoke evidence.
-- В рабочей линии `1.5.0` `WhisperRunner` ограничивает зависший `whisper-cli` timeout `30` минут и читает `stderr` во время работы процесса; `LicenseService` ограничивает первый `ioreg`; `RecordingService` чистит stale temp audio.
+- В рабочей линии `1.5.0` `WhisperRunner` ограничивает зависший `whisper-cli` timeout `30` минут и читает `stderr` во время работы процесса; `LicenseService` ограничивает первый `ioreg`, использует license request timeout `20` секунд и не показывает runtime-warning при transient license failure, если активен valid cached grace; `RecordingService` чистит stale temp audio.
 - В `1.5.0` добавлен optional second-AI layer: preferred Qwen2.5-3B-Instruct Q4_K_M (`.gguf`) через `llama.cpp` (`llama-completion`) с fallback на Qwen2.5-1.5B-Instruct Q4_K_M, persisted toggle `MacDictateTextImprovementEnabled`, top-level toggle `Улучшить текст`, downloader модели, safe input limit `6_000` символов, runtime timeout `10` минут, context `8_192` tokens, `TextImprovementProfile.professionalCopyEditor` с editorial rules / terminology packs и `TextImprovementFormatter` для очевидных list/term guardrails.
 - Text improvement pipeline применяет `TextImprovementFormatter.normalize` до Qwen и после Qwen: pre-formatting защищает структуру перечислений и термины (`ChaiJPT`/`Чай и GPT` -> `ChatGPT`), post-processing страхует финальный output.
 - В `1.5.0` добавлен opt-in local debug session logging: `MacDictateDebugSessionLoggingEnabled` сохраняет аудио, raw/cleaned Whisper output, Qwen prompt/raw/cleaned/final output, final inserted text и `events.jsonl` в `~/.macdictate/debug-sessions/`. Эти artifacts чувствительны и не отправляются на сервер.
 - Будущий AI corpus/fine-tune governed by `docs/8_AI_Corpus_Strategy.md`: primary corpus — approved real dictation pairs из debug-сессий; copywriting datasets HuggingFace — только secondary style/eval material после license review.
-- Локальные runtime harnesses: `scripts/test_whisper_runner_timeout.sh`, `scripts/test_license_machine_id_timeout.sh`, `scripts/test_recording_temp_cleanup.sh`, `scripts/test_text_improvement_runner.sh`, `scripts/test_debug_session_logger.sh`.
+- Локальные runtime harnesses: `scripts/test_whisper_runner_timeout.sh`, `scripts/test_license_machine_id_timeout.sh`, `scripts/test_license_status_response.sh`, `scripts/test_license_grace_diagnostic.sh`, `scripts/test_recording_temp_cleanup.sh`, `scripts/test_text_improvement_runner.sh`, `scripts/test_debug_session_logger.sh`.
 
 ## Version Folder Contract
 
