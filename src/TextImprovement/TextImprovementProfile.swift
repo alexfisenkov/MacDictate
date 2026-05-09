@@ -96,9 +96,11 @@ struct TextImprovementProfile {
         speechNormalizationHints: [
             "чат джпт -> ChatGPT",
             "чат джипити / чат gpt -> ChatGPT",
+            "чата GPT -> ChatGPT",
             "ChagPT / Chag GPT / ChagJPT -> ChatGPT",
             "ChaiJPT -> ChatGPT; Chai GPT / Чай и GPT / чай джипити -> ChatGPT",
             "Клод от Anthropic / Cloud от Anthropic / Cloud Anthropic -> Claude от Anthropic / Claude Anthropic",
+            "Cloud Code / Cloud Code от Anthropic -> Claude Code / Claude Code от Anthropic",
             "Syntax AI / SyntaxAI / Синтакс AI / синтакс ай -> Syntx AI",
             "опен эй ай / опенэйай -> OpenAI",
             "кьювен / qwen -> Qwen",

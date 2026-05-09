@@ -448,6 +448,10 @@ final class TextImprovementRunner {
             return "unexpected_list_format"
         }
 
+        if outputAddsUnexpectedOrderedListItem(output: trimmedOutput, source: trimmedSource) {
+            return "extra_ordered_list_item"
+        }
+
         let sourceCriticalTokens = criticalTokens(in: trimmedSource)
         if !sourceCriticalTokens.isEmpty {
             let outputCriticalTokens = Set(criticalTokens(in: trimmedOutput))
@@ -572,6 +576,51 @@ final class TextImprovementRunner {
     private static func outputIntroducesUnexpectedList(output: String, source: String) -> Bool {
         guard hasListMarkers(output) else { return false }
         return !hasListMarkers(source) && !hasListCue(source)
+    }
+
+    private static func outputAddsUnexpectedOrderedListItem(output: String, source: String) -> Bool {
+        let outputMaxIndex = orderedListIndexes(in: output).max() ?? 0
+        guard outputMaxIndex > 0 else { return false }
+
+        let sourceMaxIndex = max(orderedListIndexes(in: source).max() ?? 0, expectedOrderedListCount(from: source))
+        guard sourceMaxIndex > 0 else { return false }
+
+        return outputMaxIndex > sourceMaxIndex
+    }
+
+    private static func orderedListIndexes(in text: String) -> [Int] {
+        guard let regex = try? NSRegularExpression(pattern: #"(?m)^\s*(\d+)[\.)]\s+"#) else {
+            return []
+        }
+
+        let nsRange = NSRange(text.startIndex..<text.endIndex, in: text)
+        return regex.matches(in: text, range: nsRange).compactMap { match in
+            guard match.numberOfRanges >= 2,
+                  let range = Range(match.range(at: 1), in: text) else {
+                return nil
+            }
+            return Int(text[range])
+        }
+    }
+
+    private static func expectedOrderedListCount(from text: String) -> Int {
+        let normalized = normalizeForCommentaryDetection(text).replacingOccurrences(of: "ё", with: "е")
+        let markers: [(patterns: [String], count: Int)] = [
+            (["десятое", "в-десятых", "в десятых"], 10),
+            (["девятое", "в-девятых", "в девятых"], 9),
+            (["восьмое", "в-восьмых", "в восьмых"], 8),
+            (["седьмое", "в-седьмых", "в седьмых"], 7),
+            (["шестое", "в-шестых", "в шестых"], 6),
+            (["пятое", "в-пятых", "в пятых"], 5),
+            (["четвертое", "в-четвертых", "в четвертых"], 4),
+            (["третье", "в-третьих", "в третьих", "есть три"], 3),
+            (["второе", "во-вторых", "во вторых"], 2),
+            (["первое", "во-первых", "во первых"], 1)
+        ]
+
+        return markers.first { marker in
+            marker.patterns.contains { normalized.contains($0) }
+        }?.count ?? 0
     }
 
     private static func hasListMarkers(_ text: String) -> Bool {

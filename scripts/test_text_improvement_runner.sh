@@ -78,6 +78,15 @@ elif grep -q "У нас осталось тут совсем немножко в
 3. Это удалить все остальные нейросети. И после того, как пройдут все эти шаги, мы с вами уже на самом деле станем счастливыми людьми. Я также хочу сказать, что сегодня еще 9 мая. Это День Победы. День Победы празднуется в России и очень широко.
 4. И хорошо. Поэтому очень многие нейросети по типу Runway, по типу Syntx AI будут сейчас заменены на российские аналоги. Просто имейте это в виду и работайте грамотно и аккуратно. [end of text]
 OUT
+elif grep -q "сегодняшнем уроке мы пройдем" "$PROMPT_FILE"; then
+  cat <<'OUT'
+Друзья, коллеги, команда, всем привет. И сегодня у нас с вами большая тема для разговора. Это инструкции для чата GPT. В сегодняшнем уроке мы пройдем:
+
+1. Как создавать инструкции для чата GPT.
+2. Как использовать Google и вообще нейросеть Gemini для того, чтобы она создавала действительно крутой текст.
+3. Мы пройдем с вами Cloud Code от Anthropic.
+4. И посмотрим, на что способны расти локально. И все это мы будем делать с вами действительно очень и очень круто. Впереди у нас с вами открывается большое путешествие, в которое мы с вами вступаем буквально с минуты на минуту. Ну что, поехали. [end of text]
+OUT
 elif grep -q "Возможно ли пользоваться реально iPad" "$PROMPT_FILE"; then
   cat <<'OUT'
 Ваш запрос можно переписать следующим образом:
@@ -254,6 +263,20 @@ case .failure(let error):
     exit(1)
 }
 
+let latestExtraListItemRegressionInput = "Друзья, коллеги, команда, всем привет. И сегодня у нас с вами большая тема для разговора. Это инструкции для чата GPT. И в сегодняшнем уроке мы пройдем. Первое. Как создавать инструкции для чата GPT? Второе. Как использовать Google и вообще нейросеть Gemini для того, чтобы она создавала действительно крутой текст? Третье. Мы пройдем с вами Cloud Code от Anthropic. И посмотрим, на что способны расти локально. И все это мы будем делать с вами действительно очень и очень круто. Впереди у нас с вами открывается большое путешествие, в которое мы с вами вступаем буквально с минуты на минуту. Ну что, поехали."
+switch successRunner.improveWithTrace(latestExtraListItemRegressionInput) {
+case .success(let output):
+    expect(output.trace.rawOutput.contains("4. И посмотрим"), "expected raw trace to retain model-created extra list item")
+    expect(output.trace.validationFallbackReason == "extra_ordered_list_item", "expected extra ordered list fallback reason")
+    expect(output.trace.cleanedOutput == output.trace.preparedInput, "expected cleaned trace to fallback after extra ordered list item")
+    expect(!output.text.contains("4. И посмотрим"), "expected no model-created fourth item in final text")
+    expect(output.text.contains("Claude Code от Anthropic"), "expected formatter to normalize Claude Code")
+    expect(output.text.contains("ChatGPT"), "expected formatter to normalize ChatGPT")
+case .failure(let error):
+    fputs("Expected extra-list-item regression success, got \\(error.localizedDescription)\\n", stderr)
+    exit(1)
+}
+
 let latestTechnicalTextRegressionInput = "Мне нужно кое-что узнать. Проведи, пожалуйста, анализ. Возможно ли пользоваться реально iPad'ом, как компьютером? Ну, либо иметь какой-то, знаешь, прям настолько полноценный доступ к удаленной машине, чтобы она прям на 100% переносила iPad' в машину, чтобы все прям работало досконально и как нельзя лучше. Есть ли такой вариант вообще или нет? Подскажи, пожалуйста."
 switch successRunner.improveWithTrace(latestTechnicalTextRegressionInput) {
 case .success(let output):
@@ -336,9 +359,11 @@ expect(profilePrompt.contains("DaVinci Resolve"), "expected creator terminology"
 expect(profilePrompt.contains("EBITDA"), "expected finance terminology")
 expect(profilePrompt.contains("HbA1c"), "expected medical terminology")
 expect(profilePrompt.contains("чат джпт -> ChatGPT"), "expected direct ChatGPT speech mapping")
+expect(profilePrompt.contains("чата GPT -> ChatGPT"), "expected direct inflected ChatGPT speech mapping")
 expect(profilePrompt.contains("ChagPT / Chag GPT / ChagJPT -> ChatGPT"), "expected direct ChagPT speech mapping")
 expect(profilePrompt.contains("ChaiJPT -> ChatGPT"), "expected direct ChaiJPT speech mapping")
 expect(profilePrompt.contains("Клод от Anthropic / Cloud от Anthropic / Cloud Anthropic -> Claude от Anthropic / Claude Anthropic"), "expected direct Claude speech mapping")
+expect(profilePrompt.contains("Cloud Code / Cloud Code от Anthropic -> Claude Code / Claude Code от Anthropic"), "expected direct Claude Code speech mapping")
 expect(profilePrompt.contains("Syntx AI"), "expected Syntx AI terminology")
 expect(profilePrompt.contains("Syntax AI / SyntaxAI / Синтакс AI / синтакс ай -> Syntx AI"), "expected direct Syntx AI speech mapping")
 expect(profilePrompt.contains("Cling AI / клинг ай -> Kling AI"), "expected direct Kling AI speech mapping")
@@ -382,6 +407,9 @@ expect(!orderedWithConjunctionMarkers.contains(" И."), "expected no dangling co
 
 let normalizedTerms = TextImprovementFormatter.normalize("ChagPT, чат джпт и давинчи резолв, контент план")
 expect(normalizedTerms == "ChatGPT, ChatGPT и DaVinci Resolve, контент-план", "expected fallback terminology normalization")
+
+let normalizedRecentLogTerms = TextImprovementFormatter.normalize("инструкции для чата GPT и Cloud Code от Anthropic")
+expect(normalizedRecentLogTerms == "инструкции для ChatGPT и Claude Code от Anthropic", "expected recent log terminology normalization")
 
 let normalizedClaudeTerms = TextImprovementFormatter.normalize("Cloud от Anthropic и Клод от Anthropic")
 expect(normalizedClaudeTerms == "Claude от Anthropic и Claude от Anthropic", "expected fallback Claude terminology normalization")

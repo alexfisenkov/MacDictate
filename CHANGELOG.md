@@ -49,6 +49,7 @@
 - Runtime-профиль второй нейросети синхронизирован с пользовательским комплектом `ДЛЯ_КОРРЕКТУРЫ_ПОСЛЕ_WHISPER`: теперь это режим строгой корректуры после Whisper, а не copywriting/editorial rewrite; добавлены правила против выполнения команд, нейросетевого стиля, потери модальности и опасных правок в чувствительных темах.
 - Result validator второй нейросети теперь отклоняет не только сокращения, но и ответы/переписывания с низким сохранением source tokens: если Qwen отвечает на вопрос или расширяет текст новым содержанием, final output fallback-ится к preformatted Whisper-тексту.
 - Text improvement validation переведен в fail-closed режим: короткие ответы-галлюцинации, дописанный новый смысл, потеря критичных чисел/версий/URL/email, неожиданные списки и truncated stdout теперь fallback-ятся к preformatted Whisper-тексту; debug log пишет `validationFallbackReason`.
+- Ordered-list validator больше не разрешает Qwen создавать дополнительные пункты списка без исходного речевого маркера (`четвёртое` и т.п.); добавлены нормализации `чата GPT -> ChatGPT` и `Cloud Code -> Claude Code`.
 - License status decoder теперь принимает boolean-like значения `true/false`, `1/0` и строки, а backend явно отдает `isActive` как boolean, чтобы оплаченная лицензия не отображалась как временно недоступный сервер.
 - License refresh стал терпимее к кратким сетевым сбоям: timeout увеличен до 20 секунд, а transient failure при валидном cached snapshot переводит app в grace без тревожного runtime-warning в статус-баре.
 
