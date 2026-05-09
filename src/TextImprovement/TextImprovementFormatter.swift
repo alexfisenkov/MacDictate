@@ -33,6 +33,8 @@ enum TextImprovementFormatter {
         ("Клод от Anthropic", "Claude от Anthropic"),
         ("Клод Anthropic", "Claude Anthropic"),
         ("контент план", "контент-план"),
+        ("промт", "промпт"),
+        ("сиарэм", "CRM"),
         ("миджорни", "Midjourney"),
         ("Cling AI", "Kling AI"),
         ("Клинг AI", "Kling AI"),
