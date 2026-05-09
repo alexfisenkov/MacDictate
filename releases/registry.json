@@ -5,10 +5,10 @@
   "governanceDocument": "docs/7_Release_Governance.md",
   "current": {
     "publicStable": "v1.5.0",
-    "workingLine": "v1.5.0-working",
-    "developmentBranch": "release/1.5.0",
-    "bundleShortVersion": "1.5.0",
-    "bundleVersion": "10"
+    "workingLine": "v1.5.1-working",
+    "developmentBranch": "release/1.5.1",
+    "bundleShortVersion": "1.5.1",
+    "bundleVersion": "11"
   },
   "versions": [
     {
@@ -284,6 +284,36 @@
       },
       "summary": "Public stable 1.5.0: bounded Whisper runtime, licensing diagnostics, release governance, modular app architecture, and optional local text improvement via Qwen.",
       "sourceConfidence": "confirmed_git_and_github"
+    },
+    {
+      "version": "v1.5.1-working",
+      "status": "working_line",
+      "channel": "development",
+      "bundle": {
+        "shortVersion": "1.5.1",
+        "build": "11"
+      },
+      "git": {
+        "commit": null,
+        "localTag": null,
+        "remoteTags": [],
+        "tagRequiredLocally": false,
+        "branch": "release/1.5.1"
+      },
+      "github": {
+        "releaseUrl": null,
+        "assetName": null,
+        "githubAssetSha256": null,
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.5.1-working",
+        "artifactPath": null,
+        "localArtifactSha256": null,
+        "buildLogPath": null
+      },
+      "summary": "Active 1.5.1 development line after public v1.5.0 release.",
+      "sourceConfidence": "confirmed_working_line"
     }
   ],
   "checkpoints": [

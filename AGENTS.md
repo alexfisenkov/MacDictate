@@ -43,8 +43,8 @@
 ## Current Version State
 
 - Текущая публичная stable: `v1.5.0`.
-- Bundle в `assets/Info.plist`: `1.5.0` / build `10`.
-- Следующая рабочая линия: `release/1.5.1`.
+- Bundle в `assets/Info.plist`: `1.5.1` / build `11`.
+- Рабочая линия: `release/1.5.1`.
 - `v1.5.0` считается релизом только при наличии tag `v1.5.0`, GitHub Release, registry entry, DMG asset и smoke evidence.
 - В `1.5.0` `WhisperRunner` ограничивает зависший `whisper-cli` timeout `30` минут и читает `stderr` во время работы процесса; `LicenseService` ограничивает первый `ioreg`, использует license request timeout `20` секунд и не показывает runtime-warning при transient license failure, если активен valid cached grace; `RecordingService` чистит stale temp audio.
 - В `1.5.0` добавлен optional second-AI layer: preferred Qwen2.5-3B-Instruct Q4_K_M (`.gguf`) через `llama.cpp` (`llama-completion`) с fallback на Qwen2.5-1.5B-Instruct Q4_K_M, persisted toggle `MacDictateTextImprovementEnabled`, top-level toggle `Улучшить текст`, downloader модели, safe input limit `6_000` символов, runtime timeout `10` минут, context `8_192` tokens, controlled retry для невалидного Qwen-output, `TextImprovementProfile.professionalCopyEditor` с editorial rules / terminology packs и `TextImprovementFormatter` для очевидных list/term guardrails.

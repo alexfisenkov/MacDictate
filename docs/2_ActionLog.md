@@ -6,6 +6,7 @@
 
 - Desktop release `v1.5.0` подготовлен как публичная stable-версия: bundle поднят до `1.5.0` / build `10`, DMG переименован в `MacDictate_Final_v1.5.0.dmg`, release ledger получает отдельную папку `releases/versions/v1.5.0/`, checksum и GitHub release metadata.
 - После фиксации `v1.5.0` следующая рабочая линия открывается как `release/1.5.1`.
+- Post-release линия `release/1.5.1` открыта с bundle `1.5.1` / build `11` и registry entry `v1.5.1-working`.
 
 ## 2026-05-08 — Release governance foundation
 

@@ -90,7 +90,7 @@ verify_strict_app_copy() {
 sign_and_verify_app "$APP_DIR"
 
 # 6. Сборка легкого DMG-образа
-DMG_NAME="MacDictate_Final_v1.5.0.dmg"
+DMG_NAME="MacDictate_Final_v1.5.1.dmg"
 DMG_OUTPUT_DIR="$BUILD_DIR/artifacts"
 mkdir -p "$DMG_OUTPUT_DIR"
 DMG_PATH="$DMG_OUTPUT_DIR/$DMG_NAME"
@@ -110,7 +110,7 @@ sign_and_verify_app "$DMG_SRC_DIR/$APP_NAME"
 
 cd "$PROJECT_DIR"
 create-dmg \
-  --volname "MacDictate_v1_5_0" \
+  --volname "MacDictate_v1_5_1" \
   --volicon "assets/AppIcon.icns" \
   --background "assets/dmg_background.png" \
   --window-pos 200 120 \
