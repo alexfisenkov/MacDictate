@@ -90,6 +90,10 @@ elif grep -q "Возможно ли пользоваться реально iPad
 
 Текст сохранен в исходном формате, язык и стиль автора сохранены. [end of text]
 OUT
+elif grep -q "Мне нужна помощь. Я могу разобраться в тексте" "$PROMPT_FILE"; then
+  cat <<'OUT'
+Конечно, я могу помочь с редактированием и коррекцией вашего текста. Пожалуйста, предоставьте фрагмент текста, который вам нужно обработать. [end of text]
+OUT
 elif grep -q "1. Это только установить Charger 5." "$PROMPT_FILE"; then
   cat <<'OUT'
 Ваш текст уже практически готов, но есть несколько небольших исправлений и дополнений, чтобы он был более грамотным и аккуратным:
@@ -253,6 +257,20 @@ case .failure(let error):
     exit(1)
 }
 
+let assistantAnswerRegressionInput = "Мне нужна помощь. Я могу разобраться в тексте, поэтому мне нужна здесь помощь для его обработки. Что ты мне можешь посоветовать?"
+switch successRunner.improveWithTrace(assistantAnswerRegressionInput) {
+case .success(let output):
+    expect(output.trace.rawOutput.contains("Конечно, я могу помочь"), "expected raw trace to retain assistant-style model answer")
+    expect(output.trace.cleanedOutput == output.trace.preparedInput, "expected cleaned trace to fallback to prepared input after assistant answer")
+    expect(!output.text.contains("Конечно"), "expected no assistant answer preamble in final text")
+    expect(!output.text.contains("предоставьте фрагмент текста"), "expected no request-for-input footer in final text")
+    expect(output.text.contains("Мне нужна помощь."), "expected fallback to preserve original first sentence")
+    expect(output.text.contains("Что ты мне можешь посоветовать?"), "expected fallback to preserve original question")
+case .failure(let error):
+    fputs("Expected assistant-answer regression success, got \\(error.localizedDescription)\\n", stderr)
+    exit(1)
+}
+
 expect(
     TextImprovementRunner.cleanModelOutput("Improved text:\\nHello world.\\n[end of text]\\n<|endoftext|>") == "Hello world.",
     "expected English prefix cleanup"
@@ -277,6 +295,7 @@ expect(profilePrompt.contains("Cling AI / клинг ай -> Kling AI"), "expect
 expect(!profilePrompt.contains("Вход:"), "runtime prompt should avoid example input labels")
 expect(!profilePrompt.contains("Выход:"), "runtime prompt should avoid example output labels")
 expect(profilePrompt.contains("Не заменяй разговорные слова автора"), "expected conservative wording rule")
+expect(profilePrompt.contains("Если исходный фрагмент звучит как вопрос или просьба"), "expected no-answer question handling rule")
 expect(profilePrompt.contains("давинчи резолв -> DaVinci Resolve"), "expected direct DaVinci speech mapping")
 expect(profilePrompt.contains("во-первых"), "expected ordered-list speech cue")
 expect(profilePrompt.contains("несколько раз повторяется «дальше»"), "expected repeated дальше list cue")
