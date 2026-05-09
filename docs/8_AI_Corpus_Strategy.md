@@ -11,8 +11,11 @@
 - `02_whisper_cleaned.txt` — очищенный text после Whisper;
 - `04_qwen_prompt.txt` — prompt второй нейросети;
 - `05_qwen_raw_output.txt` — сырой output Qwen;
+- `05a_qwen_initial_raw_output.txt` — первый отклонённый output Qwen, если запускался controlled retry;
 - `06_qwen_cleaned_output.txt` — cleaned output Qwen;
+- `06a_qwen_initial_cleaned_output.txt` — cleaned версия первого отклонённого output, если запускался controlled retry;
 - `06b_qwen_final_after_formatter.txt` — итог после deterministic formatter;
+- `06d_qwen_retry.txt` — причина controlled retry, если он запускался;
 - `07_final_inserted.txt` — текст, который реально ушел во вставку;
 - `events.jsonl` — порядок событий и ошибки.
 

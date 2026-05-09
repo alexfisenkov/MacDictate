@@ -57,6 +57,9 @@ struct TextImprovementTrace {
     let cleanedOutput: String
     let finalOutput: String
     let validationFallbackReason: String?
+    let retryTriggerReason: String?
+    let initialRawOutput: String?
+    let initialCleanedOutput: String?
     let modelPath: String
     let runtimePath: String
     let arguments: [String]
@@ -75,6 +78,20 @@ final class TextImprovementRunner {
     private let profile: TextImprovementProfile
     private let modelPathProvider: () -> String?
     private let llamaCliPathProvider: () -> String?
+
+    private struct ModelRun {
+        let prompt: String
+        let rawOutput: String
+        let outputWasTruncated: Bool
+        let arguments: [String]
+    }
+
+    private struct ValidatedOutput {
+        let cleanedCandidateOutput: String
+        let cleanedOutput: String
+        let finalOutput: String
+        let validationFallbackReason: String?
+    }
 
     init(
         bundle: Bundle = .main,
@@ -138,6 +155,9 @@ final class TextImprovementRunner {
                 cleanedOutput: "",
                 finalOutput: "",
                 validationFallbackReason: nil,
+                retryTriggerReason: nil,
+                initialRawOutput: nil,
+                initialCleanedOutput: nil,
                 modelPath: "",
                 runtimePath: "",
                 arguments: []
@@ -159,6 +179,90 @@ final class TextImprovementRunner {
 
         let preparedInput = TextImprovementFormatter.normalize(input)
         let prompt = profile.prompt(for: preparedInput)
+
+        let initialRun: ModelRun
+        switch runModel(prompt: prompt, modelPath: modelPath, llamaCli: llamaCli, tokenBasis: input) {
+        case .success(let run):
+            initialRun = run
+        case .failure(let error):
+            return .failure(error)
+        }
+
+        let initialValidation = Self.validateModelOutput(
+            rawOutput: initialRun.rawOutput,
+            outputWasTruncated: initialRun.outputWasTruncated,
+            source: preparedInput
+        )
+
+        if let reason = initialValidation.validationFallbackReason,
+           Self.shouldRetryAfterValidationFallback(reason) {
+            let retryPrompt = profile.retryPrompt(
+                for: preparedInput,
+                rejectedOutput: initialValidation.cleanedCandidateOutput,
+                validationReason: reason
+            )
+
+            if case .success(let retryRun) = runModel(
+                prompt: retryPrompt,
+                modelPath: modelPath,
+                llamaCli: llamaCli,
+                tokenBasis: input
+            ) {
+                let retryValidation = Self.validateModelOutput(
+                    rawOutput: retryRun.rawOutput,
+                    outputWasTruncated: retryRun.outputWasTruncated,
+                    source: preparedInput
+                )
+
+                if !retryValidation.finalOutput.isEmpty {
+                    let trace = TextImprovementTrace(
+                        input: input,
+                        preparedInput: preparedInput,
+                        prompt: retryRun.prompt,
+                        rawOutput: retryRun.rawOutput,
+                        cleanedOutput: retryValidation.cleanedOutput,
+                        finalOutput: retryValidation.finalOutput,
+                        validationFallbackReason: retryValidation.validationFallbackReason,
+                        retryTriggerReason: reason,
+                        initialRawOutput: initialRun.rawOutput,
+                        initialCleanedOutput: initialValidation.cleanedCandidateOutput,
+                        modelPath: modelPath,
+                        runtimePath: llamaCli,
+                        arguments: retryRun.arguments
+                    )
+                    return .success(TextImprovementOutput(text: retryValidation.finalOutput, trace: trace))
+                }
+            }
+        }
+
+        guard !initialValidation.finalOutput.isEmpty else {
+            return .failure(.outputMissing)
+        }
+
+        let trace = TextImprovementTrace(
+            input: input,
+            preparedInput: preparedInput,
+            prompt: initialRun.prompt,
+            rawOutput: initialRun.rawOutput,
+            cleanedOutput: initialValidation.cleanedOutput,
+            finalOutput: initialValidation.finalOutput,
+            validationFallbackReason: initialValidation.validationFallbackReason,
+            retryTriggerReason: nil,
+            initialRawOutput: nil,
+            initialCleanedOutput: nil,
+            modelPath: modelPath,
+            runtimePath: llamaCli,
+            arguments: initialRun.arguments
+        )
+        return .success(TextImprovementOutput(text: initialValidation.finalOutput, trace: trace))
+    }
+
+    private func runModel(
+        prompt: String,
+        modelPath: String,
+        llamaCli: String,
+        tokenBasis: String
+    ) -> Result<ModelRun, TextImprovementFailure> {
         let promptPath: String
         do {
             promptPath = try writePromptFile(prompt)
@@ -180,7 +284,7 @@ final class TextImprovementRunner {
             "-m", modelPath,
             "-f", promptPath,
             "-c", "\(Self.contextTokens)",
-            "-n", "\(Self.maxGeneratedTokens(for: input))",
+            "-n", "\(Self.maxGeneratedTokens(for: tokenBasis))",
             "--temp", "0.1",
             "--top-p", "0.9",
             "--no-display-prompt",
@@ -235,70 +339,79 @@ final class TextImprovementRunner {
                 return .failure(.nonZeroExit(task.terminationStatus, stderrText))
             }
 
-            let rawOutput = stdoutCollector.text()
-            if stdoutCollector.wasTruncated() {
-                let finalOutput = TextImprovementFormatter.normalize(preparedInput)
-                let trace = TextImprovementTrace(
-                    input: input,
-                    preparedInput: preparedInput,
-                    prompt: prompt,
-                    rawOutput: rawOutput,
-                    cleanedOutput: preparedInput,
-                    finalOutput: finalOutput,
-                    validationFallbackReason: "output_truncated",
-                    modelPath: modelPath,
-                    runtimePath: llamaCli,
-                    arguments: arguments
-                )
-                return .success(TextImprovementOutput(text: finalOutput, trace: trace))
-            }
-
-            let cleanedOutput = Self.cleanModelOutput(rawOutput)
-            let markdownAdjustedOutput = Self.stripDecorativeMarkdownIfSourceWasPlain(
-                cleanedOutput,
-                source: preparedInput
-            )
-            var validationFallbackReason: String?
-            let guardedOutput = Self.fallbackToSourceIfOutputLooksLikeEditorialCommentary(
-                markdownAdjustedOutput,
-                source: preparedInput
-            )
-            if Self.sameTrimmedText(guardedOutput, preparedInput),
-               !Self.sameTrimmedText(markdownAdjustedOutput, preparedInput) {
-                validationFallbackReason = "editorial_commentary"
-            }
-
-            let contentPreservingOutput: String
-            if let reason = Self.nonConservativeCorrectionReason(guardedOutput, source: preparedInput) {
-                validationFallbackReason = reason
-                contentPreservingOutput = preparedInput.trimmingCharacters(in: .whitespacesAndNewlines)
-            } else {
-                contentPreservingOutput = guardedOutput
-            }
-            let improved = TextImprovementFormatter.normalize(contentPreservingOutput)
-            guard !improved.isEmpty else {
-                return .failure(.outputMissing)
-            }
-
-            let trace = TextImprovementTrace(
-                input: input,
-                preparedInput: preparedInput,
+            return .success(ModelRun(
                 prompt: prompt,
-                rawOutput: rawOutput,
-                cleanedOutput: contentPreservingOutput,
-                finalOutput: improved,
-                validationFallbackReason: validationFallbackReason,
-                modelPath: modelPath,
-                runtimePath: llamaCli,
+                rawOutput: stdoutCollector.text(),
+                outputWasTruncated: stdoutCollector.wasTruncated(),
                 arguments: arguments
-            )
-            return .success(TextImprovementOutput(text: improved, trace: trace))
+            ))
         } catch {
             stdoutHandle.readabilityHandler = nil
             stderrHandle.readabilityHandler = nil
             task.terminationHandler = nil
             return .failure(.launchFailed(error.localizedDescription))
         }
+    }
+
+    private static func validateModelOutput(
+        rawOutput: String,
+        outputWasTruncated: Bool,
+        source: String
+    ) -> ValidatedOutput {
+        if outputWasTruncated {
+            let finalOutput = TextImprovementFormatter.normalize(source)
+            return ValidatedOutput(
+                cleanedCandidateOutput: source,
+                cleanedOutput: source,
+                finalOutput: finalOutput,
+                validationFallbackReason: "output_truncated"
+            )
+        }
+
+        let cleanedOutput = cleanModelOutput(rawOutput)
+        let markdownAdjustedOutput = stripDecorativeMarkdownIfSourceWasPlain(
+            cleanedOutput,
+            source: source
+        )
+        var validationFallbackReason: String?
+        let guardedOutput = fallbackToSourceIfOutputLooksLikeEditorialCommentary(
+            markdownAdjustedOutput,
+            source: source
+        )
+        if sameTrimmedText(guardedOutput, source),
+           !sameTrimmedText(markdownAdjustedOutput, source) {
+            validationFallbackReason = "editorial_commentary"
+        }
+
+        let contentPreservingOutput: String
+        if let reason = nonConservativeCorrectionReason(guardedOutput, source: source) {
+            validationFallbackReason = reason
+            contentPreservingOutput = source.trimmingCharacters(in: .whitespacesAndNewlines)
+        } else {
+            contentPreservingOutput = guardedOutput
+        }
+
+        return ValidatedOutput(
+            cleanedCandidateOutput: markdownAdjustedOutput,
+            cleanedOutput: contentPreservingOutput,
+            finalOutput: TextImprovementFormatter.normalize(contentPreservingOutput),
+            validationFallbackReason: validationFallbackReason
+        )
+    }
+
+    private static func shouldRetryAfterValidationFallback(_ reason: String) -> Bool {
+        let retryableReasons: Set<String> = [
+            "editorial_commentary",
+            "unexpected_list_format",
+            "extra_ordered_list_item",
+            "critical_tokens_missing",
+            "source_content_dropped",
+            "source_tokens_not_preserved",
+            "new_content_added",
+            "short_answer_expansion",
+            "appended_new_content"
+        ]
+        return retryableReasons.contains(reason)
     }
 
     static func cleanModelOutput(_ output: String) -> String {

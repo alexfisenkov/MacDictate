@@ -79,7 +79,18 @@ elif grep -q "У нас осталось тут совсем немножко в
 4. И хорошо. Поэтому очень многие нейросети по типу Runway, по типу Syntx AI будут сейчас заменены на российские аналоги. Просто имейте это в виду и работайте грамотно и аккуратно. [end of text]
 OUT
 elif grep -q "сегодняшнем уроке мы пройдем" "$PROMPT_FILE"; then
-  cat <<'OUT'
+  if grep -q "Повторная попытка после ошибки валидатора: extra_ordered_list_item" "$PROMPT_FILE"; then
+    cat <<'OUT'
+Друзья, коллеги, команда, всем привет. И сегодня у нас с вами большая тема для разговора. Это инструкции для чата GPT. В сегодняшнем уроке мы пройдем:
+
+1. Как создавать инструкции для чата GPT.
+2. Как использовать Google и вообще нейросеть Gemini для того, чтобы она создавала действительно крутой текст.
+3. Мы пройдем с вами Cloud Code от Anthropic.
+
+И посмотрим, на что способны расти локально. И все это мы будем делать с вами действительно очень и очень круто. Впереди у нас с вами открывается большое путешествие, в которое мы с вами вступаем буквально с минуты на минуту. Ну что, поехали. [end of text]
+OUT
+  else
+    cat <<'OUT'
 Друзья, коллеги, команда, всем привет. И сегодня у нас с вами большая тема для разговора. Это инструкции для чата GPT. В сегодняшнем уроке мы пройдем:
 
 1. Как создавать инструкции для чата GPT.
@@ -87,6 +98,7 @@ elif grep -q "сегодняшнем уроке мы пройдем" "$PROMPT_FI
 3. Мы пройдем с вами Cloud Code от Anthropic.
 4. И посмотрим, на что способны расти локально. И все это мы будем делать с вами действительно очень и очень круто. Впереди у нас с вами открывается большое путешествие, в которое мы с вами вступаем буквально с минуты на минуту. Ну что, поехали. [end of text]
 OUT
+  fi
 elif grep -q "Возможно ли пользоваться реально iPad" "$PROMPT_FILE"; then
   cat <<'OUT'
 Ваш запрос можно переписать следующим образом:
@@ -266,10 +278,14 @@ case .failure(let error):
 let latestExtraListItemRegressionInput = "Друзья, коллеги, команда, всем привет. И сегодня у нас с вами большая тема для разговора. Это инструкции для чата GPT. И в сегодняшнем уроке мы пройдем. Первое. Как создавать инструкции для чата GPT? Второе. Как использовать Google и вообще нейросеть Gemini для того, чтобы она создавала действительно крутой текст? Третье. Мы пройдем с вами Cloud Code от Anthropic. И посмотрим, на что способны расти локально. И все это мы будем делать с вами действительно очень и очень круто. Впереди у нас с вами открывается большое путешествие, в которое мы с вами вступаем буквально с минуты на минуту. Ну что, поехали."
 switch successRunner.improveWithTrace(latestExtraListItemRegressionInput) {
 case .success(let output):
-    expect(output.trace.rawOutput.contains("4. И посмотрим"), "expected raw trace to retain model-created extra list item")
-    expect(output.trace.validationFallbackReason == "extra_ordered_list_item", "expected extra ordered list fallback reason")
-    expect(output.trace.cleanedOutput == output.trace.preparedInput, "expected cleaned trace to fallback after extra ordered list item")
+    expect(output.trace.initialRawOutput?.contains("4. И посмотрим") == true, "expected initial raw trace to retain model-created extra list item")
+    expect(output.trace.retryTriggerReason == "extra_ordered_list_item", "expected retry to be triggered by extra ordered list item")
+    expect(!output.trace.rawOutput.contains("4. И посмотрим"), "expected final raw trace to come from retried output")
+    expect(output.trace.validationFallbackReason == nil, "expected successful retry to avoid final fallback")
+    expect(output.trace.cleanedOutput != output.trace.preparedInput, "expected cleaned trace to use retried Qwen output")
+    expect(output.trace.cleanedOutput.contains("И посмотрим, на что способны расти локально."), "expected retry to preserve post-list paragraph")
     expect(!output.text.contains("4. И посмотрим"), "expected no model-created fourth item in final text")
+    expect(output.text.contains("И посмотрим, на что способны расти локально."), "expected final text to keep post-list paragraph")
     expect(output.text.contains("Claude Code от Anthropic"), "expected formatter to normalize Claude Code")
     expect(output.text.contains("ChatGPT"), "expected formatter to normalize ChatGPT")
 case .failure(let error):

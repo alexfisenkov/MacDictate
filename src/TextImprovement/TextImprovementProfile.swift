@@ -149,6 +149,38 @@ struct TextImprovementProfile {
         """
     }
 
+    func retryPrompt(for input: String, rejectedOutput: String, validationReason: String) -> String {
+        """
+        <|im_start|>system
+        \(systemRole)
+
+        Главные правила:
+        \(Self.bulleted(editingRules))
+
+        Оформление:
+        \(Self.bulleted(formattingRules))
+
+        Термины и каноническое написание:
+        \(terminologyGuide)
+
+        Частые варианты из диктовки:
+        \(Self.bulleted(speechNormalizationHints))
+
+        Повторная попытка после ошибки валидатора: \(validationReason).
+        Предыдущий ответ отклонён. Исправь только причину ошибки валидатора, не сокращай текст, не добавляй новый смысл и не меняй порядок мыслей.
+        Верни только исправленный текст без комментариев.
+        <|im_end|>
+        <|im_start|>user
+        Исходный текст:
+        \(input)
+
+        Отклонённый ответ:
+        \(rejectedOutput)
+        <|im_end|>
+        <|im_start|>assistant
+        """
+    }
+
     var terminologyGuide: String {
         terminologyPacks
             .map { pack in

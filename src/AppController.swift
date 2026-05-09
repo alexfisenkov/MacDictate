@@ -403,14 +403,26 @@ final class AppController: NSObject {
             if let reason = output.trace.validationFallbackReason {
                 qwenFinishedDetails["validationFallbackReason"] = reason
             }
+            if let reason = output.trace.retryTriggerReason {
+                qwenFinishedDetails["retryTriggerReason"] = reason
+            }
             debugSession?.record("qwen_finished", details: qwenFinishedDetails)
             debugSession?.writeTextFile("04_qwen_prompt.txt", output.trace.prompt)
             debugSession?.writeTextFile("04b_qwen_preformatted_input.txt", output.trace.preparedInput)
+            if let initialRawOutput = output.trace.initialRawOutput {
+                debugSession?.writeTextFile("05a_qwen_initial_raw_output.txt", initialRawOutput)
+            }
+            if let initialCleanedOutput = output.trace.initialCleanedOutput {
+                debugSession?.writeTextFile("06a_qwen_initial_cleaned_output.txt", initialCleanedOutput)
+            }
             debugSession?.writeTextFile("05_qwen_raw_output.txt", output.trace.rawOutput)
             debugSession?.writeTextFile("06_qwen_cleaned_output.txt", output.trace.cleanedOutput)
             debugSession?.writeTextFile("06b_qwen_final_after_formatter.txt", output.trace.finalOutput)
             if let reason = output.trace.validationFallbackReason {
                 debugSession?.writeTextFile("06c_qwen_validation.txt", "fallbackReason: \(reason)\n")
+            }
+            if let reason = output.trace.retryTriggerReason {
+                debugSession?.writeTextFile("06d_qwen_retry.txt", "retryTriggerReason: \(reason)\n")
             }
             debugSession?.writeTextFile("qwen_arguments.txt", output.trace.arguments.joined(separator: "\n"))
             return (output.text, nil)
