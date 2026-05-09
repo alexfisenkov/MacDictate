@@ -5,7 +5,7 @@
 - Status: `public_stable`
 - Bundle: `1.5.0` / build `10`
 - Git tag: `v1.5.0`
-- Git commit: recorded in `releases/registry.json` after tag creation
+- Git commit: `c1de36f6b99d5ff906bd049c5fc9f5da4fe0b3ce`
 - GitHub Release: `https://github.com/alexfisenkov/MacDictate/releases/tag/v1.5.0`
 
 ## Summary
@@ -44,4 +44,3 @@
 - Whisper and llama.cpp runtimes are still expected from Homebrew paths.
 - Text improvement is optional and bounded: input over `6_000` characters falls back instead of chunking.
 - Debug session logs are local and sensitive; user-facing retention/cleanup controls remain future work.
-

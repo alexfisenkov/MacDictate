@@ -263,7 +263,7 @@
         "build": "10"
       },
       "git": {
-        "commit": null,
+        "commit": "c1de36f6b99d5ff906bd049c5fc9f5da4fe0b3ce",
         "localTag": "v1.5.0",
         "remoteTags": [
           "v1.5.0"
@@ -274,7 +274,7 @@
         "releaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.5.0",
         "assetName": "MacDictate_Final_v1.5.0.dmg",
         "githubAssetSha256": "75c595ae0a1dbcbcae88ee440375cb613186de2bc3d053b69d7354f34076e9d4",
-        "publishedAt": null
+        "publishedAt": "2026-05-09T20:04:27Z"
       },
       "local": {
         "releaseDir": "releases/versions/v1.5.0",
@@ -283,7 +283,7 @@
         "buildLogPath": "releases/versions/v1.5.0/artifacts/build_log_v1.5.0.txt"
       },
       "summary": "Public stable 1.5.0: bounded Whisper runtime, licensing diagnostics, release governance, modular app architecture, and optional local text improvement via Qwen.",
-      "sourceConfidence": "confirmed_local_artifact_pending_github"
+      "sourceConfidence": "confirmed_git_and_github"
     }
   ],
   "checkpoints": [
