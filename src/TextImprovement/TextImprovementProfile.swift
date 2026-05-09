@@ -38,7 +38,7 @@ struct TextImprovementProfile {
                     "OpenAI", "ChatGPT", "GPT-4o", "Claude", "Gemini", "Grok", "Qwen", "Qwen2.5", "Llama", "Mistral", "DeepSeek", "Whisper", "WhisperKit",
                     "Syntx AI",
                     "Hugging Face", "PyTorch", "TensorFlow", "ONNX", "Core ML", "MLX", "Metal", "CUDA", "MPS", "GGUF", "llama.cpp", "whisper.cpp",
-                    "Stable Diffusion", "Midjourney", "Runway", "Pika", "Sora", "ComfyUI", "ControlNet"
+                    "Stable Diffusion", "Midjourney", "Runway", "Kling AI", "Pika", "Sora", "ComfyUI", "ControlNet"
                 ]
             ),
             TerminologyPack(
@@ -98,6 +98,7 @@ struct TextImprovementProfile {
             "капкат -> CapCut",
             "фигма -> Figma",
             "миджорни -> Midjourney",
+            "Cling AI / клинг ай -> Kling AI",
             "ебитда -> EBITDA",
             "аш би эй ван си -> HbA1c"
         ],

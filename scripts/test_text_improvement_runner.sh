@@ -71,6 +71,13 @@ elif grep -q "1. Мы создали специальный сценарий." "
 3. Мы выделили несколько файлов-факторов, которые это все закрывают.
 <|im_end|>
 OUT
+elif grep -q "У нас осталось тут совсем немножко времени" "$PROMPT_FILE"; then
+  cat <<'OUT'
+1. Что нужно сделать, это установить ChatGPT.
+2. Это нормально справиться с этой задачей.
+3. Это удалить все остальные нейросети. И после того, как пройдут все эти шаги, мы с вами уже на самом деле станем счастливыми людьми. Я также хочу сказать, что сегодня еще 9 мая. Это День Победы. День Победы празднуется в России и очень широко.
+4. И хорошо. Поэтому очень многие нейросети по типу Runway, по типу Syntx AI будут сейчас заменены на российские аналоги. Просто имейте это в виду и работайте грамотно и аккуратно. [end of text]
+OUT
 elif grep -q "1. Это только установить Charger 5." "$PROMPT_FILE"; then
   cat <<'OUT'
 Ваш текст уже практически готов, но есть несколько небольших исправлений и дополнений, чтобы он был более грамотным и аккуратным:
@@ -206,6 +213,20 @@ case .failure(let error):
     exit(1)
 }
 
+let latestContentDropRegressionInput = "Раз, два, три, три, два, один. У нас осталось тут совсем немножко времени. Первое, что нужно сделать, это установить чат GPT. Второе, это нормально справиться с этой задачей. Третье, это удалить все остальные нейросети. И после того, как пройдут все эти шаги, мы с вами уже на самом деле станем счастливыми людьми. Я также хочу сказать, что сегодня еще 9 мая. Это День Победы. День Победы празднуется в России и очень широко. И хорошо. Поэтому очень многие нейросети по типу Runway, по типу Cling AI будут сейчас заменены на российские аналоги по типу Syntax AI. Просто имейте это в виду и работайте грамотно и аккуратно."
+switch successRunner.improveWithTrace(latestContentDropRegressionInput) {
+case .success(let output):
+    expect(output.trace.rawOutput.contains("1. Что нужно сделать"), "expected raw trace to retain lossy Qwen output")
+    expect(output.trace.cleanedOutput == output.trace.preparedInput, "expected cleaned trace to fallback to prepared input after content loss")
+    expect(output.text.contains("Раз, два, три, три, два, один."), "expected fallback to preserve opening phrase")
+    expect(output.text.contains("У нас осталось тут совсем немножко времени."), "expected fallback to preserve intro sentence")
+    expect(output.text.contains("Kling AI"), "expected Cling AI to normalize to Kling AI")
+    expect(output.text.contains("Syntx AI"), "expected Syntax AI to normalize to Syntx AI")
+case .failure(let error):
+    fputs("Expected latest content-drop regression success, got \\(error.localizedDescription)\\n", stderr)
+    exit(1)
+}
+
 expect(
     TextImprovementRunner.cleanModelOutput("Improved text:\\nHello world.\\n[end of text]\\n<|endoftext|>") == "Hello world.",
     "expected English prefix cleanup"
@@ -226,6 +247,7 @@ expect(profilePrompt.contains("ChaiJPT -> ChatGPT"), "expected direct ChaiJPT sp
 expect(profilePrompt.contains("Клод от Anthropic / Cloud от Anthropic / Cloud Anthropic -> Claude от Anthropic / Claude Anthropic"), "expected direct Claude speech mapping")
 expect(profilePrompt.contains("Syntx AI"), "expected Syntx AI terminology")
 expect(profilePrompt.contains("Syntax AI / SyntaxAI / Синтакс AI / синтакс ай -> Syntx AI"), "expected direct Syntx AI speech mapping")
+expect(profilePrompt.contains("Cling AI / клинг ай -> Kling AI"), "expected direct Kling AI speech mapping")
 expect(!profilePrompt.contains("Вход:"), "runtime prompt should avoid example input labels")
 expect(!profilePrompt.contains("Выход:"), "runtime prompt should avoid example output labels")
 expect(profilePrompt.contains("Не заменяй разговорные слова автора"), "expected conservative wording rule")
@@ -261,6 +283,9 @@ expect(normalizedClaudeTerms == "Claude от Anthropic и Claude от Anthropic"
 
 let normalizedSyntxTerms = TextImprovementFormatter.normalize("Syntax AI, SyntaxAI и синтакс ай")
 expect(normalizedSyntxTerms == "Syntx AI, Syntx AI и Syntx AI", "expected fallback Syntx AI terminology normalization")
+
+let normalizedKlingTerms = TextImprovementFormatter.normalize("Runway, Cling AI и клинг ай")
+expect(normalizedKlingTerms == "Runway, Kling AI и Kling AI", "expected fallback Kling AI terminology normalization")
 
 let realDebugSessionOutput = TextImprovementFormatter.normalize(
     "Мы недавно собирались с ChaiJPT и Gemini от Google. Вот что мы достигли. Во-первых, мы создали специальный сценарий. Во-вторых, мы создали специальную штуку, которая обрабатывает этот сценарий. Ну, а в-третьих, мы выделили несколько файлов-факторов, которые это все закрывают."

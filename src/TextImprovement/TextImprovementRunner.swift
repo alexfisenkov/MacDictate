@@ -243,7 +243,11 @@ final class TextImprovementRunner {
                 markdownAdjustedOutput,
                 source: preparedInput
             )
-            let improved = TextImprovementFormatter.normalize(guardedOutput)
+            let contentPreservingOutput = Self.fallbackToSourceIfOutputDropsSourceContent(
+                guardedOutput,
+                source: preparedInput
+            )
+            let improved = TextImprovementFormatter.normalize(contentPreservingOutput)
             guard !improved.isEmpty else {
                 return .failure(.outputMissing)
             }
@@ -253,7 +257,7 @@ final class TextImprovementRunner {
                 preparedInput: preparedInput,
                 prompt: prompt,
                 rawOutput: rawOutput,
-                cleanedOutput: guardedOutput,
+                cleanedOutput: contentPreservingOutput,
                 finalOutput: improved,
                 modelPath: modelPath,
                 runtimePath: llamaCli,
@@ -356,6 +360,39 @@ final class TextImprovementRunner {
         return hasAddedEditorialCommentary ? trimmedSource : output
     }
 
+    static func fallbackToSourceIfOutputDropsSourceContent(_ output: String, source: String) -> String {
+        let trimmedOutput = output.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedSource = source.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedOutput.isEmpty, !trimmedSource.isEmpty else {
+            return output
+        }
+
+        let sourceTokens = significantTokens(in: trimmedSource)
+        guard sourceTokens.count >= 12 else {
+            return output
+        }
+
+        var outputTokenCounts: [String: Int] = [:]
+        for token in significantTokens(in: trimmedOutput) {
+            outputTokenCounts[token, default: 0] += 1
+        }
+
+        var missingCount = 0
+        for token in sourceTokens {
+            if let count = outputTokenCounts[token], count > 0 {
+                outputTokenCounts[token] = count - 1
+            } else {
+                missingCount += 1
+            }
+        }
+
+        let missingRatio = Double(missingCount) / Double(sourceTokens.count)
+        let lengthRatio = Double(trimmedOutput.count) / Double(trimmedSource.count)
+        let likelyContentDropped = missingCount >= 6 && missingRatio >= 0.10 && lengthRatio < 0.95
+
+        return likelyContentDropped ? trimmedSource : output
+    }
+
     private static func extractOutputFromLeakedPromptScaffold(_ output: String) -> String {
         let outputMarkers = [
             "Выход:",
@@ -393,6 +430,17 @@ final class TextImprovementRunner {
     private static func normalizeForCommentaryDetection(_ text: String) -> String {
         text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "ru_RU"))
             .lowercased()
+    }
+
+    private static func significantTokens(in text: String) -> [String] {
+        let normalized = text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "ru_RU"))
+            .lowercased()
+        let separators = CharacterSet.alphanumerics.inverted
+        return normalized
+            .components(separatedBy: separators)
+            .filter { token in
+                token.count >= 3 || token.rangeOfCharacter(from: .decimalDigits) != nil
+            }
     }
 
     private static func removeStandaloneMarkdownRuleLines(_ output: String) -> String {
