@@ -2,6 +2,12 @@
 
 Этот журнал фиксирует инженерные шаги и checkpoints, а не маркетинговое описание релиза.
 
+## 2026-05-10 — v1.5.1 brand icon standardization
+
+- Для рабочей линии `release/1.5.1` принят единый brand icon из пользовательских SVG `mic_logo.svg` и `mic_menubar.svg`.
+- macOS menu bar больше не использует emoji-микрофон: `NSStatusItem` переведен на template-иконку `mic_menubar`, а сборка копирует `mic_menubar.png` / `mic_menubar@2x.png` в app resources.
+- `AppIcon.icns`, landing/legal/payment pages и iOS AppIcon/recording controls синхронизированы на новый визуальный знак; публичный release не публиковался.
+
 ## 2026-05-09 — v1.5.0 release
 
 - Desktop release `v1.5.0` подготовлен как публичная stable-версия: bundle поднят до `1.5.0` / build `10`, DMG переименован в `MacDictate_Final_v1.5.0.dmg`, release ledger получает отдельную папку `releases/versions/v1.5.0/`, checksum и GitHub release metadata.

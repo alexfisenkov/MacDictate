@@ -44,7 +44,7 @@ enum MenuBuilder {
         let accessibilityStateItem = NSMenuItem(title: "♿️ Универсальный доступ: проверка...", action: nil, keyEquivalent: "")
         settingsSubmenu.addItem(accessibilityStateItem)
 
-        let microphoneStateItem = NSMenuItem(title: "🎤 Микрофон: проверка...", action: nil, keyEquivalent: "")
+        let microphoneStateItem = NSMenuItem(title: "Микрофон: проверка...", action: nil, keyEquivalent: "")
         settingsSubmenu.addItem(microphoneStateItem)
         settingsSubmenu.addItem(NSMenuItem.separator())
 

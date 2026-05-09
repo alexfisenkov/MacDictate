@@ -21,7 +21,8 @@ mkdir -p "$RESOURCES_DIR/bin"
 # 2. Копирование Info.plist
 cp "$PROJECT_DIR/assets/Info.plist" "$CONTENTS_DIR/Info.plist"
 cp "$PROJECT_DIR/assets/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
-cp "$PROJECT_DIR/assets/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
+cp "$PROJECT_DIR/assets/mic_menubar.png" "$RESOURCES_DIR/mic_menubar.png"
+cp "$PROJECT_DIR/assets/mic_menubar@2x.png" "$RESOURCES_DIR/mic_menubar@2x.png"
 
 # 3. Компиляция Swift-файлов
 echo "📦 Компиляция Swift-кода (arm64)... это займет пару секунд!"
@@ -120,6 +121,7 @@ create-dmg \
   --app-drop-link 460 190 \
   --eula "assets/license.txt" \
   --no-internet-enable \
+  --hdiutil-retries 20 \
   "$DMG_PATH" \
   "$DMG_SRC_DIR"
 

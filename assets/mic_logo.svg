@@ -1,0 +1,96 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+
+  <!--
+    Background: deep space indigo
+    Centre bright violet → mid dark → near-black edge
+  -->
+  <radialGradient id="paint0_radial_4016_52" cx="0" cy="0" r="1"
+    gradientUnits="userSpaceOnUse"
+    gradientTransform="translate(512 396) rotate(90) scale(628)">
+    <stop offset="0.00" stop-color="#5535D4"/>
+    <stop offset="0.30" stop-color="#221650"/>
+    <stop offset="0.65" stop-color="#0D0828"/>
+    <stop offset="1.00" stop-color="#04020E"/>
+  </radialGradient>
+
+  <!--
+    Aurora: extra violet bloom centred on the capsule
+  -->
+  <radialGradient id="aurora" cx="0" cy="0" r="1"
+    gradientUnits="userSpaceOnUse"
+    gradientTransform="translate(512 396) rotate(90) scale(310)">
+    <stop offset="0.00" stop-color="#7755FF" stop-opacity="0.42"/>
+    <stop offset="0.55" stop-color="#5533CC" stop-opacity="0.12"/>
+    <stop offset="1.00" stop-color="#3311AA" stop-opacity="0"/>
+  </radialGradient>
+
+  <!--
+    Soft violet bloom behind every white stroke / fill
+    SourceAlpha → blur → tint violet → merge under original
+  -->
+  <filter id="mic-glow" x="-14%" y="-14%" width="128%" height="128%"
+          color-interpolation-filters="sRGB">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="7" result="blur"/>
+    <feFlood flood-color="#9977FF" flood-opacity="0.60" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge>
+      <feMergeNode in="glow"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+
+  <!--
+    Slightly stronger bloom specifically for the capsule outline
+  -->
+  <filter id="capsule-glow" x="-18%" y="-18%" width="136%" height="136%"
+          color-interpolation-filters="sRGB">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="11" result="blur"/>
+    <feFlood flood-color="#8866FF" flood-opacity="0.50" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge>
+      <feMergeNode in="glow"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+
+</defs>
+
+<!-- ── Background ───────────────────────────────────────────── -->
+<rect width="1024" height="1024" rx="212" fill="url(#paint0_radial_4016_52)"/>
+
+<!-- ── Aurora overlay (violet centre bloom) ─────────────────── -->
+<rect width="1024" height="1024" rx="212" fill="url(#aurora)"/>
+
+<!-- ── Capsule outline (strongest glow) ─────────────────────── -->
+<path filter="url(#capsule-glow)"
+  d="M647.531 302.969C647.531 228.393 587.076 167.938 512.5 167.938C437.924 167.938 377.469 228.393 377.469 302.969V489.219C377.469 563.794 437.924 624.25 512.5 624.25C587.076 624.25 647.531 563.794 647.531 489.219V302.969Z"
+  stroke="white" stroke-width="40.95" stroke-linejoin="round"/>
+
+<!-- ── All remaining mic elements (uniform bloom) ────────────── -->
+<g filter="url(#mic-glow)">
+
+  <!-- Grille lines -->
+  <path d="M428.688 335.562H596.313" stroke="white" stroke-width="30.55" stroke-linecap="round"/>
+  <path d="M428.688 405.406H596.313" stroke="white" stroke-width="30.55" stroke-linecap="round"/>
+  <path d="M428.688 475.25H596.313"  stroke="white" stroke-width="30.55" stroke-linecap="round"/>
+
+  <!-- Neck connector -->
+  <path d="M554.406 670.812C554.406 647.668 535.644 628.906 512.5 628.906C489.356 628.906 470.594 647.668 470.594 670.812V675.469C470.594 698.613 489.356 717.375 512.5 717.375C535.644 717.375 554.406 698.613 554.406 675.469V670.812Z"
+        stroke="white" stroke-width="40.8"/>
+
+  <!-- Stand arms -->
+  <path d="M475.25 717.375C422.479 751.521 375.917 794.979 335.562 847.75"
+        stroke="white" stroke-width="40.9" stroke-linecap="round"/>
+  <path d="M549.75 717.375C602.521 751.521 649.083 794.979 689.438 847.75"
+        stroke="white" stroke-width="40.9" stroke-linecap="round"/>
+
+  <!-- Base bar -->
+  <path d="M279.688 847.75H745.312" stroke="white" stroke-width="41.15" stroke-linecap="round"/>
+
+  <!-- Indicator dot -->
+  <circle cx="512.498" cy="249.56" r="21.9118" fill="white"/>
+
+</g>
+
+</svg>

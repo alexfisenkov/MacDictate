@@ -53,11 +53,26 @@ final class AppController: NSObject {
     }
 
     private func buildMenu() {
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.button?.title = "🎙️"
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        configureStatusBarButton()
 
         menuComponents = MenuBuilder.build(for: self)
         statusItem.menu = menuComponents.menu
+    }
+
+    private func configureStatusBarButton() {
+        guard let button = statusItem.button else { return }
+
+        if let image = NSImage(named: "mic_menubar") {
+            image.isTemplate = true
+            image.size = NSSize(width: 17, height: 17)
+            button.image = image
+            button.imagePosition = .imageOnly
+            button.title = ""
+        } else {
+            button.image = nil
+            button.title = "MacDictate"
+        }
     }
 
     private func bindServices() {
@@ -145,9 +160,9 @@ final class AppController: NSObject {
         setStatus(idleStatus.text, icon: idleStatus.icon)
     }
 
-    private func setStatus(_ text: String, icon: String) {
+    private func setStatus(_ text: String, icon _: String) {
         DispatchQueue.main.async {
-            self.statusItem.button?.title = icon
+            self.configureStatusBarButton()
             self.menuComponents.statusItem.title = "Status: \(text)"
         }
     }

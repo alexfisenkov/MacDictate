@@ -63,7 +63,7 @@ enum StatusPresentation {
             let icon: String
             switch runtimeDiagnostic.severity {
             case .ok:
-                icon = "🎙️"
+                icon = ""
             case .warning:
                 icon = "⚠️"
             case .error:
@@ -76,7 +76,7 @@ enum StatusPresentation {
         case .checking:
             return ("Checking license...", "⏳")
         case .active:
-            return ("Ready", "🎙️")
+            return ("Ready", "")
         case .grace:
             return ("Offline Grace", "🟡")
         case .expired:
@@ -95,11 +95,11 @@ enum StatusPresentation {
     static func microphoneMenuTitle(state: MicrophonePermissionState) -> String {
         switch state {
         case .authorized:
-            return "🎤 Микрофон: доступ разрешён"
+            return "Микрофон: доступ разрешён"
         case .notDetermined:
-            return "🎤 Микрофон: ожидает подтверждения"
+            return "Микрофон: ожидает подтверждения"
         case .denied:
-            return "🎤 Микрофон: доступ не выдан"
+            return "Микрофон: доступ не выдан"
         }
     }
 
