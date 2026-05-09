@@ -49,3 +49,20 @@
 - [ ] Release asset и release notes соответствуют changelog.
 - [ ] `scripts/verify_release_governance.sh --online` проходит после публикации GitHub Release.
 - [ ] После публикации обновлены публичные references, если download URL менялся.
+
+## v1.5.0 Release Evidence
+
+- [x] Bundle поднят до `1.5.0` / build `10`.
+- [x] Release DMG собран как `MacDictate_Final_v1.5.0.dmg`.
+- [x] Local artifact SHA256: `75c595ae0a1dbcbcae88ee440375cb613186de2bc3d053b69d7354f34076e9d4`.
+- [x] `scripts/test_whisper_runner_timeout.sh`.
+- [x] `scripts/test_license_machine_id_timeout.sh`.
+- [x] `scripts/test_license_status_response.sh`.
+- [x] `scripts/test_license_grace_diagnostic.sh`.
+- [x] `scripts/test_recording_temp_cleanup.sh`.
+- [x] `scripts/test_text_improvement_runner.sh`.
+- [x] `scripts/test_debug_session_logger.sh`.
+- [x] `swiftc -typecheck $(find src -name '*.swift' | sort)`.
+- [x] `node --check backend/server.js && node --check backend/db.js`.
+- [x] `plutil -lint assets/Info.plist`.
+- [x] `./build.sh`.

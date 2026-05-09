@@ -42,12 +42,12 @@
 
 ## Current Version State
 
-- Текущая публичная stable: `v1.4.2`.
-- Bundle в `assets/Info.plist`: `1.4.2` / build `9`.
-- Рабочая линия: `release/1.5.0`.
-- `v1.5.0` не считается релизом до tag, GitHub Release, registry update, DMG asset и smoke evidence.
-- В рабочей линии `1.5.0` `WhisperRunner` ограничивает зависший `whisper-cli` timeout `30` минут и читает `stderr` во время работы процесса; `LicenseService` ограничивает первый `ioreg`, использует license request timeout `20` секунд и не показывает runtime-warning при transient license failure, если активен valid cached grace; `RecordingService` чистит stale temp audio.
-- В `1.5.0` добавлен optional second-AI layer: preferred Qwen2.5-3B-Instruct Q4_K_M (`.gguf`) через `llama.cpp` (`llama-completion`) с fallback на Qwen2.5-1.5B-Instruct Q4_K_M, persisted toggle `MacDictateTextImprovementEnabled`, top-level toggle `Улучшить текст`, downloader модели, safe input limit `6_000` символов, runtime timeout `10` минут, context `8_192` tokens, `TextImprovementProfile.professionalCopyEditor` с editorial rules / terminology packs и `TextImprovementFormatter` для очевидных list/term guardrails.
+- Текущая публичная stable: `v1.5.0`.
+- Bundle в `assets/Info.plist`: `1.5.0` / build `10`.
+- Следующая рабочая линия: `release/1.5.1`.
+- `v1.5.0` считается релизом только при наличии tag `v1.5.0`, GitHub Release, registry entry, DMG asset и smoke evidence.
+- В `1.5.0` `WhisperRunner` ограничивает зависший `whisper-cli` timeout `30` минут и читает `stderr` во время работы процесса; `LicenseService` ограничивает первый `ioreg`, использует license request timeout `20` секунд и не показывает runtime-warning при transient license failure, если активен valid cached grace; `RecordingService` чистит stale temp audio.
+- В `1.5.0` добавлен optional second-AI layer: preferred Qwen2.5-3B-Instruct Q4_K_M (`.gguf`) через `llama.cpp` (`llama-completion`) с fallback на Qwen2.5-1.5B-Instruct Q4_K_M, persisted toggle `MacDictateTextImprovementEnabled`, top-level toggle `Улучшить текст`, downloader модели, safe input limit `6_000` символов, runtime timeout `10` минут, context `8_192` tokens, controlled retry для невалидного Qwen-output, `TextImprovementProfile.professionalCopyEditor` с editorial rules / terminology packs и `TextImprovementFormatter` для очевидных list/term guardrails.
 - Text improvement pipeline применяет `TextImprovementFormatter.normalize` до Qwen и после Qwen: pre-formatting защищает структуру перечислений и термины (`ChaiJPT`/`Чай и GPT` -> `ChatGPT`), post-processing страхует финальный output.
 - В `1.5.0` добавлен opt-in local debug session logging: `MacDictateDebugSessionLoggingEnabled` сохраняет аудио, raw/cleaned Whisper output, Qwen prompt/raw/cleaned/final output, final inserted text и `events.jsonl` в `~/.macdictate/debug-sessions/`. Эти artifacts чувствительны и не отправляются на сервер.
 - Будущий AI corpus/fine-tune governed by `docs/8_AI_Corpus_Strategy.md`: primary corpus — approved real dictation pairs из debug-сессий; copywriting datasets HuggingFace — только secondary style/eval material после license review.
@@ -110,7 +110,7 @@ scripts/verify_release_governance.sh --online
 
 - `v1.2` и `v1.3` есть в GitHub Releases/remote tags, но локальные tags отсутствуют; remote tags указывают на тот же commit, что `v1.4`. Их история помечена как reconstructed.
 - `v1.4.1-local` — локальная сборка build `8`, не публичный release.
-- Локальный `v1.4.2` DMG отличается по SHA256 от GitHub asset; публичным download source of truth остается GitHub Release.
+- Публичным download source of truth для `v1.5.0` остается GitHub Release.
 
 ## Development Priority
 

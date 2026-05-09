@@ -1,5 +1,11 @@
 # Decision Log
 
+## D-016 — v1.5.0 becomes public stable and next line is 1.5.1
+
+- **Дата:** 2026-05-09
+- **Решение:** зафиксировать desktop `v1.5.0` как публичный stable release, а дальнейшую работу вести в линии `release/1.5.1`.
+- **Почему:** линия `release/1.5.0` закрыла запланированные слои: bounded Whisper runtime, license hardening, diagnostics, release governance, модульную app-архитектуру и optional local text improvement через вторую нейросеть.
+
 ## D-001 — Working line goes to 1.5.0, not 1.4.3
 
 - **Дата:** 2026-04-19

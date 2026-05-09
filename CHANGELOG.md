@@ -2,7 +2,7 @@
 
 Этот changelog фиксирует только пользовательски и релизно значимые изменения.
 
-## [Unreleased] 1.5.0 Working Line
+## [v1.5.0] - 2026-05-09
 
 ### Added
 - server-authoritative checkout и catalog тарифов на backend-слое;

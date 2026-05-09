@@ -2,7 +2,7 @@
 
 ## Status
 
-- Status: `public_stable`
+- Status: `public_release`
 - Bundle: `1.4.2` / build `9`
 - Git tag: `v1.4.2`
 - Git commit: `4a2fa2a3eebd392f4f336080df2b3c84d0884d26`
@@ -10,7 +10,7 @@
 
 ## Summary
 
-Текущая публичная стабильная desktop-версия. Добавлены OTA-проверка обновлений через GitHub Releases API и звук `Tink` после успешной вставки.
+Предыдущая публичная стабильная desktop-версия. Добавлены OTA-проверка обновлений через GitHub Releases API и звук `Tink` после успешной вставки.
 
 ## Difference From v1.4
 

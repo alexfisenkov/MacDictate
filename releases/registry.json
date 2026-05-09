@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "product": "MacDictate macOS desktop",
-  "registryUpdatedAt": "2026-05-08",
+  "registryUpdatedAt": "2026-05-09",
   "governanceDocument": "docs/7_Release_Governance.md",
   "current": {
-    "publicStable": "v1.4.2",
+    "publicStable": "v1.5.0",
     "workingLine": "v1.5.0-working",
     "developmentBranch": "release/1.5.0",
-    "bundleShortVersion": "1.4.2",
-    "bundleVersion": "9"
+    "bundleShortVersion": "1.5.0",
+    "bundleVersion": "10"
   },
   "versions": [
     {
@@ -51,7 +51,9 @@
       "git": {
         "commit": "7b895cf50a72e9fc8f85aeb609a8813e4b88488e",
         "localTag": "v1.1",
-        "remoteTags": ["v1.1"],
+        "remoteTags": [
+          "v1.1"
+        ],
         "tagRequiredLocally": true
       },
       "github": {
@@ -80,7 +82,9 @@
       "git": {
         "commit": "cb6db00839c0f00d3f7f681706ded082b235013a",
         "localTag": null,
-        "remoteTags": ["v1.2"],
+        "remoteTags": [
+          "v1.2"
+        ],
         "tagRequiredLocally": false
       },
       "github": {
@@ -109,7 +113,9 @@
       "git": {
         "commit": "cb6db00839c0f00d3f7f681706ded082b235013a",
         "localTag": null,
-        "remoteTags": ["v1.3"],
+        "remoteTags": [
+          "v1.3"
+        ],
         "tagRequiredLocally": false
       },
       "github": {
@@ -138,7 +144,9 @@
       "git": {
         "commit": "cb6db00839c0f00d3f7f681706ded082b235013a",
         "localTag": "v1.4",
-        "remoteTags": ["v1.4"],
+        "remoteTags": [
+          "v1.4"
+        ],
         "tagRequiredLocally": true
       },
       "github": {
@@ -187,8 +195,8 @@
     },
     {
       "version": "v1.4.2",
-      "status": "public_stable",
-      "channel": "stable",
+      "status": "public_release",
+      "channel": "stable_history",
       "bundle": {
         "shortVersion": "1.4.2",
         "build": "9"
@@ -196,7 +204,9 @@
       "git": {
         "commit": "4a2fa2a3eebd392f4f336080df2b3c84d0884d26",
         "localTag": "v1.4.2",
-        "remoteTags": ["v1.4.2"],
+        "remoteTags": [
+          "v1.4.2"
+        ],
         "tagRequiredLocally": true
       },
       "github": {
@@ -211,7 +221,7 @@
         "localArtifactSha256": "8f86246ea0b823a2f1b106e96f7a14014a06fd252df3055a5de5e6d8ae166ddb",
         "buildLogPath": "releases/versions/v1.4.2/artifacts/build_log_v1.4.2.txt"
       },
-      "summary": "Current public stable: GitHub OTA update check and paste success sound.",
+      "summary": "Previous public stable: GitHub OTA update check and paste success sound.",
       "sourceConfidence": "confirmed_git_and_github"
     },
     {
@@ -243,6 +253,37 @@
       },
       "summary": "Active 1.5.0 development line: backend checkout hardening, license state machine, diagnostics, modular app architecture, release governance.",
       "sourceConfidence": "confirmed_working_line"
+    },
+    {
+      "version": "v1.5.0",
+      "status": "public_stable",
+      "channel": "stable",
+      "bundle": {
+        "shortVersion": "1.5.0",
+        "build": "10"
+      },
+      "git": {
+        "commit": null,
+        "localTag": "v1.5.0",
+        "remoteTags": [
+          "v1.5.0"
+        ],
+        "tagRequiredLocally": true
+      },
+      "github": {
+        "releaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.5.0",
+        "assetName": "MacDictate_Final_v1.5.0.dmg",
+        "githubAssetSha256": "75c595ae0a1dbcbcae88ee440375cb613186de2bc3d053b69d7354f34076e9d4",
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.5.0",
+        "artifactPath": "releases/versions/v1.5.0/artifacts/MacDictate_Final_v1.5.0.dmg",
+        "localArtifactSha256": "75c595ae0a1dbcbcae88ee440375cb613186de2bc3d053b69d7354f34076e9d4",
+        "buildLogPath": "releases/versions/v1.5.0/artifacts/build_log_v1.5.0.txt"
+      },
+      "summary": "Public stable 1.5.0: bounded Whisper runtime, licensing diagnostics, release governance, modular app architecture, and optional local text improvement via Qwen.",
+      "sourceConfidence": "confirmed_local_artifact_pending_github"
     }
   ],
   "checkpoints": [

@@ -1,5 +1,5 @@
 {
-  "version": "1.1",
-  "download_url": "https://github.com/alexfisenkov/MacDictate/releases/latest",
-  "release_notes": "Улучшена стабильность и добавлен автозапуск."
+  "version": "1.5.0",
+  "download_url": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.5.0",
+  "release_notes": "Добавлены устойчивость транскрипции, лицензирование, диагностика и локальное улучшение текста второй нейросетью."
 }
