@@ -56,6 +56,7 @@ struct TextImprovementTrace {
     let rawOutput: String
     let cleanedOutput: String
     let finalOutput: String
+    let validationFallbackReason: String?
     let modelPath: String
     let runtimePath: String
     let arguments: [String]
@@ -136,6 +137,7 @@ final class TextImprovementRunner {
                 rawOutput: "",
                 cleanedOutput: "",
                 finalOutput: "",
+                validationFallbackReason: nil,
                 modelPath: "",
                 runtimePath: "",
                 arguments: []
@@ -234,19 +236,45 @@ final class TextImprovementRunner {
             }
 
             let rawOutput = stdoutCollector.text()
+            if stdoutCollector.wasTruncated() {
+                let finalOutput = TextImprovementFormatter.normalize(preparedInput)
+                let trace = TextImprovementTrace(
+                    input: input,
+                    preparedInput: preparedInput,
+                    prompt: prompt,
+                    rawOutput: rawOutput,
+                    cleanedOutput: preparedInput,
+                    finalOutput: finalOutput,
+                    validationFallbackReason: "output_truncated",
+                    modelPath: modelPath,
+                    runtimePath: llamaCli,
+                    arguments: arguments
+                )
+                return .success(TextImprovementOutput(text: finalOutput, trace: trace))
+            }
+
             let cleanedOutput = Self.cleanModelOutput(rawOutput)
             let markdownAdjustedOutput = Self.stripDecorativeMarkdownIfSourceWasPlain(
                 cleanedOutput,
                 source: preparedInput
             )
+            var validationFallbackReason: String?
             let guardedOutput = Self.fallbackToSourceIfOutputLooksLikeEditorialCommentary(
                 markdownAdjustedOutput,
                 source: preparedInput
             )
-            let contentPreservingOutput = Self.fallbackToSourceIfOutputIsNotConservativeCorrection(
-                guardedOutput,
-                source: preparedInput
-            )
+            if Self.sameTrimmedText(guardedOutput, preparedInput),
+               !Self.sameTrimmedText(markdownAdjustedOutput, preparedInput) {
+                validationFallbackReason = "editorial_commentary"
+            }
+
+            let contentPreservingOutput: String
+            if let reason = Self.nonConservativeCorrectionReason(guardedOutput, source: preparedInput) {
+                validationFallbackReason = reason
+                contentPreservingOutput = preparedInput.trimmingCharacters(in: .whitespacesAndNewlines)
+            } else {
+                contentPreservingOutput = guardedOutput
+            }
             let improved = TextImprovementFormatter.normalize(contentPreservingOutput)
             guard !improved.isEmpty else {
                 return .failure(.outputMissing)
@@ -259,6 +287,7 @@ final class TextImprovementRunner {
                 rawOutput: rawOutput,
                 cleanedOutput: contentPreservingOutput,
                 finalOutput: improved,
+                validationFallbackReason: validationFallbackReason,
                 modelPath: modelPath,
                 runtimePath: llamaCli,
                 arguments: arguments
@@ -375,7 +404,16 @@ final class TextImprovementRunner {
             "пришлите исходный текст",
             "фрагмент текста, который вам нужно обработать",
             "затрудняет редактирование",
-            "для дальнейшей работы"
+            "для дальнейшей работы",
+            "я считаю",
+            "я думаю",
+            "я отношусь",
+            "важно помнить",
+            "рекомендую",
+            "советую",
+            "вы можете",
+            "давайте рассмотрим",
+            "ответ на ваш вопрос"
         ]
 
         let hasAddedEditorialCommentary = editorialMarkers.contains { marker in
@@ -386,15 +424,37 @@ final class TextImprovementRunner {
     }
 
     static func fallbackToSourceIfOutputIsNotConservativeCorrection(_ output: String, source: String) -> String {
+        if nonConservativeCorrectionReason(output, source: source) != nil {
+            return source.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        return output
+    }
+
+    private static func nonConservativeCorrectionReason(_ output: String, source: String) -> String? {
         let trimmedOutput = output.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedSource = source.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedOutput.isEmpty, !trimmedSource.isEmpty else {
-            return output
+            return nil
         }
 
         let sourceTokens = significantTokens(in: trimmedSource)
-        guard sourceTokens.count >= 12 else {
-            return output
+        let sourceTokenCount = sourceTokens.count
+        guard sourceTokenCount >= 3 else {
+            return nil
+        }
+
+        if outputIntroducesUnexpectedList(output: trimmedOutput, source: trimmedSource) {
+            return "unexpected_list_format"
+        }
+
+        let sourceCriticalTokens = criticalTokens(in: trimmedSource)
+        if !sourceCriticalTokens.isEmpty {
+            let outputCriticalTokens = Set(criticalTokens(in: trimmedOutput))
+            let missingCriticalTokens = sourceCriticalTokens.filter { !outputCriticalTokens.contains($0) }
+            if !missingCriticalTokens.isEmpty {
+                return "critical_tokens_missing"
+            }
         }
 
         var outputTokenCounts: [String: Int] = [:]
@@ -411,13 +471,43 @@ final class TextImprovementRunner {
             }
         }
 
-        let missingRatio = Double(missingCount) / Double(sourceTokens.count)
+        let extraCount = outputTokenCounts.values.reduce(0, +)
+        let missingRatio = Double(missingCount) / Double(sourceTokenCount)
+        let extraRatio = Double(extraCount) / Double(sourceTokenCount)
         let lengthRatio = Double(trimmedOutput.count) / Double(trimmedSource.count)
-        let likelyContentDropped = missingCount >= 6 && missingRatio >= 0.10 && lengthRatio < 0.95
-        let likelyAnsweredOrRewritten = missingCount >= 4 && missingRatio >= 0.30
-        let likelyExpandedWithNewContent = missingCount >= 3 && missingRatio >= 0.20 && lengthRatio >= 1.50
+        let likelyContentDropped = sourceTokenCount >= 12 && missingCount >= 6 && missingRatio >= 0.10 && lengthRatio < 0.95
+        if likelyContentDropped {
+            return "source_content_dropped"
+        }
 
-        return (likelyContentDropped || likelyAnsweredOrRewritten || likelyExpandedWithNewContent) ? trimmedSource : output
+        let likelyAnsweredOrRewritten = sourceTokenCount >= 4 && missingCount >= 4 && missingRatio >= 0.30
+        if likelyAnsweredOrRewritten {
+            return "source_tokens_not_preserved"
+        }
+
+        let likelyExpandedWithNewContent = sourceTokenCount >= 4
+            && extraCount >= max(6, Int((Double(sourceTokenCount) * 0.40).rounded(.up)))
+            && extraRatio >= 0.35
+            && lengthRatio >= 1.35
+        if likelyExpandedWithNewContent {
+            return "new_content_added"
+        }
+
+        let likelyShortAnswerExpansion = sourceTokenCount < 12
+            && extraCount >= max(6, sourceTokenCount)
+            && lengthRatio >= 1.75
+        if likelyShortAnswerExpansion {
+            return "short_answer_expansion"
+        }
+
+        let likelyAppendedAnswer = missingCount <= max(1, Int((Double(sourceTokenCount) * 0.05).rounded(.up)))
+            && extraCount >= max(8, Int((Double(sourceTokenCount) * 0.50).rounded(.up)))
+            && lengthRatio >= 1.50
+        if likelyAppendedAnswer {
+            return "appended_new_content"
+        }
+
+        return nil
     }
 
     private static func extractOutputFromLeakedPromptScaffold(_ output: String) -> String {
@@ -457,6 +547,50 @@ final class TextImprovementRunner {
     private static func normalizeForCommentaryDetection(_ text: String) -> String {
         text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "ru_RU"))
             .lowercased()
+    }
+
+    private static func sameTrimmedText(_ lhs: String, _ rhs: String) -> Bool {
+        lhs.trimmingCharacters(in: .whitespacesAndNewlines) == rhs.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func criticalTokens(in text: String) -> Set<String> {
+        let pattern = #"https?://\S+|[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}|[A-Za-zА-Яа-яЁё]*\d[\w.%/:+-]*"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            return []
+        }
+
+        let nsRange = NSRange(text.startIndex..<text.endIndex, in: text)
+        return Set(regex.matches(in: text, range: nsRange).compactMap { match in
+            guard let range = Range(match.range, in: text) else { return nil }
+            return String(text[range])
+                .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "ru_RU"))
+                .lowercased()
+                .trimmingCharacters(in: CharacterSet(charactersIn: ".,;:!?()[]{}\"'"))
+        }.filter { !$0.isEmpty })
+    }
+
+    private static func outputIntroducesUnexpectedList(output: String, source: String) -> Bool {
+        guard hasListMarkers(output) else { return false }
+        return !hasListMarkers(source) && !hasListCue(source)
+    }
+
+    private static func hasListMarkers(_ text: String) -> Bool {
+        text.range(
+            of: #"(?m)^\s*(?:[-*•]\s+|\d+[\.)]\s+)"#,
+            options: .regularExpression
+        ) != nil
+    }
+
+    private static func hasListCue(_ text: String) -> Bool {
+        let normalized = normalizeForCommentaryDetection(text).replacingOccurrences(of: "ё", with: "е")
+        let cues = [
+            "во-первых", "во первых", "во-вторых", "во вторых", "в-третьих", "в третьих",
+            "первое", "второе", "третье", "пункт первый", "пункт второй",
+            "раз, два", "есть три", "есть несколько", "несколько вариантов",
+            "несколько причин", "несколько вещей", "перечислю", "список",
+            "сюда входит", "нам нужно", "важно сделать"
+        ]
+        return cues.contains { normalized.contains($0) }
     }
 
     private static func significantTokens(in text: String) -> [String] {
@@ -554,6 +688,12 @@ private final class TextProcessOutputCollector {
             }
 
             return text
+        }
+    }
+
+    func wasTruncated() -> Bool {
+        queue.sync {
+            truncated
         }
     }
 }

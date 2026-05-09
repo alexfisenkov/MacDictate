@@ -98,6 +98,13 @@ elif grep -q "как ты относишься к корректировке т�
   cat <<'OUT'
 Я отношусь к корректировке текста через нейросеть с положительной точки зрения. Нейросети могут помочь в выявлении и исправлении ошибок, особенно тех, которые могут быть трудно заметить для человека. Однако важно помнить, что они не заменяют проверку рукой и могут допускать ошибки, особенно если текст содержит специфические или уникальные случаи. [end of text]
 OUT
+elif grep -q "проверить длинный вывод модели" "$PROMPT_FILE"; then
+  i=0
+  while [ "$i" -lt 120 ]; do
+    printf "Это лишний расширенный ответ модели номер %03d, который не должен попадать во вставку. " "$i"
+    i=$((i + 1))
+  done
+  printf "[end of text]\n"
 elif grep -q "1. Это только установить Charger 5." "$PROMPT_FILE"; then
   cat <<'OUT'
 Ваш текст уже практически готов, но есть несколько небольших исправлений и дополнений, чтобы он был более грамотным и аккуратным:
@@ -279,6 +286,7 @@ let latestQuestionAnswerRegressionInput = "Сейчас хотелось бы с
 switch successRunner.improveWithTrace(latestQuestionAnswerRegressionInput) {
 case .success(let output):
     expect(output.trace.rawOutput.contains("Я отношусь к корректировке текста через нейросеть"), "expected raw trace to retain answered question")
+    expect(output.trace.validationFallbackReason != nil, "expected validation fallback reason for answered question")
     expect(output.trace.cleanedOutput == output.trace.preparedInput, "expected cleaned trace to fallback to prepared input after answered question")
     expect(!output.text.contains("Я отношусь к корректировке текста"), "expected no model answer in final text")
     expect(!output.text.contains("Однако важно помнить"), "expected no assistant explanation in final text")
@@ -286,6 +294,26 @@ case .success(let output):
     expect(output.text.contains("Ответь, пожалуйста."), "expected fallback to preserve closing phrase")
 case .failure(let error):
     fputs("Expected latest question-answer regression success, got \\(error.localizedDescription)\\n", stderr)
+    exit(1)
+}
+
+let truncatingRunner = TextImprovementRunner(
+    timeoutSeconds: 5,
+    terminationGraceSeconds: 0.2,
+    outputLimitBytes: 96,
+    profile: .professionalCopyEditor,
+    modelPathProvider: { fakeModel },
+    llamaCliPathProvider: { successCli }
+)
+let truncatedOutputRegressionInput = "Нужно проверить длинный вывод модели и убедиться, что он не попадет во вставку."
+switch truncatingRunner.improveWithTrace(truncatedOutputRegressionInput) {
+case .success(let output):
+    expect(output.trace.rawOutput.contains("[output truncated]"), "expected raw trace to mark truncated output")
+    expect(output.trace.validationFallbackReason == "output_truncated", "expected output_truncated fallback reason")
+    expect(output.trace.cleanedOutput == output.trace.preparedInput, "expected truncated output to fallback to prepared input")
+    expect(output.text.contains("Нужно проверить длинный вывод модели"), "expected fallback to preserve source text")
+case .failure(let error):
+    fputs("Expected truncation fallback success, got \\(error.localizedDescription)\\n", stderr)
     exit(1)
 }
 
@@ -452,6 +480,77 @@ expect(
         source: requestRewriteCommentarySource
     ) == requestRewriteCommentarySource.trimmingCharacters(in: .whitespacesAndNewlines),
     "expected request rewrite commentary output to fallback to source"
+)
+
+let shortQuestionSource = "Что думаешь про нейросеть?"
+let shortQuestionAnswer = "Я думаю, что нейросеть может быть полезной, если правильно понимать её ограничения и использовать её аккуратно."
+expect(
+    TextImprovementRunner.fallbackToSourceIfOutputIsNotConservativeCorrection(
+        shortQuestionAnswer,
+        source: shortQuestionSource
+    ) == shortQuestionSource,
+    "expected short answered question to fallback to source"
+)
+
+let appendedAnswerSource = "Сейчас хотелось бы спросить кое-что у тебя. А как ты относишься к корректировке текста через нейросеть? Ответь, пожалуйста."
+let appendedAnswerOutput = """
+Сейчас хотелось бы спросить кое-что у тебя. А как ты относишься к корректировке текста через нейросеть? Ответь, пожалуйста.
+
+Я отношусь к корректировке текста через нейросеть положительно, потому что она помогает быстро находить ошибки и улучшать читаемость.
+"""
+expect(
+    TextImprovementRunner.fallbackToSourceIfOutputIsNotConservativeCorrection(
+        appendedAnswerOutput,
+        source: appendedAnswerSource
+    ) == appendedAnswerSource,
+    "expected appended assistant answer to fallback even when source text is preserved"
+)
+
+let validQuestionCorrection = "Почему люди боятся нейросетей и что с этим делать?"
+expect(
+    TextImprovementRunner.fallbackToSourceIfOutputIsNotConservativeCorrection(
+        validQuestionCorrection,
+        source: "почему люди боятся нейросетей и что с этим делать"
+    ) == validQuestionCorrection,
+    "expected conservative question correction to be accepted"
+)
+
+let validListCorrection = """
+Есть три причины:
+
+1. Нет цели.
+2. Нет системы.
+3. Нет понимания аудитории.
+"""
+expect(
+    TextImprovementRunner.fallbackToSourceIfOutputIsNotConservativeCorrection(
+        validListCorrection,
+        source: "есть три причины первое нет цели второе нет системы третье нет понимания аудитории"
+    ) == validListCorrection,
+    "expected conservative list formatting to be accepted"
+)
+
+let unexpectedListSource = "Сегодня я хочу поговорить про текст и нейросеть."
+let unexpectedListOutput = """
+- Сегодня я хочу поговорить про текст.
+- Нейросеть помогает редактировать.
+"""
+expect(
+    TextImprovementRunner.fallbackToSourceIfOutputIsNotConservativeCorrection(
+        unexpectedListOutput,
+        source: unexpectedListSource
+    ) == unexpectedListSource,
+    "expected unexpected list formatting to fallback to source"
+)
+
+let criticalTokenSource = "Сумма 125000 рублей, НДС 20%, договор AB-15."
+let criticalTokenOutput = "Сумма рублей, НДС, договор."
+expect(
+    TextImprovementRunner.fallbackToSourceIfOutputIsNotConservativeCorrection(
+        criticalTokenOutput,
+        source: criticalTokenSource
+    ) == criticalTokenSource,
+    "expected missing critical numeric tokens to fallback to source"
 )
 
 expect(
