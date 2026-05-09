@@ -94,6 +94,10 @@ elif grep -q "Мне нужна помощь. Я могу разобраться
   cat <<'OUT'
 Конечно, я могу помочь с редактированием и коррекцией вашего текста. Пожалуйста, предоставьте фрагмент текста, который вам нужно обработать. [end of text]
 OUT
+elif grep -q "как ты относишься к корректировке текста через нейросеть" "$PROMPT_FILE"; then
+  cat <<'OUT'
+Я отношусь к корректировке текста через нейросеть с положительной точки зрения. Нейросети могут помочь в выявлении и исправлении ошибок, особенно тех, которые могут быть трудно заметить для человека. Однако важно помнить, что они не заменяют проверку рукой и могут допускать ошибки, особенно если текст содержит специфические или уникальные случаи. [end of text]
+OUT
 elif grep -q "1. Это только установить Charger 5." "$PROMPT_FILE"; then
   cat <<'OUT'
 Ваш текст уже практически готов, но есть несколько небольших исправлений и дополнений, чтобы он был более грамотным и аккуратным:
@@ -268,6 +272,20 @@ case .success(let output):
     expect(output.text.contains("Что ты мне можешь посоветовать?"), "expected fallback to preserve original question")
 case .failure(let error):
     fputs("Expected assistant-answer regression success, got \\(error.localizedDescription)\\n", stderr)
+    exit(1)
+}
+
+let latestQuestionAnswerRegressionInput = "Сейчас хотелось бы спросить кое-что у тебя. А как ты относишься к корректировке текста через нейросеть? Ответь, пожалуйста."
+switch successRunner.improveWithTrace(latestQuestionAnswerRegressionInput) {
+case .success(let output):
+    expect(output.trace.rawOutput.contains("Я отношусь к корректировке текста через нейросеть"), "expected raw trace to retain answered question")
+    expect(output.trace.cleanedOutput == output.trace.preparedInput, "expected cleaned trace to fallback to prepared input after answered question")
+    expect(!output.text.contains("Я отношусь к корректировке текста"), "expected no model answer in final text")
+    expect(!output.text.contains("Однако важно помнить"), "expected no assistant explanation in final text")
+    expect(output.text.contains("Сейчас хотелось бы спросить кое-что у тебя."), "expected fallback to preserve opening sentence")
+    expect(output.text.contains("Ответь, пожалуйста."), "expected fallback to preserve closing phrase")
+case .failure(let error):
+    fputs("Expected latest question-answer regression success, got \\(error.localizedDescription)\\n", stderr)
     exit(1)
 }
 

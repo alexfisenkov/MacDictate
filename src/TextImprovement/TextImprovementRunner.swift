@@ -243,7 +243,7 @@ final class TextImprovementRunner {
                 markdownAdjustedOutput,
                 source: preparedInput
             )
-            let contentPreservingOutput = Self.fallbackToSourceIfOutputDropsSourceContent(
+            let contentPreservingOutput = Self.fallbackToSourceIfOutputIsNotConservativeCorrection(
                 guardedOutput,
                 source: preparedInput
             )
@@ -385,7 +385,7 @@ final class TextImprovementRunner {
         return hasAddedEditorialCommentary ? trimmedSource : output
     }
 
-    static func fallbackToSourceIfOutputDropsSourceContent(_ output: String, source: String) -> String {
+    static func fallbackToSourceIfOutputIsNotConservativeCorrection(_ output: String, source: String) -> String {
         let trimmedOutput = output.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedSource = source.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedOutput.isEmpty, !trimmedSource.isEmpty else {
@@ -414,8 +414,10 @@ final class TextImprovementRunner {
         let missingRatio = Double(missingCount) / Double(sourceTokens.count)
         let lengthRatio = Double(trimmedOutput.count) / Double(trimmedSource.count)
         let likelyContentDropped = missingCount >= 6 && missingRatio >= 0.10 && lengthRatio < 0.95
+        let likelyAnsweredOrRewritten = missingCount >= 4 && missingRatio >= 0.30
+        let likelyExpandedWithNewContent = missingCount >= 3 && missingRatio >= 0.20 && lengthRatio >= 1.50
 
-        return likelyContentDropped ? trimmedSource : output
+        return (likelyContentDropped || likelyAnsweredOrRewritten || likelyExpandedWithNewContent) ? trimmedSource : output
     }
 
     private static func extractOutputFromLeakedPromptScaffold(_ output: String) -> String {
