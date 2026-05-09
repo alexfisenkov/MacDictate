@@ -78,6 +78,18 @@ elif grep -q "У нас осталось тут совсем немножко в
 3. Это удалить все остальные нейросети. И после того, как пройдут все эти шаги, мы с вами уже на самом деле станем счастливыми людьми. Я также хочу сказать, что сегодня еще 9 мая. Это День Победы. День Победы празднуется в России и очень широко.
 4. И хорошо. Поэтому очень многие нейросети по типу Runway, по типу Syntx AI будут сейчас заменены на российские аналоги. Просто имейте это в виду и работайте грамотно и аккуратно. [end of text]
 OUT
+elif grep -q "Возможно ли пользоваться реально iPad" "$PROMPT_FILE"; then
+  cat <<'OUT'
+Ваш запрос можно переписать следующим образом:
+
+---
+
+Мне нужно узнать, возможно ли использовать реально iPad как компьютер. Имеется ли такой вариант, чтобы иметь полноценный доступ к удаленной машине, чтобы она полностью переносила iPad, обеспечив работу всех приложений и функций на 100% безупречно? Есть ли такой вариант вообще?
+
+---
+
+Текст сохранен в исходном формате, язык и стиль автора сохранены. [end of text]
+OUT
 elif grep -q "1. Это только установить Charger 5." "$PROMPT_FILE"; then
   cat <<'OUT'
 Ваш текст уже практически готов, но есть несколько небольших исправлений и дополнений, чтобы он был более грамотным и аккуратным:
@@ -227,6 +239,20 @@ case .failure(let error):
     exit(1)
 }
 
+let latestTechnicalTextRegressionInput = "Мне нужно кое-что узнать. Проведи, пожалуйста, анализ. Возможно ли пользоваться реально iPad'ом, как компьютером? Ну, либо иметь какой-то, знаешь, прям настолько полноценный доступ к удаленной машине, чтобы она прям на 100% переносила iPad' в машину, чтобы все прям работало досконально и как нельзя лучше. Есть ли такой вариант вообще или нет? Подскажи, пожалуйста."
+switch successRunner.improveWithTrace(latestTechnicalTextRegressionInput) {
+case .success(let output):
+    expect(output.trace.rawOutput.contains("Ваш запрос можно переписать следующим образом"), "expected raw trace to retain model commentary")
+    expect(output.trace.cleanedOutput == output.trace.preparedInput, "expected cleaned trace to fallback to prepared input after technical commentary")
+    expect(!output.text.contains("Ваш запрос"), "expected no request preamble in final text")
+    expect(!output.text.contains("Текст сохранен"), "expected no model footer in final text")
+    expect(output.text.contains("Проведи, пожалуйста, анализ."), "expected fallback to preserve original intent")
+    expect(output.text.contains("Подскажи, пожалуйста."), "expected fallback to preserve closing phrase")
+case .failure(let error):
+    fputs("Expected latest technical-text regression success, got \\(error.localizedDescription)\\n", stderr)
+    exit(1)
+}
+
 expect(
     TextImprovementRunner.cleanModelOutput("Improved text:\\nHello world.\\n[end of text]\\n<|endoftext|>") == "Hello world.",
     "expected English prefix cleanup"
@@ -357,6 +383,24 @@ expect(
         source: editorialReportSource
     ) == editorialReportSource.trimmingCharacters(in: .whitespacesAndNewlines),
     "expected editorial commentary output to fallback to source"
+)
+
+let requestRewriteCommentaryOutput = """
+Ваш запрос можно переписать следующим образом:
+
+Мне нужно узнать, возможно ли использовать iPad как компьютер.
+
+Текст сохранен в исходном формате, язык и стиль автора сохранены.
+"""
+let requestRewriteCommentarySource = """
+Мне нужно кое-что узнать. Проведи, пожалуйста, анализ.
+"""
+expect(
+    TextImprovementRunner.fallbackToSourceIfOutputLooksLikeEditorialCommentary(
+        requestRewriteCommentaryOutput,
+        source: requestRewriteCommentarySource
+    ) == requestRewriteCommentarySource.trimmingCharacters(in: .whitespacesAndNewlines),
+    "expected request rewrite commentary output to fallback to source"
 )
 
 expect(
