@@ -14,6 +14,8 @@ if (dbPath !== ':memory:') {
 }
 
 const db = new sqlite3.Database(dbPath);
+const dbBusyTimeoutMs = Number.parseInt(process.env.DB_BUSY_TIMEOUT_MS || '5000', 10);
+db.configure('busyTimeout', Number.isFinite(dbBusyTimeoutMs) ? dbBusyTimeoutMs : 5000);
 
 function run(sql, params = []) {
     return new Promise((resolve, reject) => {
@@ -64,6 +66,10 @@ async function ensureColumn(tableName, columnName, definition) {
 }
 
 export async function initDb() {
+    await run(`PRAGMA journal_mode = WAL`);
+    await run(`PRAGMA foreign_keys = ON`);
+    await run(`PRAGMA busy_timeout = ${Number.isFinite(dbBusyTimeoutMs) ? dbBusyTimeoutMs : 5000}`);
+
     await run(`CREATE TABLE IF NOT EXISTS devices (
         device_id TEXT PRIMARY KEY,
         email TEXT,

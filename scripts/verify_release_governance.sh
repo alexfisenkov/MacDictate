@@ -24,6 +24,7 @@ done
 python3 - "$ROOT_DIR" "$REGISTRY" "$ONLINE" "$STRICT_LOCAL_ARTIFACTS" <<'PY'
 import hashlib
 import json
+import os
 import plistlib
 import re
 import subprocess
@@ -34,6 +35,7 @@ root = Path(sys.argv[1])
 registry_path = Path(sys.argv[2])
 online = sys.argv[3] == "1"
 strict_local_artifacts = sys.argv[4] == "1"
+github_token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
 errors = []
 warnings = []
 VERSION_RE = re.compile(r"^v\d+\.\d+(?:\.\d+)?(?:-(?:local|working))?$")
@@ -91,6 +93,7 @@ else:
         fail(f"Governance document missing: {rel(governance)}")
 
     versions = registry.get("versions", [])
+    versions_by_name = {}
     seen_versions = set()
     stable_versions = []
     working_lines = []
@@ -109,6 +112,7 @@ else:
         if version in seen_versions:
             fail(f"Duplicate version entry: {version}")
         seen_versions.add(version)
+        versions_by_name[version] = item
 
         status = item.get("status")
         if status not in ALLOWED_STATUSES:
@@ -240,6 +244,41 @@ else:
             f"(got {current.get('workingLine')})"
         )
 
+    public_stable = current.get("publicStable")
+    stable_item = versions_by_name.get(public_stable)
+    download_manifest_path = root / "web-landing" / "downloads" / "latest-desktop.json"
+    if not download_manifest_path.exists():
+        fail("web-landing/downloads/latest-desktop.json missing")
+    elif stable_item:
+        try:
+            with download_manifest_path.open("r", encoding="utf-8") as fh:
+                download_manifest = json.load(fh)
+        except Exception as exc:
+            fail(f"web-landing/downloads/latest-desktop.json is invalid JSON: {exc}")
+        else:
+            expected_public_path = "/downloads/MacDictate_Latest.dmg"
+            stable_github = stable_item.get("github", {})
+            expected_sha = stable_github.get("githubAssetSha256") or stable_item.get("local", {}).get("localArtifactSha256")
+
+            if download_manifest.get("schemaVersion") != 1:
+                fail("web download manifest schemaVersion must be 1")
+            if download_manifest.get("version") != public_stable:
+                fail(
+                    "web download manifest version must match registry.current.publicStable "
+                    f"({public_stable}); got {download_manifest.get('version')}"
+                )
+            if download_manifest.get("publicPath") != expected_public_path:
+                fail(
+                    "web download manifest publicPath must be "
+                    f"{expected_public_path}; got {download_manifest.get('publicPath')}"
+                )
+            if download_manifest.get("githubReleaseUrl") != stable_github.get("releaseUrl"):
+                fail("web download manifest githubReleaseUrl must match public stable registry entry")
+            if download_manifest.get("githubAssetName") != stable_github.get("assetName"):
+                fail("web download manifest githubAssetName must match public stable registry entry")
+            if expected_sha and download_manifest.get("sha256") != expected_sha:
+                fail("web download manifest sha256 must match public stable registry entry")
+
     if not versions_root.exists():
         fail("releases/versions directory missing")
     else:
@@ -317,6 +356,25 @@ else:
             warn(f"Current branch is {branch}; registry developmentBranch is {expected_branch}")
 
     if online:
+        if download_manifest_path.exists():
+            try:
+                with download_manifest_path.open("r", encoding="utf-8") as fh:
+                    download_manifest = json.load(fh)
+                public_url = download_manifest.get("publicUrl")
+                if public_url:
+                    result = subprocess.run(
+                        ["/usr/bin/curl", "-fsSIL", "--max-time", "15", public_url],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        text=True,
+                    )
+                    if result.returncode != 0:
+                        raise RuntimeError(result.stderr.strip() or "curl failed")
+                else:
+                    fail("web download manifest publicUrl is empty")
+            except (RuntimeError, OSError, json.JSONDecodeError) as exc:
+                fail(f"Website latest DMG check failed: {exc}")
+
         for item in versions:
             github = item.get("github", {})
             release_url = github.get("releaseUrl")
@@ -326,8 +384,21 @@ else:
             tag = release_url.rstrip("/").split("/")[-1]
             api_url = f"https://api.github.com/repos/alexfisenkov/MacDictate/releases/tags/{tag}"
             try:
+                curl_args = [
+                    "/usr/bin/curl",
+                    "-fsSL",
+                    "--max-time",
+                    "15",
+                    "-H",
+                    "Accept: application/vnd.github+json",
+                    "-H",
+                    "User-Agent: MacDictate-release-governance",
+                ]
+                if github_token:
+                    curl_args.extend(["-H", f"Authorization: Bearer {github_token}"])
+                curl_args.append(api_url)
                 result = subprocess.run(
-                    ["curl", "-fsSL", "--max-time", "15", api_url],
+                    curl_args,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     text=True,

@@ -1,5 +1,19 @@
 # Decision Log
 
+## D-019 — Website latest DMG must mirror public stable release
+
+- **Дата:** 2026-05-11
+- **Решение:** при каждом публичном desktop-релизе GitHub Release остается каноническим местом публикации, но сайт `macdictate.pro` обязан зеркалить тот же notarized DMG как `/downloads/MacDictate_Latest.dmg`. Версия, asset name и SHA фиксируются в `web-landing/downloads/latest-desktop.json` и сверяются с `releases/registry.json`.
+- **Почему:** пользовательский путь начинается с сайта, а не с реконструкции GitHub release page. Если сайт отдает старый DMG, clean-install flow фактически проверяет не текущий продукт.
+- **Ограничение:** сам бинарный DMG не хранится в git. Его нужно загружать в website hosting/storage при release-публикации; `scripts/verify_release_governance.sh --online` проверяет доступность alias, но не заменяет deployment step.
+
+## D-020 — Fresh installs get bounded connectivity grace on license outage
+
+- **Дата:** 2026-05-11
+- **Решение:** если свежий Mac еще не имеет server-confirmed license snapshot, а `GET /api/license/status` временно недоступен, MacDictate включает 24-часовой локальный grace с warning diagnostic. Первый успешный server response очищает этот локальный grace.
+- **Почему:** backend уже выдает новым устройствам 60-дневный trial, поэтому кратковременный TLS/API outage не должен блокировать первую диктовку на чистой установке.
+- **Ограничение:** это не заменяет production availability. Live-аудит показал TLS-handshake timeouts до Express route, поэтому reverse proxy / host layer все равно нужно чинить отдельно.
+
 ## D-018 — v1.5.1 becomes signed public stable and next line is 1.5.2
 
 - **Дата:** 2026-05-10

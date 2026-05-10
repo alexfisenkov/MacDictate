@@ -65,6 +65,11 @@ final class LlamaCompletionRuntime {
         ]
         task.launchPath = runtimePath
         task.arguments = arguments
+        if let backendPath = GGMLBackendLocator.bundledBackendPath(forRuntimePath: runtimePath) {
+            var environment = ProcessInfo.processInfo.environment
+            environment["GGML_BACKEND_PATH"] = backendPath
+            task.environment = environment
+        }
         task.standardOutput = stdoutPipe
         task.standardError = stderrPipe
 

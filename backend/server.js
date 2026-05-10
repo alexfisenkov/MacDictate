@@ -32,6 +32,11 @@ const DEVICE_ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{3,63}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const rateLimitBuckets = new Map();
 
+function parsePositiveInt(rawValue, fallback) {
+    const value = Number.parseInt(rawValue || '', 10);
+    return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
 function parseAllowedOrigins(rawValue) {
     const origins = (rawValue || '')
         .split(',')
@@ -82,6 +87,8 @@ function validateDeviceId(deviceId) {
 function validateEmail(email) {
     return email.length <= 254 && EMAIL_RE.test(email);
 }
+
+const slowRequestLogMs = parsePositiveInt(process.env.SLOW_REQUEST_LOG_MS, 1000);
 
 function createRateLimiter({ windowMs, maxRequests }) {
     return (req, res, next) => {
@@ -141,13 +148,41 @@ function readPaymentSelection(body) {
     return { deviceId, email, plan };
 }
 
+app.disable('x-powered-by');
 app.use(cors(createCorsOptions()));
 app.use(express.json({ limit: '32kb' }));
 app.use(express.urlencoded({ extended: true, limit: '32kb' }));
+app.use((req, res, next) => {
+    const start = process.hrtime.bigint();
+    res.on('finish', () => {
+        const durationMs = Number(process.hrtime.bigint() - start) / 1_000_000;
+        if (durationMs >= slowRequestLogMs) {
+            console.warn(
+                JSON.stringify({
+                    event: 'slow_request',
+                    method: req.method,
+                    path: req.path,
+                    status: res.statusCode,
+                    durationMs: Math.round(durationMs)
+                })
+            );
+        }
+    });
+    next();
+});
 
 const licenseStatusLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 120 });
 const plansLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 120 });
 const paymentCreateLimiter = createRateLimiter({ windowMs: 15 * 60_000, maxRequests: 10 });
+
+app.get(['/healthz', '/api/health'], (_req, res) => {
+    res.json({
+        status: 'ok',
+        service: 'macdictate-api',
+        uptimeSeconds: Math.round(process.uptime()),
+        timestamp: new Date().toISOString()
+    });
+});
 
 // 1. App calling to check license status
 app.get('/api/license/status', licenseStatusLimiter, async (req, res) => {
@@ -342,9 +377,13 @@ app.use((err, _req, res, _next) => {
 async function startServer() {
     await initDb();
 
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
         console.log(`MacDictate API running on port ${PORT}`);
     });
+
+    server.requestTimeout = parsePositiveInt(process.env.SERVER_REQUEST_TIMEOUT_MS, 30_000);
+    server.headersTimeout = parsePositiveInt(process.env.SERVER_HEADERS_TIMEOUT_MS, 35_000);
+    server.keepAliveTimeout = parsePositiveInt(process.env.SERVER_KEEP_ALIVE_TIMEOUT_MS, 65_000);
 }
 
 startServer().catch((error) => {

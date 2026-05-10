@@ -5,6 +5,9 @@ final class LicenseService {
     private static let machineIDCommandTimeout: TimeInterval = 2
     private static let machineIDCommandTerminationGrace: TimeInterval = 0.5
     private static let licenseRequestTimeout: TimeInterval = 20
+    private static let firstRunConnectivityGraceInterval: TimeInterval = 24 * 60 * 60
+    private static let connectivityGraceStartedAtKey = "MacDictateLicenseConnectivityGraceStartedAt"
+    private static let connectivityGraceMachineIDKey = "MacDictateLicenseConnectivityGraceMachineID"
 
     private let userDefaults: UserDefaults
     private let cache: LicenseCache
@@ -128,6 +131,7 @@ final class LicenseService {
     private func handleSuccess(response: LicenseStatusResponse) {
         let snapshot = makeSnapshot(from: response)
         runtimeDiagnostic = nil
+        clearConnectivityGrace()
 
         if snapshot.isActive {
             cache.persist(snapshot)
@@ -148,6 +152,22 @@ final class LicenseService {
            deadline > Date() {
             state = .grace(snapshot, deadline)
             runtimeDiagnostic = nil
+        } else if cachedSnapshot == nil, let firstRunGrace = firstRunConnectivityGrace() {
+            state = .grace(firstRunGrace.snapshot, firstRunGrace.deadline)
+
+            let baseMessage = "Сервер лицензий временно недоступен."
+            let graceMessage = "Включен временный локальный режим на 24 часа, чтобы можно было начать диктовку."
+            if let error {
+                runtimeDiagnostic = RuntimeDiagnostic(
+                    severity: .warning,
+                    message: "\(baseMessage) \(graceMessage) \(error.localizedDescription)"
+                )
+            } else {
+                runtimeDiagnostic = RuntimeDiagnostic(
+                    severity: .warning,
+                    message: "\(baseMessage) \(graceMessage)"
+                )
+            }
         } else if case .expired(let previousExpired) = state {
             state = .expired(previousExpired)
             runtimeDiagnostic = nil
@@ -166,6 +186,47 @@ final class LicenseService {
         }
 
         onChange?()
+    }
+
+    private func firstRunConnectivityGrace(now: Date = Date()) -> (snapshot: LicenseSnapshot, deadline: Date)? {
+        let startedAt: Date
+
+        if userDefaults.string(forKey: Self.connectivityGraceMachineIDKey) != machineID {
+            startedAt = now
+            userDefaults.set(machineID, forKey: Self.connectivityGraceMachineIDKey)
+            userDefaults.set(startedAt.timeIntervalSince1970, forKey: Self.connectivityGraceStartedAtKey)
+        } else {
+            let storedTimestamp = userDefaults.double(forKey: Self.connectivityGraceStartedAtKey)
+            if storedTimestamp > 0 {
+                startedAt = Date(timeIntervalSince1970: storedTimestamp)
+            } else {
+                startedAt = now
+                userDefaults.set(startedAt.timeIntervalSince1970, forKey: Self.connectivityGraceStartedAtKey)
+            }
+        }
+
+        let deadline = startedAt.addingTimeInterval(Self.firstRunConnectivityGraceInterval)
+        guard deadline > now else {
+            return nil
+        }
+
+        let secondsLeft = max(0, deadline.timeIntervalSince(now))
+        let daysLeft = max(1, Int(ceil(secondsLeft / (24 * 60 * 60))))
+        let snapshot = LicenseSnapshot(
+            machineID: machineID,
+            isPaid: false,
+            isActive: true,
+            daysLeft: daysLeft,
+            expiresAt: deadline,
+            checkedAt: startedAt
+        )
+
+        return (snapshot, deadline)
+    }
+
+    private func clearConnectivityGrace() {
+        userDefaults.removeObject(forKey: Self.connectivityGraceStartedAtKey)
+        userDefaults.removeObject(forKey: Self.connectivityGraceMachineIDKey)
     }
 
     private func makeSnapshot(from response: LicenseStatusResponse) -> LicenseSnapshot {

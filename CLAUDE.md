@@ -37,6 +37,7 @@
 - Не менять статус версии, bundle version, Git tag, GitHub asset или artifact path вне `releases/registry.json`.
 - Не оставлять DMG/build logs в корне `macos/`.
 - Не считать локальную сборку релизом без `RELEASE.md`, registry entry, checksum и проверки.
+- Не считать публичный release завершенным, пока сайт не отдает тот же DMG через `/downloads/MacDictate_Latest.dmg` и `web-landing/downloads/latest-desktop.json` не совпадает с `registry.current.publicStable`.
 - Не начинать feature/release work, если `scripts/verify_release_governance.sh` падает.
 - Не добавлять новую версию по другой схеме: все следующие версии обязаны жить в `releases/versions/<version>/` и иметь запись с тем же именем в registry.
 - Если есть противоречие между docs, registry, GitHub и DMG, остановиться и сначала восстановить release ledger.
@@ -57,6 +58,7 @@
 - В `1.5.1` release-signing контур переведен на Developer ID: `build.sh` поддерживает `MACDICTATE_SIGN_IDENTITY`, hardened runtime, timestamp, DMG signing, default `assets/MacDictate.entitlements` с `com.apple.security.device.audio-input` и `MACDICTATE_NOTARY_PROFILE` / `MACDICTATE_NOTARIZE=true`; runbook — `docs/9_Distribution_Signing_Runbook.md`. Notarized/stapled DMG подтвержден с `Developer ID Application: Aleksander Fisenkov (5BABN9U6WS)` и notary profile `macdictate-notary`.
 - В `1.5.2-working` app-side структура повторно разгружена: `AppController.swift` держит composition/status, сценарные extension-файлы живут в `src/App/`, системные runtime wrappers — в `src/System/`, update checker — в `src/Updates/`, а text-improvement cleaner/validator/trace/llama runtime отделены от runner.
 - В `1.5.2-working` clean-install path обеих нейросетей закрыт bundled runtime: `build.sh` по умолчанию кладет `whisper-cli`/`llama-completion` в `Contents/Resources/bin`, transitive `.dylib` dependencies в `Contents/Resources/lib`, ggml backend plugins в `Contents/Resources/libexec/ggml`, переписывает install names на `@rpath`, подписывает nested Mach-O и проверяет artifact через `scripts/check_bundled_whisper_runtime.sh`, `scripts/check_bundled_llama_runtime.sh` и `scripts/check_install_artifact_flow.sh`. Homebrew runtime теперь только developer fallback, не пользовательское требование.
+- В `1.5.2-working` release/download discipline усилена: сайт должен зеркалить текущий `public_stable` DMG как `/downloads/MacDictate_Latest.dmg`, tracked manifest живет в `web-landing/downloads/latest-desktop.json`, backend health/ops runbook — `docs/11_Backend_Ops_Runbook.md`, а fresh install при временном license outage получает bounded 24h connectivity grace.
 - Будущий рост app-side governed by `docs/10_App_Architecture_Guardrails.md`: новая ответственность получает свой слой/файл, `AppController.swift` hard limit 250 строк, `src/App/AppController+*.swift` hard limit 320 строк, остальные Swift-файлы hard limit 350 строк, проверка — `scripts/check_architecture_guardrails.sh`.
 - Будущий AI corpus/fine-tune governed by `docs/8_AI_Corpus_Strategy.md`: primary corpus — approved real dictation pairs из debug-сессий; copywriting datasets HuggingFace — только secondary style/eval material после license review.
 - Локальные runtime harnesses/checks: `scripts/test_whisper_runner_timeout.sh`, `scripts/test_license_machine_id_timeout.sh`, `scripts/test_license_status_response.sh`, `scripts/test_license_grace_diagnostic.sh`, `scripts/test_recording_temp_cleanup.sh`, `scripts/test_llama_runtime_locator.sh`, `scripts/test_text_improvement_runner.sh`, `scripts/test_debug_session_logger.sh`, `scripts/test_last_dictation_store.sh`, `scripts/check_bundled_whisper_runtime.sh`, `scripts/check_bundled_llama_runtime.sh`, `scripts/check_install_artifact_flow.sh`, `scripts/check_distribution_signing.sh`.
@@ -85,6 +87,7 @@ releases/versions/<version>/
 - `CHANGELOG.md`;
 - `docs/2_ActionLog.md`;
 - `docs/6_Release_Checklist.md`;
+- `web-landing/downloads/latest-desktop.json`, если меняется публичный stable release;
 - `docs/4_Decision_Log.md`, если изменилось правило или архитектурное решение;
 - `docs/3_TechDebt_Tasks.md`, если остался новый долг.
 

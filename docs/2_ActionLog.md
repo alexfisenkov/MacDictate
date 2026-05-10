@@ -2,6 +2,18 @@
 
 Этот журнал фиксирует инженерные шаги и checkpoints, а не маркетинговое описание релиза.
 
+## 2026-05-11 — clean install release/download and license hardening
+
+- Зафиксировано release-правило: после каждого публичного desktop-релиза сайт обязан отдавать тот же stable DMG через `/downloads/MacDictate_Latest.dmg`; добавлен tracked manifest `web-landing/downloads/latest-desktop.json`, а `scripts/verify_release_governance.sh` теперь сверяет его с `registry.current.publicStable`.
+- `docs/6_Release_Checklist.md` и `docs/7_Release_Governance.md` обновлены: GitHub Release больше не считается финалом, пока сайт не обновлен на тот же DMG.
+- По live-проверке `macdictate.pro` подтвержден текущий симптом: TCP connect к `78.159.131.90:443` быстрый, но HTTPS/TLS handshake уходит в timeout; это указывает на reverse proxy / HTTPS / host layer до попадания запроса в Express route.
+- Backend получил `/api/health` и `/healthz`, slow-request логирование без device ID, явные Node server timeout settings и SQLite WAL/busy-timeout для снижения риска локов на license/payment database.
+- `LicenseService` получил bounded first-run connectivity grace: если на чистом Mac сервер лицензий недоступен до первого успешного ответа, приложение включает 24-часовой локальный grace с warning diagnostic, чтобы пользователь мог начать диктовку и не упирался в разовый outage.
+- `WhisperRunner` и `LlamaCompletionRuntime` больше не передают `GGML_BACKEND_PATH` как директорию; добавлен `GGMLBackendLocator`, выбирающий конкретный bundled ggml backend file под Apple Silicon.
+- Bundled runtime checks усилены: `check_bundled_whisper_runtime.sh` и `check_bundled_llama_runtime.sh` теперь запускают runtime с конкретным backend file, ловят `failed to load` / `no backends are loaded` и проверяют Mach-O deployment target относительно `LSMinimumSystemVersion`.
+- First-run model downloader больше не может оставить LSUIElement-приложение в невидимом подвешенном состоянии: закрытие окна отменяет загрузку и завершает app вместо silent background state.
+- Добавлены `docs/11_Backend_Ops_Runbook.md` и `scripts/check_public_services.sh` с health checks, timeout triage и production commands для диагностики `macdictate.pro`.
+
 ## 2026-05-10 — v1.5.2 architecture hygiene
 
 - Рабочая линия `release/1.5.2` приведена к более явной layered-структуре без изменения публичного поведения и без публикации релиза.

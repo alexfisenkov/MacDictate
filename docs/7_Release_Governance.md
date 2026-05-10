@@ -12,6 +12,7 @@
 | Артефакты | `releases/versions/<version>/artifacts/` | Локальные DMG/build logs/checksums. Бинарники не являются source of truth для кода. |
 | Runtime | `src/`, `assets/`, `build.sh` | Исходники desktop-приложения. |
 | GitHub | Git tags + GitHub Releases | Публичная история релизов и публичные DMG assets. |
+| Website download alias | `web-landing/downloads/latest-desktop.json` + `/downloads/MacDictate_Latest.dmg` | Сайт должен отдавать тот же DMG, что и текущий `public_stable` release. |
 
 Если источники расходятся, порядок приоритета такой:
 
@@ -174,7 +175,11 @@ git -C macos worktree add ../MacDictate-macos-v1.4.2 v1.4.2
 8. Выполнить `scripts/verify_release_governance.sh --strict-local-artifacts`, если release-candidate ссылается на локальные artifact files.
 9. Создать annotated tag.
 10. Опубликовать GitHub Release и asset.
-11. Снова выполнить `scripts/verify_release_governance.sh --online`.
+11. Обновить website download alias:
+   - загрузить те же байты notarized DMG на сайт как `/downloads/MacDictate_Latest.dmg`;
+   - обновить `web-landing/downloads/latest-desktop.json` по `releases/registry.json` текущего `public_stable`;
+   - убедиться, что ссылки на сайте продолжают вести на `/downloads/MacDictate_Latest.dmg`.
+12. Снова выполнить `scripts/verify_release_governance.sh --online`.
 
 ## Что нельзя делать
 
@@ -182,6 +187,7 @@ git -C macos worktree add ../MacDictate-macos-v1.4.2 v1.4.2
 - Нельзя создавать папку версии без registry entry и `RELEASE.md`.
 - Нельзя менять release status только в тексте: status должен быть изменен в `releases/registry.json`.
 - Нельзя добавлять новый публичный release без GitHub Release URL, asset name и явного checksum plan.
+- Нельзя считать release завершенным, если сайт продолжает отдавать старый `/downloads/MacDictate_Latest.dmg` или `web-landing/downloads/latest-desktop.json` не совпадает с `registry.current.publicStable`.
 - Нельзя менять цену/тариф/checkout без `docs/4_Decision_Log.md`.
 - Нельзя выпускать релиз без записи в `releases/registry.json`.
 - Нельзя считать `v1.5.0` выпущенной, пока нет release tag, GitHub Release, `RELEASE.md`, registry entry и smoke evidence.

@@ -6,13 +6,15 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | Release | Done | P0 | Distribution | M | Project | Перевести release path на Developer ID + notarization + stapling: build pipeline, runbook, `Developer ID Application` certificate, `macdictate-notary` profile и первая notarized/stapled DMG-сборка подтверждены. |
 | Release | Done | P0 | Distribution | S | Project | Настроить `MACDICTATE_NOTARY_PROFILE` для notarytool и выполнить первую notarized/stapled DMG-сборку. |
-| Release | Open | P0 | Integrity | M | Project | Определить один source of truth для release asset: GitHub release vs site download. |
+| Release | Done | P0 | Integrity | M | Project | Определить один source of truth для release asset: GitHub release vs site download. Решение: GitHub Release остается каноном публикации, а сайт обязан зеркалить текущий `public_stable` через `/downloads/MacDictate_Latest.dmg`; manifest `web-landing/downloads/latest-desktop.json` и `verify_release_governance.sh --online` фиксируют правило. |
 | Release | Open | P0 | History | S | Project | Нормализовать исторические remote/local tags `v1.2` и `v1.3`: решить, пересоздавать/документировать aliases или оставить как legacy. |
 | Release | Done | P1 | Packaging | M | Project | Strict verification установленной/смонтированной DMG-копии: `scripts/check_install_artifact_flow.sh` монтирует финальный DMG, проверяет app внутри образа, копирует во временную Applications-папку и валидирует codesign, microphone entitlement и bundled `whisper`/`llama` runtimes. |
 | Release | Open | P1 | Integrity | S | Project | Скачать опубликованные GitHub assets для `v1.1`-`v1.4` и заполнить `githubAssetSha256` в `releases/registry.json`. |
 | Release | Open | P1 | Hygiene | S | Project | Проверить, нужно ли удалять ранее tracked binary DMG из git history через отдельную history-rewrite policy; текущая cleanup-итерация только убирает их из рабочего дерева вперед. |
 | Backend/App | Open | P0 | Revenue / UX | M | Project | Ввести app-side support snapshot и операторски понятный manual license recheck flow. |
-| Backend | Open | P1 | Ops | M | Project | Подтвердить parity локального `backend/` с production deploy и задокументировать production ownership. |
+| Backend | Open | P0 | Ops / Availability | M | Project | Починить production TLS/reverse-proxy timeout на `macdictate.pro`: live-аудит 2026-05-11 показывает быстрый TCP connect к `78.159.131.90:443`, но TLS handshake timeout до Express route. Нужна проверка nginx/Caddy, TLS certificate, worker/file-descriptor limits, host load и Docker/API process. |
+| Backend | Done | P1 | Ops | M | Project | Подтвердить parity локального `backend/` с production deploy и задокументировать production ownership: добавлен `docs/11_Backend_Ops_Runbook.md`, `/api/health`, slow-request telemetry, server timeout env и SQLite WAL/busy timeout. |
+| App | Open | P0 | Runtime / Compatibility | M | Project | Пересобрать bundled `whisper-cli` и `llama-completion` под фактический minimum macOS target приложения. Усиленные runtime checks теперь ловят Mach-O `minos` выше `LSMinimumSystemVersion`; текущие Homebrew-built binaries могут требовать macOS 26 и не подходят для clean Mac на более старой macOS. |
 | App | Open | P1 | Supportability | M | Project | Добавить repair flow для `no model / no whisper / permission denied`. |
 | App | Open | P1 | UX | M | Project | Вынести `launch at login` из AppleScript fallback в более чистый и проверяемый path. |
 | App | Open | P1 | Flexibility | M | Project | Сделать настраиваемую горячую клавишу без ломки menu bar utility UX. |

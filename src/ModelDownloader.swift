@@ -39,7 +39,7 @@ struct ModelDownloadConfiguration {
     )
 }
 
-class ModelDownloader {
+class ModelDownloader: NSObject, NSWindowDelegate {
     let modelsDir: String
     let completion: (Bool) -> Void
     let configuration: ModelDownloadConfiguration
@@ -47,6 +47,8 @@ class ModelDownloader {
     var progressIndicator: NSProgressIndicator!
     var statusLabel: NSTextField!
     var downloadButton: NSButton!
+    fileprivate var activeTask: URLSessionDownloadTask?
+    private var completionReported = false
 
     init(
         modelsDir: String,
@@ -56,6 +58,7 @@ class ModelDownloader {
         self.modelsDir = modelsDir
         self.configuration = configuration
         self.completion = completion
+        super.init()
     }
     
     func createWindow() -> NSWindow {
@@ -64,6 +67,8 @@ class ModelDownloader {
                               backing: .buffered, defer: false)
         window.center()
         window.title = configuration.windowTitle
+        window.delegate = self
+        window.isReleasedWhenClosed = false
         
         // Визуальный контейнер
         let view = NSView(frame: NSRect(x: 0, y: 0, width: 450, height: 280))
@@ -114,7 +119,22 @@ class ModelDownloader {
         let session = URLSession(configuration: sessionConfig, delegate: DownloadDelegate(downloader: self, destURL: destURL), delegateQueue: OperationQueue.main)
         
         let task = session.downloadTask(with: configuration.modelURL)
+        activeTask = task
         task.resume()
+    }
+
+    func reportCompletion(_ success: Bool) {
+        guard !completionReported else { return }
+        completionReported = true
+        activeTask?.cancel()
+        activeTask = nil
+        completion(success)
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        guard !completionReported else { return }
+        statusLabel?.stringValue = "Загрузка отменена."
+        reportCompletion(false)
     }
 }
 
@@ -163,19 +183,24 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
             downloader.statusLabel.stringValue = downloader.configuration.statusFinished
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.downloader.completion(true)
+                self.downloader.reportCompletion(true)
             }
         } catch {
             downloader.statusLabel.stringValue = "Не удалось сохранить модель. Проверьте доступ к домашней папке и свободное место."
             downloader.downloadButton.isEnabled = true
+            downloader.activeTask = nil
         }
     }
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let err = error {
+            if (err as NSError).code == NSURLErrorCancelled {
+                return
+            }
             downloader.statusLabel.stringValue = "Ошибка загрузки: \(err.localizedDescription). Проверьте интернет/VPN и попробуйте снова."
             downloader.downloadButton.isEnabled = true
             downloader.progressIndicator.doubleValue = 0
+            downloader.activeTask = nil
         }
     }
 }

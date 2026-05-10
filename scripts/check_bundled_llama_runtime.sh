@@ -3,9 +3,14 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_PATH="${1:-"$ROOT_DIR/build/MacDictate.app"}"
+if [[ "$APP_PATH" != /* ]]; then
+  APP_PATH="$PWD/$APP_PATH"
+fi
 RESOURCES_DIR="$APP_PATH/Contents/Resources"
+INFO_PLIST="$APP_PATH/Contents/Info.plist"
 BIN_DIR="$RESOURCES_DIR/bin"
 LIB_DIR="$RESOURCES_DIR/lib"
+GGML_BACKEND_DIR="$RESOURCES_DIR/libexec/ggml"
 status=0
 
 fail() {
@@ -35,12 +40,44 @@ if [ -z "$runtime" ]; then
   exit "$status"
 fi
 
+app_min_version="$(/usr/libexec/PlistBuddy -c "Print :LSMinimumSystemVersion" "$INFO_PLIST" 2>/dev/null || true)"
+version_greater_than() {
+  /usr/bin/python3 - "$1" "$2" <<'PY'
+import sys
+
+def parse(value):
+    return tuple(int(part) for part in value.split(".") if part.isdigit())
+
+left = parse(sys.argv[1])
+right = parse(sys.argv[2])
+max_len = max(len(left), len(right))
+left += (0,) * (max_len - len(left))
+right += (0,) * (max_len - len(right))
+sys.exit(0 if left > right else 1)
+PY
+}
+
+check_deployment_target() {
+  local file_path="$1"
+  if [ -z "$app_min_version" ]; then
+    fail "Unable to read LSMinimumSystemVersion from $INFO_PLIST"
+    return
+  fi
+
+  local minos
+  minos="$(/usr/bin/vtool -show-build "$file_path" 2>/dev/null | /usr/bin/awk '/minos/{print $2; exit}')"
+  if [ -n "$minos" ] && version_greater_than "$minos" "$app_min_version"; then
+    fail "Bundled Mach-O deployment target is newer than app minimum macOS: $file_path minos=$minos app=$app_min_version"
+  fi
+}
+
 if ! file "$runtime" | grep -q 'arm64'; then
   fail "Bundled llama runtime is not arm64: $runtime"
 fi
 
 check_macho_file() {
   local file_path="$1"
+  check_deployment_target "$file_path"
 
   if ! codesign --verify --strict --verbose=2 "$file_path" >/dev/null 2>&1; then
     fail "Nested Mach-O signature verification failed: $file_path"
@@ -65,11 +102,28 @@ else
 fi
 
 runtime_stderr="$(mktemp)"
-if "$runtime" --help >/dev/null 2>"$runtime_stderr"; then
+runtime_backend=""
+for candidate in \
+  "$GGML_BACKEND_DIR/libggml-cpu-apple_m1.so" \
+  "$GGML_BACKEND_DIR/libggml-cpu-apple_m2_m3.so" \
+  "$GGML_BACKEND_DIR/libggml-cpu-apple_m4.so" \
+  "$GGML_BACKEND_DIR/libggml-metal.so" \
+  "$GGML_BACKEND_DIR/libggml-blas.so"; do
+  if [ -f "$candidate" ]; then
+    runtime_backend="$candidate"
+    break
+  fi
+done
+
+if [ -z "$runtime_backend" ]; then
+  fail "No bundled ggml backend file found in $GGML_BACKEND_DIR"
+fi
+
+if [ -n "$runtime_backend" ] && GGML_BACKEND_PATH="$runtime_backend" "$runtime" --help >/dev/null 2>"$runtime_stderr"; then
   :
 fi
-if grep -Eiq 'dyld|Library not loaded|image not found' "$runtime_stderr"; then
-  fail "Bundled llama runtime failed to launch because of a dynamic library error."
+if grep -Eiq 'dyld|Library not loaded|image not found|failed to load|no backends are loaded|no usable GPU found' "$runtime_stderr"; then
+  fail "Bundled llama runtime failed to launch cleanly with bundled ggml backend."
   cat "$runtime_stderr" >&2
 fi
 rm -f "$runtime_stderr"

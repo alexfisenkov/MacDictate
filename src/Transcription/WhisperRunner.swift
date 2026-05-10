@@ -200,19 +200,7 @@ final class WhisperRunner {
     }
 
     private static func bundledGGMLBackendPath(forWhisperCli whisperCli: String) -> String? {
-        let cliURL = URL(fileURLWithPath: whisperCli)
-        let resourcesURL = cliURL.deletingLastPathComponent().deletingLastPathComponent()
-        guard resourcesURL.lastPathComponent == "Resources" else {
-            return nil
-        }
-
-        let backendURL = resourcesURL.appendingPathComponent("libexec/ggml", isDirectory: true)
-        var isDirectory: ObjCBool = false
-        if FileManager.default.fileExists(atPath: backendURL.path, isDirectory: &isDirectory), isDirectory.boolValue {
-            return backendURL.path
-        }
-
-        return nil
+        GGMLBackendLocator.bundledBackendPath(forRuntimePath: whisperCli)
     }
 }
 

@@ -17,6 +17,7 @@
 - [ ] Обновлен `docs/4_Decision_Log.md` при архитектурных или policy-изменениях.
 - [ ] Обновлен `docs/3_TechDebt_Tasks.md`, если остались новые долги.
 - [ ] Проверен `docs/7_Release_Governance.md`, если менялась release discipline.
+- [ ] Обновлен `web-landing/downloads/latest-desktop.json` под текущий `public_stable`.
 - [ ] Проверен `README.md` и актуальность source-of-truth описания.
 
 ## Build / distribution
@@ -37,6 +38,7 @@
 - [ ] Ясно, какой DMG является release source of truth.
 - [ ] Обычный build output лежит в `build/artifacts/`, а release DMG перенесен в `releases/versions/<version>/artifacts/`.
 - [ ] GitHub Release asset и локальный artifact имеют зафиксированные SHA256.
+- [ ] Те же байты DMG загружены на сайт как `/downloads/MacDictate_Latest.dmg`.
 - [ ] `./build.sh` выполнен с `MACDICTATE_SIGN_IDENTITY`, `MACDICTATE_NOTARY_PROFILE` и `MACDICTATE_NOTARIZE=true` для публичного release.
 - [ ] Выполнены steps по Developer ID подписи / notarization / stapling.
 - [ ] `spctl` принимает notarized DMG primary signature.
@@ -57,7 +59,7 @@
 - [ ] Создан release commit/tag.
 - [ ] Release asset и release notes соответствуют changelog.
 - [ ] `scripts/verify_release_governance.sh --online` проходит после публикации GitHub Release.
-- [ ] После публикации обновлены публичные references, если download URL менялся.
+- [ ] После публикации сайт скачивает именно текущий stable DMG, а не старый alias.
 
 ## v1.5.0 Release Evidence
 

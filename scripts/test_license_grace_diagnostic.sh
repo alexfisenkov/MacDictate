@@ -19,10 +19,10 @@ python3 -m http.server "$PORT" --bind 127.0.0.1 --directory "$TMP_DIR" >/dev/nul
 SERVER_PID="$!"
 
 for _ in $(seq 1 30); do
-    if curl -fsS --max-time 1 "http://127.0.0.1:$PORT/" >/dev/null 2>&1; then
+    if /usr/bin/curl -fsS --max-time 1 "http://127.0.0.1:$PORT/" >/dev/null 2>&1; then
         break
     fi
-    sleep 0.1
+    /bin/sleep 0.1
 done
 
 TEST_SWIFT="$TMP_DIR/main.swift"
@@ -110,7 +110,7 @@ func testCachedSnapshotFailureStaysQuietGrace() {
     defaults.removePersistentDomain(forName: suiteName)
 }
 
-func testNoCacheFailureStillWarns() {
+func testNoCacheFailureUsesBoundedFirstRunGrace() {
     let suiteName = "com.alexfisenkov.macdictate.license-unavailable.\\(UUID().uuidString)"
     let defaults = makeDefaults(suiteName)
     defaults.set("MD-NOCACHE", forKey: "MachineID")
@@ -125,10 +125,51 @@ func testNoCacheFailureStillWarns() {
 
     let state = waitForTerminalLicenseState(service)
     switch state {
-    case .serverUnavailable:
-        expect(service.runtimeDiagnostic != nil, "expected warning diagnostic without valid cache")
+    case .grace(let snapshot, let deadline):
+        expect(snapshot.machineID == "MD-NOCACHE", "expected first-run grace snapshot")
+        expect(!snapshot.isPaid, "expected first-run grace to stay unpaid")
+        expect(deadline > Date(), "expected future first-run grace deadline")
+        expect(service.runtimeDiagnostic != nil, "expected warning diagnostic while first-run grace is active")
     default:
-        fputs("Expected serverUnavailable state, got \\(state)\\n", stderr)
+        fputs("Expected first-run grace state, got \\(state)\\n", stderr)
+        exit(1)
+    }
+
+    defaults.removePersistentDomain(forName: suiteName)
+}
+
+func testExpiredCacheDoesNotGetFreshFirstRunGrace() {
+    let suiteName = "com.alexfisenkov.macdictate.license-expired-cache.\(UUID().uuidString)"
+    let defaults = makeDefaults(suiteName)
+    let cache = LicenseCache(userDefaults: defaults)
+    let machineID = "MD-OLDGRACE"
+    defaults.set(machineID, forKey: "MachineID")
+    cache.persist(
+        LicenseSnapshot(
+            machineID: machineID,
+            isPaid: true,
+            isActive: true,
+            daysLeft: 0,
+            expiresAt: Date().addingTimeInterval(-10 * 24 * 60 * 60),
+            checkedAt: Date().addingTimeInterval(-10 * 24 * 60 * 60)
+        )
+    )
+
+    let service = LicenseService(
+        userDefaults: defaults,
+        cache: cache,
+        statusURLString: "http://127.0.0.1:$PORT/api/license/status",
+        refreshInterval: 3600,
+        machineIDKey: "MachineID"
+    )
+
+    let state = waitForTerminalLicenseState(service)
+    switch state {
+    case .serverUnavailable(let snapshot):
+        expect(snapshot?.machineID == machineID, "expected old snapshot to be retained for diagnostics")
+        expect(service.runtimeDiagnostic != nil, "expected warning diagnostic after expired cache")
+    default:
+        fputs("Expected serverUnavailable for expired cache, got \\(state)\\n", stderr)
         exit(1)
     }
 
@@ -136,7 +177,8 @@ func testNoCacheFailureStillWarns() {
 }
 
 testCachedSnapshotFailureStaysQuietGrace()
-testNoCacheFailureStillWarns()
+testNoCacheFailureUsesBoundedFirstRunGrace()
+testExpiredCacheDoesNotGetFreshFirstRunGrace()
 print("License grace diagnostic test passed.")
 SWIFT
 
