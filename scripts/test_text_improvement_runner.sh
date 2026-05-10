@@ -689,8 +689,12 @@ SWIFT
 
 swiftc \
     "$ROOT_DIR/src/Transcription/ModelLocator.swift" \
+    "$ROOT_DIR/src/TextImprovement/TextImprovementTrace.swift" \
     "$ROOT_DIR/src/TextImprovement/TextImprovementProfile.swift" \
     "$ROOT_DIR/src/TextImprovement/TextImprovementFormatter.swift" \
+    "$ROOT_DIR/src/TextImprovement/TextImprovementOutputCleaner.swift" \
+    "$ROOT_DIR/src/TextImprovement/TextImprovementOutputValidator.swift" \
+    "$ROOT_DIR/src/TextImprovement/LlamaCompletionRuntime.swift" \
     "$ROOT_DIR/src/TextImprovement/TextImprovementRunner.swift" \
     "$TEST_SWIFT" \
     -o "$TEST_BIN"

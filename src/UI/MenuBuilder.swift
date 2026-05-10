@@ -1,5 +1,4 @@
 import Cocoa
-import ServiceManagement
 
 struct AppMenuComponents {
     let menu: NSMenu
@@ -78,7 +77,7 @@ enum MenuBuilder {
         if #available(macOS 13.0, *) {
             let autoLaunchItem = NSMenuItem(title: "Запускать при включении Mac", action: #selector(AppController.toggleLaunchAtLogin), keyEquivalent: "")
             autoLaunchItem.target = controller
-            autoLaunchItem.state = SMAppService.mainApp.status == .enabled ? .on : .off
+            autoLaunchItem.state = LaunchAtLoginService.isEnabled ? .on : .off
             settingsSubmenu.addItem(autoLaunchItem)
             settingsSubmenu.addItem(NSMenuItem.separator())
         }

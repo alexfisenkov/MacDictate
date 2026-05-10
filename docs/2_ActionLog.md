@@ -2,6 +2,16 @@
 
 Этот журнал фиксирует инженерные шаги и checkpoints, а не маркетинговое описание релиза.
 
+## 2026-05-10 — v1.5.2 architecture hygiene
+
+- Рабочая линия `release/1.5.2` приведена к более явной layered-структуре без изменения публичного поведения и без публикации релиза.
+- `AppController.swift` больше не содержит весь runtime flow в одном файле: core composition/status оставлен в основном файле, а dictation flow, permissions, text-improvement menu, last-dictation recovery, system actions и update UI вынесены в отдельные `src/App/AppController+*.swift`.
+- `TextImprovementRunner.swift` разгружен: trace DTO, cleaner, validator и `llama.cpp` subprocess runtime вынесены в `TextImprovementTrace.swift`, `TextImprovementOutputCleaner.swift`, `TextImprovementOutputValidator.swift` и `LlamaCompletionRuntime.swift`; runner теперь отвечает за prompt/profile, retry/fallback orchestration и сбор trace.
+- GitHub update-check logic вынесена из `AppController` в `src/Updates/UpdateChecker.swift`; UI-alerts остались на app/controller уровне.
+- Relaunch/uninstall и launch-at-login runtime wrappers вынесены в `src/System/AppLifecycleActions.swift` и `src/System/LaunchAtLoginService.swift`; `MenuBuilder` больше не читает `SMAppService` напрямую.
+- Старые root icon experiments и helper/test scratch-файлы перенесены из корня проекта в `archive/legacy-root-scratch/` с README; активный root layout снова отделяет `src`, `assets`, `backend`, `web-landing`, `docs`, `scripts`, `releases` и `archive`.
+- Targeted harness `scripts/test_text_improvement_runner.sh` обновлен под новую модульную структуру и проходит; дополнительно подтверждены `scripts/test_last_dictation_store.sh`, `scripts/test_debug_session_logger.sh`, `scripts/verify_release_governance.sh --online` и локальный `./build.sh` с DMG verify.
+
 ## 2026-05-10 — v1.5.1 brand icon standardization
 
 - Для рабочей линии `release/1.5.1` принят единый brand icon из пользовательских SVG `mic_logo.svg` и `mic_menubar.svg`.

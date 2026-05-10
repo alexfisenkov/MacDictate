@@ -13,6 +13,7 @@
 - Engineering canon: `docs/`.
 - Release ledger: `releases/`.
 - Local release checks: `scripts/`.
+- Historical/non-active scratch artifacts: `archive/`.
 
 Не смешивать desktop-release discipline с iOS и Transcribe ветками из родительского проекта.
 
@@ -52,6 +53,7 @@
 - В `1.5.0` добавлен opt-in local debug session logging: `MacDictateDebugSessionLoggingEnabled` сохраняет аудио, raw/cleaned Whisper output, Qwen prompt/raw/cleaned/final output, final inserted text и `events.jsonl` в `~/.macdictate/debug-sessions/`. Эти artifacts чувствительны и не отправляются на сервер.
 - В `1.5.1-working` добавлена safety-система последней диктовки: финальный non-empty текст сохраняется в `MacDictateLastDictation` до попытки paste, а menu action `Скопировать последнюю диктовку` копирует его в системный буфер для восстановления при смене активного окна/курсора.
 - В `1.5.1` release-signing контур переведен на Developer ID: `build.sh` поддерживает `MACDICTATE_SIGN_IDENTITY`, hardened runtime, timestamp, DMG signing, default `assets/MacDictate.entitlements` с `com.apple.security.device.audio-input` и `MACDICTATE_NOTARY_PROFILE` / `MACDICTATE_NOTARIZE=true`; runbook — `docs/9_Distribution_Signing_Runbook.md`. Notarized/stapled DMG подтвержден с `Developer ID Application: Aleksander Fisenkov (5BABN9U6WS)` и notary profile `macdictate-notary`.
+- В `1.5.2-working` app-side структура повторно разгружена: `AppController.swift` держит composition/status, сценарные extension-файлы живут в `src/App/`, системные runtime wrappers — в `src/System/`, update checker — в `src/Updates/`, а text-improvement cleaner/validator/trace/llama runtime отделены от runner.
 - Будущий AI corpus/fine-tune governed by `docs/8_AI_Corpus_Strategy.md`: primary corpus — approved real dictation pairs из debug-сессий; copywriting datasets HuggingFace — только secondary style/eval material после license review.
 - Локальные runtime harnesses/checks: `scripts/test_whisper_runner_timeout.sh`, `scripts/test_license_machine_id_timeout.sh`, `scripts/test_license_status_response.sh`, `scripts/test_license_grace_diagnostic.sh`, `scripts/test_recording_temp_cleanup.sh`, `scripts/test_text_improvement_runner.sh`, `scripts/test_debug_session_logger.sh`, `scripts/test_last_dictation_store.sh`, `scripts/check_distribution_signing.sh`.
 

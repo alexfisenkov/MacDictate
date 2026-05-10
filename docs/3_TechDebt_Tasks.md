@@ -16,7 +16,7 @@
 | App | Open | P1 | Supportability | M | Project | Добавить repair flow для `no model / no whisper / permission denied`. |
 | App | Open | P1 | UX | M | Project | Вынести `launch at login` из AppleScript fallback в более чистый и проверяемый path. |
 | App | Open | P1 | Flexibility | M | Project | Сделать настраиваемую горячую клавишу без ломки menu bar utility UX. |
-| Repo | Open | P1 | Hygiene | S | Project | Провести отдельную cleanup-итерацию по оставшимся root artifact clutter: icon scratch files и helper scripts. DMG/build logs уже расфасованы в release ledger. |
+| Repo | Done | P1 | Hygiene | S | Project | Root artifact clutter убран из активного root layout: icon scratch files и helper scripts перенесены в `archive/legacy-root-scratch/` с README. DMG/build logs уже расфасованы в release ledger. |
 | App | Open | P2 | Onboarding | L | Project | Уйти от зависимости на Homebrew `whisper-cli` или хотя бы сделать управляемый bundled runtime path. |
 | App | Open | P2 | Onboarding | M | Project | Уйти от зависимости на Homebrew `llama.cpp` runtime для второй нейросети или сделать управляемый bundled runtime path. |
 | App | Open | P2 | UX | M | Project | После runtime smoke решить, нужен ли progress/cancel flow для долгого улучшения текста. |
@@ -27,6 +27,7 @@
 | App | Open | P2 | Runtime | S | Project | Собрать runtime evidence по экстремально длинным диктовкам и решить, нужен ли user-facing progress/cancel flow. |
 | App/AI | Open | P2 | Runtime / UX | S | Project | После тестов Qwen2.5-3B собрать latency/RAM evidence на M1/16 GB и решить, нужен ли user-facing selector между 3B quality mode и 1.5B fast mode. |
 | App/Diagnostics | Open | P2 | Privacy / Supportability | S | Project | Для debug-сессий добавить user-facing управление: открыть папку логов, отключить logging, удалить старые session folders и/или задать retention policy. |
+| App | Open | P2 | Maintainability | M | Project | Если dictation flow продолжит расти, вынести `src/App/AppController+DictationFlow.swift` в отдельный `DictationPipeline` service с явными callbacks для status/debug/paste, чтобы AppController extensions не стали новым hotspot. |
 
 ## Notes
 

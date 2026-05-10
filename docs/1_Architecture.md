@@ -1,6 +1,6 @@
 # Архитектура проекта MacDictate (Native Swift)
 
-Этот документ описывает текущую app-side архитектуру `1.5.0` после декомпозиции `AppController.swift`.
+Этот документ описывает текущую app-side архитектуру рабочей линии `1.5.2` после повторной декомпозиции крупных runtime-файлов.
 
 ## Технологический стек
 
@@ -18,8 +18,13 @@
 
 ## App Composition Root
 
-- `src/AppController.swift` — тонкий coordinator.
-- Его ответственность: собрать сервисы, построить menu bar UI, связать hotkeys с use case и держать high-level orchestration.
+- `src/AppController.swift` — composition/start/status root. Держит сервисы, lifecycle binding, menu/status refresh и hotkey wiring.
+- `src/App/AppController+DictationFlow.swift` — orchestration записи: recording → Whisper → optional Qwen → last-dictation save → paste.
+- `src/App/AppController+Permissions.swift` — microphone/accessibility permission flow и polling.
+- `src/App/AppController+TextImprovementMenu.swift` — menu actions/download/readiness для второй модели.
+- `src/App/AppController+LastDictation.swift` — recovery action `Скопировать последнюю диктовку`.
+- `src/App/AppController+SystemActions.swift` — instructions, restart, uninstall, launch-at-login menu actions.
+- `src/App/AppController+Updates.swift` — update-check UI reactions.
 
 ## App Modules
 
@@ -44,10 +49,14 @@
   - `LastDictationStore.swift` — локальное сохранение последнего non-empty финального текста диктовки в `UserDefaults` до попытки paste, чтобы текст можно было восстановить через menu bar action.
 
 - `src/TextImprovement/*`
+  - `TextImprovementTrace.swift` — result/trace DTO для debug-session artifacts.
   - `TextImprovementSettings.swift` — persisted toggle `MacDictateTextImprovementEnabled`.
   - `TextImprovementProfile.swift` — prompt profile для Qwen: editorial rules, list/paragraph formatting rules, terminology packs и speech-normalization hints.
   - `TextImprovementFormatter.swift` — deterministic guardrail для частых терминов и очевидных ordered-list markers; применяется и как pre-formatting перед Qwen, и как post-processing после Qwen.
-  - `TextImprovementRunner.swift` — запуск `llama.cpp` runtime для Qwen, timeout `10` минут, context `8_192` tokens, preformatted prompt input, streaming drain `stdout`/`stderr`, controlled termination и fallback-friendly ошибки.
+  - `TextImprovementOutputCleaner.swift` — очистка model output от служебных токенов, leaked prompt scaffold, markdown wrappers и preamble lines.
+  - `TextImprovementOutputValidator.swift` — fail-closed semantic/content-preservation validation, retry decision и fallback к source при assistant/commentary leakage.
+  - `LlamaCompletionRuntime.swift` — isolated `llama.cpp` subprocess layer: prompt temp file, arguments, timeout, stdout/stderr drain и bounded output collection.
+  - `TextImprovementRunner.swift` — orchestration слоя второй модели: input guard, prompt profile, runtime call, cleaner/validator, retry/fallback integration и trace assembly.
 
 - `docs/8_AI_Corpus_Strategy.md`
   - Канон по будущему обучению/eval второй нейросети: primary corpus строится из real dictation debug-сессий, а рекламные/copywriting датасеты HuggingFace считаются secondary style/eval material, не базовым correction corpus.
@@ -58,6 +67,16 @@
 - `src/UI/*`
   - `StatusPresentation.swift` — user-facing строки и status summaries.
   - `MenuBuilder.swift` — сборка menu skeleton.
+
+- `src/System/*`
+  - `AppLifecycleActions.swift` — relaunch/uninstall actions.
+  - `LaunchAtLoginService.swift` — `SMAppService` + legacy login-item compatibility wrapper.
+
+- `src/Updates/*`
+  - `UpdateChecker.swift` — GitHub latest release fetch, JSON parsing и numeric version compare.
+
+- `archive/legacy-root-scratch/*`
+  - Старые icon experiments и одноразовые helper/test files, удаленные из активного root layout без потери истории.
 
 ## Поведенческие правила app-layer
 
@@ -77,6 +96,7 @@
 - Команда `Улучшить текст` в главном меню является toggle режима второй нейросети: когда галочка включена, cleaned Whisper text перед вставкой проходит через `TextImprovementRunner`; когда выключена, вставляется исходный cleaned Whisper text.
 - Финальный non-empty текст диктовки сохраняется в `LastDictationStore` перед попыткой `Cmd+V`; menu action `Скопировать последнюю диктовку` кладёт этот текст в системный буфер обмена, если активное окно/курсор изменились и автоматическая вставка не дошла до нужного места.
 - Debug session logging является только локальным opt-in диагностическим режимом (`MacDictateDebugSessionLoggingEnabled`). Он не должен менять результат диктовки и не должен отправлять аудио, текст, prompt или model output на сервер.
+- Root проекта держит только активные source-of-truth зоны (`src`, `assets`, `backend`, `web-landing`, `docs`, `scripts`, `releases`, `archive`). Одноразовые experiments не возвращать в root; если нужно сохранить исторический артефакт, класть его в `archive/` с README.
 
 ## Build note
 
