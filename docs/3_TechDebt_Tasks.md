@@ -27,7 +27,7 @@
 | App | Open | P2 | Runtime | S | Project | Собрать runtime evidence по экстремально длинным диктовкам и решить, нужен ли user-facing progress/cancel flow. |
 | App/AI | Open | P2 | Runtime / UX | S | Project | После тестов Qwen2.5-3B собрать latency/RAM evidence на M1/16 GB и решить, нужен ли user-facing selector между 3B quality mode и 1.5B fast mode. |
 | App/Diagnostics | Open | P2 | Privacy / Supportability | S | Project | Для debug-сессий добавить user-facing управление: открыть папку логов, отключить logging, удалить старые session folders и/или задать retention policy. |
-| App | Open | P2 | Maintainability | M | Project | Если dictation flow продолжит расти, вынести `src/App/AppController+DictationFlow.swift` в отдельный `DictationPipeline` service с явными callbacks для status/debug/paste, чтобы AppController extensions не стали новым hotspot. |
+| App | Open | P2 | Maintainability | M | Project | Если dictation flow продолжит расти, вынести `src/App/AppController+DictationFlow.swift` в отдельный `DictationPipeline` service с явными callbacks для status/debug/paste. Рост этого файла теперь ограничен `docs/10_App_Architecture_Guardrails.md` и `scripts/check_architecture_guardrails.sh`. |
 
 ## Notes
 

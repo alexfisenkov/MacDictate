@@ -47,9 +47,11 @@
 
 ## App Architecture Rule
 
-- Composition root должен оставаться тонким.
-- Новые крупные обязанности не добавляются обратно в один controller.
-- License logic, diagnostics, hotkeys, transcription, paste и UI presentation живут в отдельных файлах/слоях.
+- Подробный канон: `docs/10_App_Architecture_Guardrails.md`.
+- Composition root должен оставаться тонким: `src/AppController.swift` держит composition/start/status, а сценарии живут в `src/App/` или feature folders.
+- Новые крупные обязанности не добавляются обратно в один controller или ближайший runner.
+- Новая ответственность получает свой слой: application bridge, feature service/coordinator, runtime/client, store, formatter/validator, trace DTO или UI presentation.
+- Перед завершением app-side задачи запускать `scripts/check_architecture_guardrails.sh`.
 
 ## Root Cleanliness / Artifact Policy
 

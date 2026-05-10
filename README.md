@@ -21,6 +21,7 @@ MacDictate — menu bar utility для локальной диктовки на 
 ## Source of truth
 
 - Канон по desktop runtime: `src/AppDelegate.swift`, `src/AppController.swift` и app-side модули в `src/App`, `src/License`, `src/Diagnostics`, `src/Hotkeys`, `src/Transcription`, `src/TextImprovement`, `src/Paste`, `src/UI`, `src/System`, `src/Updates`.
+- Канон по росту app-side архитектуры: `docs/10_App_Architecture_Guardrails.md` + `scripts/check_architecture_guardrails.sh`.
 - Канон по тарифам и оплате: `backend/plans.js`.
 - Главный operating model проекта: `docs/0_Project_Operating_Model.md`.
 - Канон по версиям, rollback и release assets: `docs/7_Release_Governance.md`, `releases/registry.json`, `releases/versions/<version>/RELEASE.md`.

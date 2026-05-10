@@ -11,6 +11,8 @@
 - Relaunch/uninstall и launch-at-login runtime wrappers вынесены в `src/System/AppLifecycleActions.swift` и `src/System/LaunchAtLoginService.swift`; `MenuBuilder` больше не читает `SMAppService` напрямую.
 - Старые root icon experiments и helper/test scratch-файлы перенесены из корня проекта в `archive/legacy-root-scratch/` с README; активный root layout снова отделяет `src`, `assets`, `backend`, `web-landing`, `docs`, `scripts`, `releases` и `archive`.
 - Targeted harness `scripts/test_text_improvement_runner.sh` обновлен под новую модульную структуру и проходит; дополнительно подтверждены `scripts/test_last_dictation_store.sh`, `scripts/test_debug_session_logger.sh`, `scripts/verify_release_governance.sh --online` и локальный `./build.sh` с DMG verify.
+- Архитектурные правила роста закреплены в `docs/10_App_Architecture_Guardrails.md`: описаны слои, запреты на смешение, лимиты файлов и типовые решения для новых фич.
+- Добавлен `scripts/check_architecture_guardrails.sh`; он проверяет лимиты Swift-файлов, чистоту root layout и parity `CLAUDE.md` / `AGENTS.md`. GitHub Actions release-governance workflow теперь запускает этот check.
 
 ## 2026-05-10 — v1.5.1 brand icon standardization
 

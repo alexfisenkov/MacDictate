@@ -27,8 +27,14 @@ jobs:
       - name: Validate release governance script syntax
         run: bash -n scripts/verify_release_governance.sh
 
+      - name: Validate architecture guardrails script syntax
+        run: bash -n scripts/check_architecture_guardrails.sh
+
       - name: Validate release registry JSON
         run: python3 -m json.tool releases/registry.json >/dev/null
+
+      - name: Verify architecture guardrails
+        run: scripts/check_architecture_guardrails.sh
 
       - name: Verify release governance
         run: scripts/verify_release_governance.sh
