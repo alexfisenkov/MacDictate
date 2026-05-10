@@ -2,7 +2,7 @@
 
 ## Status
 
-- Status: `public_stable`
+- Status: `public_release`
 - Bundle: `1.5.0` / build `10`
 - Git tag: `v1.5.0`
 - Git commit: `c1de36f6b99d5ff906bd049c5fc9f5da4fe0b3ce`

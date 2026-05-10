@@ -4,8 +4,8 @@ MacDictate — menu bar utility для локальной диктовки на 
 
 ## Versioning
 
-- Публичная стабильная база: `v1.5.0`
-- Следующая рабочая линия: `release/1.5.1`
+- Публичная стабильная база: `v1.5.1`
+- Следующая рабочая линия: `release/1.5.2` после фиксации релиза
 - Канон по версиям и артефактам: `docs/7_Release_Governance.md` + `releases/registry.json`
 - Обычный `./build.sh` кладет временный DMG в `build/artifacts/`.
 - Release DMG/build logs должны переноситься в `releases/versions/<version>/artifacts/` или `releases/archive/`, а не оставаться в корне проекта.
@@ -31,8 +31,8 @@ MacDictate — menu bar utility для локальной диктовки на 
 Версии desktop-продукта ведутся через `releases/`:
 
 - `releases/registry.json` — машинно-читаемый реестр всех известных версий и checkpoint-ов.
-- `releases/versions/v1.5.0/RELEASE.md` — карточка текущей stable.
-- `releases/versions/v1.5.1-working/RELEASE.md` — следующая рабочая линия.
+- `releases/versions/v1.5.1/RELEASE.md` — карточка текущей stable.
+- `releases/versions/v1.5.1-working/RELEASE.md` — завершенная рабочая линия `1.5.1`.
 - `scripts/verify_release_governance.sh` — проверка, что registry, папки версий, checksums, `Info.plist` и обязательные git tags не расходятся.
 
 Перед выпуском или восстановлением любой старой версии сначала читать `docs/7_Release_Governance.md`.

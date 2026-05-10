@@ -2,15 +2,25 @@
 
 Этот changelog фиксирует только пользовательски и релизно значимые изменения.
 
-## [Unreleased] 1.5.1 Working Line
+## [v1.5.1] - 2026-05-10
 
 ### Added
 - Единая брендовая иконка для menu bar/app/web surface.
 - Safety action `Скопировать последнюю диктовку`: последний финальный текст диктовки сохраняется локально до paste и может быть восстановлен из menu bar.
 - Динамическая индикация в status bar: idle показывает брендовый микрофон, а запись/обработка/ошибки снова меняют значок на короткий статусный символ.
+- Developer ID distribution path: публичный DMG теперь собирается с `Developer ID Application`, hardened runtime, timestamp, notarization и stapling.
+- Release entitlement `com.apple.security.device.audio-input` для корректного Microphone permission flow на hardened runtime сборках.
+
+### Changed
+- `build.sh` подключает `assets/MacDictate.entitlements` по умолчанию для Developer ID сборок.
+- `scripts/check_distribution_signing.sh` теперь проверяет не только сертификат/notary profile/Gatekeeper, но и microphone entitlement установленного или build `.app`.
+
+### Fixed
+- Исправлена ситуация, когда после перехода на Developer ID MacDictate мог не появляться в `System Settings -> Privacy & Security -> Microphone`.
+- Усилен flow запроса микрофона: pending-состояние можно повторно запросить из blocked-alert, а открытие настроек микрофона обновляет статус через polling.
 
 ### Notes
-- Рабочая линия открыта после публикации `v1.5.0`.
+- `v1.5.1` фиксирует signed/notarized desktop release перед открытием следующей рабочей линии `1.5.2`.
 
 ## [v1.5.0] - 2026-05-09
 

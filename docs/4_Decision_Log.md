@@ -1,5 +1,12 @@
 # Decision Log
 
+## D-018 — v1.5.1 becomes signed public stable and next line is 1.5.2
+
+- **Дата:** 2026-05-10
+- **Решение:** зафиксировать desktop `v1.5.1` как публичный stable release на Developer ID/notarized distribution path, а дальнейшую работу вести в линии `release/1.5.2`.
+- **Почему:** `1.5.1` закрывает брендовые иконки, last-dictation recovery, динамическую status bar индикацию и критичный regression микрофона после hardened runtime подписи.
+- **Ограничение:** первый переход пользователей со старой ad-hoc сборки на Developer ID может потребовать однократного повторного permission approval; последующие Developer ID обновления должны сохранять trust identity при неизменных bundle id, Team ID и `/Applications/MacDictate.app`.
+
 ## D-017 — Public desktop DMGs require Developer ID signing and notarization
 
 - **Дата:** 2026-05-10
