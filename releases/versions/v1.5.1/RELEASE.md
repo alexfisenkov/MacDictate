@@ -5,7 +5,7 @@
 - Status: `public_stable`
 - Bundle: `1.5.1` / build `11`
 - Git tag: `v1.5.1`
-- Git commit: recorded in `releases/registry.json` after tag creation
+- Git commit: `4e160ad908cf73759f0699fe19179a6aec8bf783`
 - GitHub Release: `https://github.com/alexfisenkov/MacDictate/releases/tag/v1.5.1`
 
 ## Summary

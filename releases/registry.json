@@ -324,7 +324,7 @@
         "build": "11"
       },
       "git": {
-        "commit": null,
+        "commit": "4e160ad908cf73759f0699fe19179a6aec8bf783",
         "localTag": "v1.5.1",
         "remoteTags": [
           "v1.5.1"
@@ -335,7 +335,7 @@
         "releaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.5.1",
         "assetName": "MacDictate_Final_v1.5.1.dmg",
         "githubAssetSha256": "f6234a26d09988bd9620e111717b631c5c5ea46d1621beffa46e5bea3ea6569e",
-        "publishedAt": null
+        "publishedAt": "2026-05-10T13:23:23Z"
       },
       "local": {
         "releaseDir": "releases/versions/v1.5.1",
@@ -344,7 +344,7 @@
         "buildLogPath": "releases/versions/v1.5.1/artifacts/build_log_v1.5.1.txt"
       },
       "summary": "Public stable 1.5.1: branded icons, last-dictation recovery, dynamic menu bar states, and Developer ID signed/notarized distribution with microphone entitlement.",
-      "sourceConfidence": "confirmed_local_artifact_pending_github"
+      "sourceConfidence": "confirmed_git_and_github"
     }
   ],
   "checkpoints": [
