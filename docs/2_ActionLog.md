@@ -4,6 +4,7 @@
 
 ## 2026-05-11 — clean install release/download and license hardening
 
+- Публичный update/download metadata `assets/version.json` возвращен на stable `1.5.1` и сайт alias `/downloads/MacDictate_Latest.dmg`, чтобы внешний пользовательский контур не рекламировал рабочую `1.5.2` до отдельного release approval.
 - Зафиксировано release-правило: после каждого публичного desktop-релиза сайт обязан отдавать тот же stable DMG через `/downloads/MacDictate_Latest.dmg`; добавлен tracked manifest `web-landing/downloads/latest-desktop.json`, а `scripts/verify_release_governance.sh` теперь сверяет его с `registry.current.publicStable`.
 - `docs/6_Release_Checklist.md` и `docs/7_Release_Governance.md` обновлены: GitHub Release больше не считается финалом, пока сайт не обновлен на тот же DMG.
 - По live-проверке `macdictate.pro` подтвержден текущий симптом: TCP connect к `78.159.131.90:443` быстрый, но HTTPS/TLS handshake уходит в timeout; это указывает на reverse proxy / HTTPS / host layer до попадания запроса в Express route.
