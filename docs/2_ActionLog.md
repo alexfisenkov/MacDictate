@@ -18,6 +18,7 @@
 - По повторному microphone incident найден реальный root cause: Developer ID + hardened runtime сборка была подписана без entitlements, поэтому macOS могла не показывать приложение в `Privacy & Security -> Microphone`. Добавлен `assets/MacDictate.entitlements` с `com.apple.security.device.audio-input`, `build.sh` подключает его по умолчанию для Developer ID, а `scripts/check_distribution_signing.sh` теперь валидирует entitlement.
 - Собрана и установлена новая локальная `1.5.1` Developer ID/notarized копия с microphone entitlement: notary submission `3c4fabc2-b896-4365-a682-a4808f167b4b` получил `Accepted`, DMG SHA256 `c585afb560f10297c6d168353b78b566b28c8cb54fff9f97102e8054d97c3e90`, `/Applications/MacDictate.app` проходит `codesign --verify --deep --strict`, `spctl --type execute` и `scripts/check_distribution_signing.sh`.
 - Desktop release `v1.5.1` подготовлен как публичная signed/notarized stable-версия: bundle остается `1.5.1` / build `11`, release ledger получает отдельную папку `releases/versions/v1.5.1/`, checksum, GitHub release metadata и Developer ID artifact evidence.
+- Post-release линия `release/1.5.2` открыта с bundle `1.5.2` / build `12` и registry entry `v1.5.2-working`.
 
 ## 2026-05-09 — v1.5.0 release
 

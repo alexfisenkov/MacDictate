@@ -5,10 +5,10 @@
   "governanceDocument": "docs/7_Release_Governance.md",
   "current": {
     "publicStable": "v1.5.1",
-    "workingLine": "v1.5.1-working",
-    "developmentBranch": "release/1.5.1",
-    "bundleShortVersion": "1.5.1",
-    "bundleVersion": "11"
+    "workingLine": "v1.5.2-working",
+    "developmentBranch": "release/1.5.2",
+    "bundleShortVersion": "1.5.2",
+    "bundleVersion": "12"
   },
   "versions": [
     {
@@ -345,6 +345,36 @@
       },
       "summary": "Public stable 1.5.1: branded icons, last-dictation recovery, dynamic menu bar states, and Developer ID signed/notarized distribution with microphone entitlement.",
       "sourceConfidence": "confirmed_git_and_github"
+    },
+    {
+      "version": "v1.5.2-working",
+      "status": "working_line",
+      "channel": "development",
+      "bundle": {
+        "shortVersion": "1.5.2",
+        "build": "12"
+      },
+      "git": {
+        "commit": null,
+        "localTag": null,
+        "remoteTags": [],
+        "tagRequiredLocally": false,
+        "branch": "release/1.5.2"
+      },
+      "github": {
+        "releaseUrl": null,
+        "assetName": null,
+        "githubAssetSha256": null,
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.5.2-working",
+        "artifactPath": null,
+        "localArtifactSha256": null,
+        "buildLogPath": null
+      },
+      "summary": "Active 1.5.2 development line after public v1.5.1 release.",
+      "sourceConfidence": "confirmed_working_line"
     }
   ],
   "checkpoints": [

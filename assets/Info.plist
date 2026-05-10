@@ -2,27 +2,27 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleIdentifier</key>
-    <string>com.alexfisenkov.macdictate</string>
-    <key>CFBundleName</key>
-    <string>MacDictate</string>
-    <key>CFBundleExecutable</key>
-    <string>MacDictate</string>
-    <key>CFBundleIconFile</key>
-    <string>AppIcon.icns</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleShortVersionString</key>
-    <string>1.5.1</string>
-    <key>CFBundleVersion</key>
-    <string>11</string>
-    <key>LSUIElement</key>
-    <true/>
-    <key>LSMinimumSystemVersion</key>
-    <string>11.0</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Приложению требуется доступ к микрофону для распознавания речи с помощью нейросети Whisper.</string>
-    <key>NSPrincipalClass</key>
-    <string>NSApplication</string>
+	<key>CFBundleExecutable</key>
+	<string>MacDictate</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.alexfisenkov.macdictate</string>
+	<key>CFBundleName</key>
+	<string>MacDictate</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.5.2</string>
+	<key>CFBundleVersion</key>
+	<string>12</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>11.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Приложению требуется доступ к микрофону для распознавания речи с помощью нейросети Whisper.</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 </dict>
 </plist>

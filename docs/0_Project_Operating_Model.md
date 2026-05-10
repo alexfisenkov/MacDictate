@@ -5,7 +5,7 @@
 ## Versioning Policy
 
 - Публичная стабильная база сейчас: `v1.5.1`.
-- Следующая рабочая линия развития: `release/1.5.2` после фиксации релиза.
+- Следующая рабочая линия развития: `release/1.5.2`.
 - Версия в `assets/Info.plist` меняется только в подготовленном release-цикле, а не из-за имени ветки.
 - Канон по версиям ведется в `docs/7_Release_Governance.md`, `releases/registry.json` и `releases/versions/<version>/RELEASE.md`.
 - Локальный DMG/build log без записи в registry не считается релизом.

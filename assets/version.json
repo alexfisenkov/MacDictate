@@ -1,5 +1,5 @@
 {
-  "version": "1.5.1",
+  "version": "1.5.2",
   "download_url": "https://github.com/alexfisenkov/MacDictate/releases/latest",
-  "release_notes": "Подписанный Developer ID релиз: брендовые иконки, восстановление последней диктовки, динамический статус-бар и исправленный доступ к микрофону."
+  "release_notes": "Рабочая линия после выпуска 1.5.1."
 }
