@@ -10,6 +10,10 @@
 - Добавлена safety-система последней диктовки: финальный текст сохраняется в `UserDefaults` до попытки вставки, а menu bar получил action `Скопировать последнюю диктовку`, чтобы пользователь мог восстановить текст при смене активного окна/курсора.
 - Добавлен targeted harness `scripts/test_last_dictation_store.sh`; полноценная desktop-история диктовок вынесена в backlog как отдельный UX item.
 - Возвращена динамическая status bar индикация: idle использует новый template microphone icon, а запись/обработка/ошибки снова показывают короткие status symbols (`🔴`, `⏳`, `✨`, `⚠️`).
+- Подготовлен Developer ID release-signing контур: `build.sh` теперь поддерживает `MACDICTATE_SIGN_IDENTITY`, hardened runtime, timestamp, DMG signing и optional `notarytool` notarization/stapling через `MACDICTATE_NOTARY_PROFILE`.
+- Создан и импортирован `Developer ID Application: Aleksander Fisenkov (5BABN9U6WS)` certificate; первая Developer ID signed DMG-сборка `MacDictate_Final_v1.5.1.dmg` прошла без notarization.
+- После первой notarization проверки добавлены обязательные bundle metadata `CFBundleExecutable=MacDictate` и `CFBundlePackageType=APPL`, чтобы Gatekeeper/spctl классифицировал signed bundle как приложение.
+- Настроен `macdictate-notary` keychain profile; финальная Developer ID signed DMG-сборка прошла Apple notarization (`Accepted`), `stapler validate`, `spctl` для DMG и `spctl --type execute` для `.app`, скопированной из DMG.
 
 ## 2026-05-09 — v1.5.0 release
 

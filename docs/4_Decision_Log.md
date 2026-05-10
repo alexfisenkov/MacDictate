@@ -1,5 +1,12 @@
 # Decision Log
 
+## D-017 — Public desktop DMGs require Developer ID signing and notarization
+
+- **Дата:** 2026-05-10
+- **Решение:** новые публичные desktop-релизы MacDictate нельзя публиковать с ad-hoc подписью или `Apple Development` identity. Release-сборка должна использовать `Developer ID Application`, hardened runtime (`codesign --options runtime`), timestamp, notarization и stapling DMG.
+- **Почему:** ad-hoc identity привязана к cdhash конкретной сборки. При обновлении macOS может считать приложение новым binary identity, из-за чего Accessibility permission требует ручного удаления старой записи и повторного добавления. Developer ID identity должна стабилизировать designated requirement между версиями.
+- **Ограничение:** первый переход с ad-hoc на Developer ID может потребовать однократного повторного Accessibility approval. Дальше обновления должны сохранять разрешение при неизменных bundle id, Team ID, signing identity и `/Applications/MacDictate.app`.
+
 ## D-016 — v1.5.0 becomes public stable and next line is 1.5.1
 
 - **Дата:** 2026-05-09

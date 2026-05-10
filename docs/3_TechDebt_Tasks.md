@@ -4,7 +4,8 @@
 
 | Area | Status | Priority | Impact | Effort | Owner | Item |
 | --- | --- | --- | --- | --- | --- | --- |
-| Release | Open | P0 | Distribution | M | Project | Перевести release path на Developer ID + notarization + stapling. |
+| Release | Done | P0 | Distribution | M | Project | Перевести release path на Developer ID + notarization + stapling: build pipeline, runbook, `Developer ID Application` certificate, `macdictate-notary` profile и первая notarized/stapled DMG-сборка подтверждены. |
+| Release | Done | P0 | Distribution | S | Project | Настроить `MACDICTATE_NOTARY_PROFILE` для notarytool и выполнить первую notarized/stapled DMG-сборку. |
 | Release | Open | P0 | Integrity | M | Project | Определить один source of truth для release asset: GitHub release vs site download. |
 | Release | Open | P0 | History | S | Project | Нормализовать исторические remote/local tags `v1.2` и `v1.3`: решить, пересоздавать/документировать aliases или оставить как legacy. |
 | Release | Open | P1 | Packaging | M | Project | Перед публичным релизом отдельно подтвердить strict verification установленной/смонтированной DMG-копии; `create-dmg`/Finder layout может добавлять Finder metadata на bundle внутри образа, поэтому финальный release path должен быть проверен вместе с Developer ID/notarization. |

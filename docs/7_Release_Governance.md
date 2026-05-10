@@ -160,13 +160,21 @@ git -C macos worktree add ../MacDictate-macos-v1.4.2 v1.4.2
    - `docs/4_Decision_Log.md`, если было policy/architecture decision;
    - `docs/3_TechDebt_Tasks.md`, если остался долг.
 3. Выполнить `scripts/verify_release_governance.sh`.
-4. Собрать `./build.sh`.
-5. Обычная сборка создает DMG в `build/artifacts/`; для release-candidate поместить DMG и build log в `releases/versions/<version>/artifacts/`.
-6. Обновить `SHA256SUMS` и `ARTIFACTS.md`.
-7. Выполнить `scripts/verify_release_governance.sh --strict-local-artifacts`, если release-candidate ссылается на локальные artifact files.
-8. Создать annotated tag.
-9. Опубликовать GitHub Release и asset.
-10. Снова выполнить `scripts/verify_release_governance.sh --online`.
+4. Выполнить `scripts/check_distribution_signing.sh` на машине, где собирается release.
+5. Собрать публичный release только через Developer ID + notarization:
+   ```bash
+   MACDICTATE_SIGN_IDENTITY="Developer ID Application: <Name> (<TEAM_ID>)" \
+   MACDICTATE_NOTARY_PROFILE="macdictate-notary" \
+   MACDICTATE_NOTARIZE=true \
+   ./build.sh
+   ```
+   Обычная `./build.sh` без этих переменных остается dev/ad-hoc сборкой и не является публичным release candidate.
+6. Обычная сборка создает DMG в `build/artifacts/`; для release-candidate поместить DMG и build log в `releases/versions/<version>/artifacts/`.
+7. Обновить `SHA256SUMS` и `ARTIFACTS.md`.
+8. Выполнить `scripts/verify_release_governance.sh --strict-local-artifacts`, если release-candidate ссылается на локальные artifact files.
+9. Создать annotated tag.
+10. Опубликовать GitHub Release и asset.
+11. Снова выполнить `scripts/verify_release_governance.sh --online`.
 
 ## Что нельзя делать
 
@@ -177,6 +185,7 @@ git -C macos worktree add ../MacDictate-macos-v1.4.2 v1.4.2
 - Нельзя менять цену/тариф/checkout без `docs/4_Decision_Log.md`.
 - Нельзя выпускать релиз без записи в `releases/registry.json`.
 - Нельзя считать `v1.5.0` выпущенной, пока нет release tag, GitHub Release, `RELEASE.md`, registry entry и smoke evidence.
+- Нельзя публиковать новый desktop DMG, подписанный ad-hoc или `Apple Development`; публичный release должен быть подписан `Developer ID Application`, notarized и stapled. Исключение требует отдельной записи в `docs/4_Decision_Log.md`.
 - Нельзя переписывать старые release notes молча. Исправления истории пишутся как `Correction note`.
 
 ## Текущие исторические оговорки

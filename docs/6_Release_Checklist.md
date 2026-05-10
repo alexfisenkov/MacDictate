@@ -21,6 +21,9 @@
 
 ## Build / distribution
 
+- [ ] `scripts/check_distribution_signing.sh` проходит для release-machine.
+- [ ] В Keychain доступен `Developer ID Application` certificate; `Apple Development` не используется для публичного DMG.
+- [ ] Настроен и проверен `MACDICTATE_NOTARY_PROFILE`, если это публичный release.
 - [ ] `swiftc`/typecheck проходит по всем `.swift` файлам.
 - [ ] `scripts/test_whisper_runner_timeout.sh` проходит.
 - [ ] `scripts/test_license_machine_id_timeout.sh` проходит.
@@ -31,7 +34,9 @@
 - [ ] Ясно, какой DMG является release source of truth.
 - [ ] Обычный build output лежит в `build/artifacts/`, а release DMG перенесен в `releases/versions/<version>/artifacts/`.
 - [ ] GitHub Release asset и локальный artifact имеют зафиксированные SHA256.
-- [ ] Выполнены steps по подписи / notarization / stapling.
+- [ ] `./build.sh` выполнен с `MACDICTATE_SIGN_IDENTITY`, `MACDICTATE_NOTARY_PROFILE` и `MACDICTATE_NOTARIZE=true` для публичного release.
+- [ ] Выполнены steps по Developer ID подписи / notarization / stapling.
+- [ ] `spctl` принимает notarized DMG primary signature.
 - [ ] Проверен install/open path на целевом macOS.
 
 ## Verification
