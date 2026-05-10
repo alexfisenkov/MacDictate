@@ -5,7 +5,7 @@
 | First launch with model present | `AppDelegate` пропускает downloader и запускает app | Partially |
 | First launch without model | показывается `ModelDownloader` | Not in this iteration |
 | No model at runtime | menu/diagnostics показывают `Model Not Found`, запись не стартует | Compile-level only |
-| No `whisper-cli` | diagnostics показывают `whisper-cli Not Found`, transcription не запускается | Compile-level only |
+| No bundled/developer `whisper-cli` | diagnostics показывают `whisper-cli Not Found`, transcription не запускается | Compile-level only |
 | No microphone permission | статус/alerts ведут в privacy settings, запись не стартует | Not runtime-verified |
 | No accessibility permission | hotkey blocked, показан accessibility guidance | Not runtime-verified |
 | Stale temp audio/text at startup | `RecordingService` удаляет старые `/tmp/mac_dictate_dist.wav` и `.txt` | Verified by `scripts/test_recording_temp_cleanup.sh` |
@@ -18,6 +18,7 @@
 | License status boolean compatibility | live/legacy backend values `true/false`, `1/0` и boolean-like strings декодируются без false `serverUnavailable` | Verified by `scripts/test_license_status_response.sh` and live endpoint curl |
 | License transient failure with cached active snapshot | при сетевом сбое и валидном snapshot app остается в grace без runtime-warning `Сервер лицензий временно недоступен`; без cache warning сохраняется | Verified by `scripts/test_license_grace_diagnostic.sh` |
 | Hung / stderr-heavy `whisper-cli` subprocess | зависший процесс завершается timeout diagnostic, temp audio чистится; большой `stderr` не блокирует успешный subprocess | Verified by `scripts/test_whisper_runner_timeout.sh` |
+| Whisper bundled runtime artifact | собранный `.app` содержит arm64 `whisper-cli`, `libwhisper`, ggml dylibs/backend plugins и `libomp`; `otool` не содержит `/opt/homebrew` / `/usr/local` ссылок; runtime запускается с bundled `GGML_BACKEND_PATH` без `dyld` error | Verified by `scripts/check_bundled_whisper_runtime.sh`, `./build.sh`, and `scripts/check_install_artifact_flow.sh` |
 | Text improvement model missing | toggle/manual action открывает downloader; automatic dictation не ломается без `.gguf` | Compile-level only |
 | Text improvement model selection | preferred 3B `.gguf` выбирается раньше legacy 1.5B; undersized 3B игнорируется; 1.5B остается fallback | Verified by `scripts/test_text_improvement_runner.sh` |
 | Text improvement runtime locator | bundled `llama-completion`/`llama-cli` выбирается раньше developer fallback paths; Homebrew не нужен для пользовательского artifact | Verified by `scripts/test_llama_runtime_locator.sh` |
@@ -45,6 +46,7 @@
 | Real Qwen editor profile smoke | Qwen + profile + formatter нормализуют `ChatGPT`, `Qwen`, `EBITDA`, `DaVinci Resolve` и оформляют `во-первых/во-вторых/в-третьих` как numbered list | Verified locally |
 | Real Qwen 3B correction smoke | локальная Qwen2.5-3B Q4_K_M выбирается runtime и улучшает короткий русский текст через `TextImprovementRunner` | Verified locally after 3B download |
 | Developer ID test artifact for 1.5.2 | `.app`/DMG собираются с Developer ID, hardened runtime и microphone entitlement; bundled `llama` self-contained; DMG checksum валиден | Verified locally with `MACDICTATE_SIGN_IDENTITY='Developer ID Application: Aleksander Fisenkov (5BABN9U6WS)' MACDICTATE_NOTARIZE=false ./build.sh`; notarization intentionally skipped for working test build |
+| Final DMG install artifact path | финальный DMG монтируется после EULA acceptance; `.app` внутри образа и временная installed-copy проходят strict codesign, microphone entitlement и bundled `llama` runtime checks | Verified by `scripts/check_install_artifact_flow.sh build/artifacts/MacDictate_Final_v1.5.2.dmg` |
 | Debug session logger opt-in | при включенном `MacDictateDebugSessionLoggingEnabled` создается локальная session folder с metadata, events, audio и staged text artifacts; при выключенном режиме logger no-op | Verified by `scripts/test_debug_session_logger.sh` |
 | Last dictation safety copy | финальный non-empty текст сохраняется до paste и может быть скопирован из menu bar через `Скопировать последнюю диктовку` | Store behavior verified by `scripts/test_last_dictation_store.sh`; menu action compile-level verified |
 | Transcription fail | user видит различимую диагностическую ошибку | Compile-level only |

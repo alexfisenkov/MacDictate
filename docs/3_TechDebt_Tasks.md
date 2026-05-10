@@ -8,7 +8,7 @@
 | Release | Done | P0 | Distribution | S | Project | Настроить `MACDICTATE_NOTARY_PROFILE` для notarytool и выполнить первую notarized/stapled DMG-сборку. |
 | Release | Open | P0 | Integrity | M | Project | Определить один source of truth для release asset: GitHub release vs site download. |
 | Release | Open | P0 | History | S | Project | Нормализовать исторические remote/local tags `v1.2` и `v1.3`: решить, пересоздавать/документировать aliases или оставить как legacy. |
-| Release | Open | P1 | Packaging | M | Project | Перед публичным релизом отдельно подтвердить strict verification установленной/смонтированной DMG-копии; `create-dmg`/Finder layout может добавлять Finder metadata на bundle внутри образа, поэтому финальный release path должен быть проверен вместе с Developer ID/notarization. |
+| Release | Done | P1 | Packaging | M | Project | Strict verification установленной/смонтированной DMG-копии: `scripts/check_install_artifact_flow.sh` монтирует финальный DMG, проверяет app внутри образа, копирует во временную Applications-папку и валидирует codesign, microphone entitlement и bundled `whisper`/`llama` runtimes. |
 | Release | Open | P1 | Integrity | S | Project | Скачать опубликованные GitHub assets для `v1.1`-`v1.4` и заполнить `githubAssetSha256` в `releases/registry.json`. |
 | Release | Open | P1 | Hygiene | S | Project | Проверить, нужно ли удалять ранее tracked binary DMG из git history через отдельную history-rewrite policy; текущая cleanup-итерация только убирает их из рабочего дерева вперед. |
 | Backend/App | Open | P0 | Revenue / UX | M | Project | Ввести app-side support snapshot и операторски понятный manual license recheck flow. |
@@ -17,7 +17,7 @@
 | App | Open | P1 | UX | M | Project | Вынести `launch at login` из AppleScript fallback в более чистый и проверяемый path. |
 | App | Open | P1 | Flexibility | M | Project | Сделать настраиваемую горячую клавишу без ломки menu bar utility UX. |
 | Repo | Done | P1 | Hygiene | S | Project | Root artifact clutter убран из активного root layout: icon scratch files и helper scripts перенесены в `archive/legacy-root-scratch/` с README. DMG/build logs уже расфасованы в release ledger. |
-| App | Open | P2 | Onboarding | L | Project | Уйти от зависимости на Homebrew `whisper-cli` или хотя бы сделать управляемый bundled runtime path. |
+| App | Done | P2 | Onboarding | L | Project | Уйти от зависимости на Homebrew `whisper-cli`: `build.sh` bundles `whisper-cli`, `libwhisper`, ggml dylibs/backend plugins и `libomp`; `WhisperRunner` использует bundled backend path, artifact проверяется `scripts/check_bundled_whisper_runtime.sh`. |
 | App | Done | P2 | Onboarding | M | Project | Уйти от зависимости на Homebrew `llama.cpp` runtime для второй нейросети: `build.sh` bundles `llama-completion` + `.dylib` dependencies, `LlamaRuntimeLocator` предпочитает bundled runtime, artifact проверяется `scripts/check_bundled_llama_runtime.sh`. |
 | App | Open | P2 | UX | M | Project | После runtime smoke решить, нужен ли progress/cancel flow для долгого улучшения текста. |
 | App | Open | P2 | UX | M | Project | Решить, нужен ли chunking для улучшения длинных диктовок; текущая защита fallback-ит input > 6 000 символов к Whisper-тексту. |

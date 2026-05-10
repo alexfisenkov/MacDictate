@@ -113,7 +113,7 @@ MACDICTATE_NOTARIZE=true \
 ./build.sh
 ```
 
-`build.sh` подписывает `.app`, staging-копию внутри DMG source и сам `.dmg`. При включенной notarization он выполняет:
+`build.sh` подписывает `.app` во временном `/tmp` staging, staging-копию внутри DMG source и сам `.dmg`. Это намеренно: рабочая папка проекта может жить в `Documents`/File Provider и получать FinderInfo/xattrs уже после cleanup, а shipped artifact должен собираться из clean staging. При включенной notarization он выполняет:
 
 - `xcrun notarytool submit --wait`;
 - `xcrun stapler staple`;
@@ -127,6 +127,19 @@ com.apple.security.device.audio-input = true
 ```
 
 Это не заменяет `NSMicrophoneUsageDescription` в `Info.plist`: description нужен для текста системного запроса, entitlement нужен для hardened runtime доступа к микрофону. Если entitlement пропустить, macOS может не показать приложение в `System Settings -> Privacy & Security -> Microphone`.
+
+Для clean-install path обычный пользовательский артефакт также обязан содержать bundled runtimes:
+
+- `Contents/Resources/bin/whisper-cli` + `Contents/Resources/libexec/ggml` для первой нейросети;
+- `Contents/Resources/bin/llama-completion` или `llama-cli` для второй нейросети.
+
+Проверки:
+
+```bash
+scripts/check_bundled_whisper_runtime.sh build/MacDictate.app
+scripts/check_bundled_llama_runtime.sh build/MacDictate.app
+scripts/check_install_artifact_flow.sh build/artifacts/MacDictate_Final_v1.5.2.dmg
+```
 
 ## Release validation
 
@@ -145,8 +158,11 @@ codesign -d --entitlements :- build/MacDictate.app | grep com.apple.security.dev
 hdiutil verify build/artifacts/MacDictate_Final_v1.5.1.dmg
 xcrun stapler validate build/artifacts/MacDictate_Final_v1.5.1.dmg
 spctl -a -vv -t open --context context:primary-signature build/artifacts/MacDictate_Final_v1.5.1.dmg
+scripts/check_install_artifact_flow.sh build/artifacts/MacDictate_Final_v1.5.1.dmg
 rm -rf "$tmp_app_dir"
 ```
+
+`scripts/check_install_artifact_flow.sh` является обязательной проверкой финального пользовательского пути: он монтирует DMG с EULA acceptance, проверяет `.app` внутри образа, копирует его во временную Applications-папку и повторно валидирует strict codesign, microphone entitlement и bundled runtime второй нейросети.
 
 После установки из DMG дополнительно проверить:
 

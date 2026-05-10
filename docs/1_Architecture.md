@@ -7,7 +7,7 @@
 ## Технологический стек
 
 - **Ядро:** нативный Swift + AppKit, сборка через `swiftc`.
-- **Speech-to-text:** `whisper-cli` (Whisper.cpp), запускается как внешний процесс.
+- **Speech-to-text:** bundled `whisper-cli` (Whisper.cpp) в `Contents/Resources/bin`, запускается как внешний процесс; Homebrew path остается только developer fallback.
 - **Text improvement:** bundled `llama.cpp` runtime (`Contents/Resources/bin/llama-completion`, fallback search включает `llama-cli`) + preferred `Qwen2.5-3B-Instruct-GGUF` Q4_K_M; `Qwen2.5-1.5B-Instruct-GGUF` Q4_K_M остается legacy fallback, запускается как второй локальный CLI-процесс.
 - **Сборка:** `build.sh`, который рекурсивно собирает все `.swift` в `src/`.
 - **Упаковка:** DMG через `create-dmg`.
@@ -91,7 +91,7 @@
 - Transcription subprocess не должен блокировать app бесконечно: зависший `whisper-cli` завершается после timeout и возвращает runtime diagnostic.
 - `stderr` subprocess читается во время выполнения, чтобы verbose/error-heavy `whisper-cli` не мог заблокироваться на заполненном pipe.
 - Text improvement является optional enhancement, а не блокером базовой диктовки. Если Qwen model отсутствует, menu action открывает downloader; если bundled `llama.cpp` runtime отсутствует или падает при включенном toggle, app вставляет cleaned Whisper-текст и показывает warning diagnostic.
-- Пользовательская установка не должна требовать Homebrew для второй нейросети: `build.sh` упаковывает `llama-completion` и transitive `.dylib` dependencies в `Contents/Resources/bin` / `Contents/Resources/lib`, переписывает install names на bundle-relative `@rpath`, подписывает nested Mach-O до подписи `.app` и проверяет отсутствие `/opt/homebrew` / `/usr/local` ссылок через `scripts/check_bundled_llama_runtime.sh`.
+- Пользовательская установка не должна требовать Homebrew для первой или второй нейросети: `build.sh` упаковывает `whisper-cli`, `llama-completion`, transitive `.dylib` dependencies и ggml backend plugins в `Contents/Resources/bin`, `Contents/Resources/lib` и `Contents/Resources/libexec/ggml`, переписывает install names на bundle-relative `@rpath`, подписывает nested Mach-O до подписи `.app` и проверяет отсутствие `/opt/homebrew` / `/usr/local` ссылок через `scripts/check_bundled_whisper_runtime.sh` и `scripts/check_bundled_llama_runtime.sh`.
 - Вторая модель выбирается из typed `.gguf` candidates: preferred `qwen2.5-3b-instruct-q4_k_m.gguf`, затем fallback `qwen2.5-1.5b-instruct-q4_k_m.gguf`; `.gguf` не участвует в выборе Whisper model.
 - Поведение второй модели задается через `TextImprovementProfile.professionalCopyEditor`: она должна исправлять и оформлять текст, но не менять смысл, факты, цифры, имена, бренды и профессиональные термины.
 - До Qwen применяется `TextImprovementFormatter.normalize` как lightweight pre-formatting: он исправляет заранее известные ASR-ошибки терминов (`ChaiJPT` / `Чай и GPT` -> `ChatGPT`) и оформляет очевидные `во-первых/во-вторых` перечисления, чтобы локальная модель не потеряла структуру.
@@ -106,7 +106,9 @@
 
 `build.sh` должен оставаться совместимым с модульной структурой: при добавлении новых `.swift` файлов они должны подхватываться автоматически, а не вручную дописываться в один список.
 
-`build.sh` по умолчанию требует bundled `llama.cpp` runtime для второй нейросети. Для developer-only сборок без этого компонента допускается `MACDICTATE_BUNDLE_LLAMA_RUNTIME=false`, но такие артефакты нельзя считать нормальным установочным кандидатом для пользователей.
+`build.sh` по умолчанию требует bundled `whisper.cpp` runtime для первой нейросети и bundled `llama.cpp` runtime для второй. Для developer-only сборок без этих компонентов допускаются `MACDICTATE_BUNDLE_WHISPER_RUNTIME=false` и/или `MACDICTATE_BUNDLE_LLAMA_RUNTIME=false`, но такие артефакты нельзя считать нормальным установочным кандидатом для пользователей.
+
+Финальный DMG не считается проверенным только по `build/MacDictate.app`: после создания образа нужно монтировать именно `build/artifacts/MacDictate_Final_v*.dmg` и проверять `.app` внутри mounted volume и copied install target. Это закреплено в `scripts/check_install_artifact_flow.sh`, потому что Finder/create-dmg metadata может отличаться от staging folder. Signed app и DMG source staging создаются во временных `/tmp/macdictate-*` папках, чтобы `Documents`/File Provider xattrs не ломали строгую подпись shipped artifact.
 
 ## Architecture Guardrail Note
 
@@ -119,6 +121,8 @@
 - `scripts/test_recording_temp_cleanup.sh` проверяет cleanup stale temp WAV/TXT.
 - `scripts/test_llama_runtime_locator.sh` проверяет приоритет bundled `llama-completion`/`llama-cli` над developer fallback paths.
 - `scripts/check_bundled_llama_runtime.sh` проверяет собранный `.app`: bundled `llama` runtime должен быть arm64, подписан, запускаться без `dyld` errors и не ссылаться на Homebrew/local install paths.
+- `scripts/check_bundled_whisper_runtime.sh` проверяет собранный `.app`: bundled `whisper-cli`, `.dylib` dependencies и ggml backend plugins должны быть arm64/Mach-O, подписаны, запускаться без `dyld` errors и не ссылаться на Homebrew/local install paths.
+- `scripts/check_install_artifact_flow.sh` монтирует финальный DMG, проверяет `.app` внутри образа, копирует во временную Applications-папку и повторно валидирует strict codesign, microphone entitlement и bundled `whisper`/`llama` runtimes.
 - `scripts/test_text_improvement_runner.sh` компилирует `TextImprovementRunner` с fake llama.cpp executable и проверяет profile prompt content, formatter guardrails, success cleanup, timeout recovery, missing runtime/model, safe input limit и non-zero stderr diagnostics.
 - `scripts/test_text_improvement_runner.sh` также проверяет regression из real debug-сессии: `ChaiJPT -> ChatGPT`, heading cue `И вот к чему пришли` и numbered list до отправки prompt в Qwen.
 - `scripts/test_debug_session_logger.sh` компилирует `DebugSessionLogger` и проверяет opt-in создание session folder, `metadata.json`, `events.jsonl`, `audio.wav`, staged text artifacts и disabled-mode no-op.

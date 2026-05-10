@@ -16,6 +16,9 @@ LLAMA_BIN_DIR="$RESOURCES_DIR/bin"
 LLAMA_LIB_DIR="$RESOURCES_DIR/lib"
 BUNDLE_LLAMA_RUNTIME="${MACDICTATE_BUNDLE_LLAMA_RUNTIME:-required}"
 LLAMA_RUNTIME_SOURCE="${MACDICTATE_LLAMA_RUNTIME_PATH:-}"
+BUNDLE_WHISPER_RUNTIME="${MACDICTATE_BUNDLE_WHISPER_RUNTIME:-required}"
+WHISPER_RUNTIME_SOURCE="${MACDICTATE_WHISPER_RUNTIME_PATH:-}"
+GGML_BACKEND_SOURCE="${MACDICTATE_GGML_BACKEND_PATH:-}"
 SIGN_IDENTITY="${MACDICTATE_SIGN_IDENTITY:-${DEVELOPER_ID_APPLICATION:-}}"
 SIGN_IDENTITY="${SIGN_IDENTITY:-"-"}"
 SIGN_MODE="ad-hoc"
@@ -26,6 +29,19 @@ DEFAULT_ENTITLEMENTS="$PROJECT_DIR/assets/MacDictate.entitlements"
 SIGN_ENTITLEMENTS="${MACDICTATE_CODESIGN_ENTITLEMENTS:-}"
 NOTARY_PROFILE="${MACDICTATE_NOTARY_PROFILE:-}"
 NOTARIZE_MODE="${MACDICTATE_NOTARIZE:-auto}"
+DMG_SRC_PARENT=""
+SIGNED_APP_PARENT=""
+SIGNED_APP_DIR=""
+
+cleanup_build_temp() {
+    if [ -n "$DMG_SRC_PARENT" ] && [ -d "$DMG_SRC_PARENT" ]; then
+        rm -rf "$DMG_SRC_PARENT"
+    fi
+    if [ -n "$SIGNED_APP_PARENT" ] && [ -d "$SIGNED_APP_PARENT" ]; then
+        rm -rf "$SIGNED_APP_PARENT"
+    fi
+}
+trap cleanup_build_temp EXIT
 
 if [ "$SIGN_MODE" = "developer-id" ]; then
     if [ -z "$SIGN_ENTITLEMENTS" ] && [ -f "$DEFAULT_ENTITLEMENTS" ]; then
@@ -105,6 +121,46 @@ bundle_llama_runtime() {
 
 bundle_llama_runtime
 
+bundle_whisper_runtime() {
+    case "$BUNDLE_WHISPER_RUNTIME" in
+        0|false|FALSE|no|NO)
+            echo "ℹ️  Bundled whisper.cpp runtime skipped by MACDICTATE_BUNDLE_WHISPER_RUNTIME=$BUNDLE_WHISPER_RUNTIME"
+            return 0
+            ;;
+        auto|required|1|true|TRUE|yes|YES)
+            ;;
+        *)
+            echo "❌ Unsupported MACDICTATE_BUNDLE_WHISPER_RUNTIME value: $BUNDLE_WHISPER_RUNTIME" >&2
+            echo "   Use required, auto, true, or false." >&2
+            exit 1
+            ;;
+    esac
+
+    echo "🎙️  Упаковка whisper.cpp runtime для первой нейросети..."
+    local bundle_args=(--resources "$RESOURCES_DIR")
+    if [ -n "$WHISPER_RUNTIME_SOURCE" ]; then
+        bundle_args+=(--runtime "$WHISPER_RUNTIME_SOURCE")
+    fi
+    if [ -n "$GGML_BACKEND_SOURCE" ]; then
+        bundle_args+=(--ggml-backends "$GGML_BACKEND_SOURCE")
+    fi
+
+    if "$PROJECT_DIR/scripts/bundle_whisper_runtime.py" "${bundle_args[@]}"; then
+        return 0
+    fi
+
+    if [ "$BUNDLE_WHISPER_RUNTIME" = "auto" ]; then
+        echo "⚠️  whisper.cpp runtime не найден; сборка продолжится без bundled Whisper runtime." >&2
+        return 0
+    fi
+
+    echo "❌ whisper.cpp runtime is required for this build." >&2
+    echo "   Install whisper.cpp locally or set MACDICTATE_BUNDLE_WHISPER_RUNTIME=false for a developer-only build." >&2
+    exit 1
+}
+
+bundle_whisper_runtime
+
 # 5. Подпись бинарников
 echo "🔐 Подписание приложения ($SIGN_MODE)..."
 clean_bundle_metadata() {
@@ -134,7 +190,7 @@ sign_nested_code() {
             codesign "${nested_args[@]}" "$nested" >/dev/null
             codesign --verify --strict --verbose=2 "$nested" >/dev/null
         fi
-    done < <(find "$nested_root/bin" "$nested_root/lib" -type f \( -perm -111 -o -name "*.dylib" \) -print0 2>/dev/null || true)
+    done < <(find "$nested_root/bin" "$nested_root/lib" "$nested_root/libexec" -type f \( -perm -111 -o -name "*.dylib" -o -name "*.so" \) -print0 2>/dev/null || true)
 }
 
 sign_and_verify_app() {
@@ -158,11 +214,11 @@ sign_and_verify_app() {
 
         if output="$(codesign "${codesign_args[@]}" 2>&1)"; then
             clean_bundle_metadata "$target"
-            if codesign --verify --deep --verbose=2 "$target" >/dev/null 2>&1; then
+            if verify_strict_app_copy "$target" >/dev/null 2>&1; then
                 clean_bundle_metadata "$target"
                 return 0
             fi
-            output="$(codesign --verify --deep --verbose=2 "$target" 2>&1)" || true
+            output="$(verify_strict_app_copy "$target" 2>&1)" || true
         fi
 
         if [ "$attempt" -lt 3 ]; then
@@ -184,6 +240,15 @@ sign_and_verify_dmg() {
 
     codesign --force --timestamp --sign "$SIGN_IDENTITY" "$target" >/dev/null
     codesign --verify --verbose=2 "$target" >/dev/null
+}
+
+copy_app_without_extended_attrs() {
+    local source="$1"
+    local destination="$2"
+    rm -rf "$destination"
+    mkdir -p "$(dirname "$destination")"
+    cp -R -X "$source" "$destination"
+    clean_bundle_metadata "$destination"
 }
 
 notarize_dmg_if_requested() {
@@ -228,18 +293,26 @@ notarize_dmg_if_requested() {
 verify_strict_app_copy() {
     local target="$1"
     local tmp_dir
+    local verify_status=0
     tmp_dir="$(mktemp -d)"
 
-    ditto --noextattr --noqtn "$target" "$tmp_dir/$APP_NAME"
-    clean_bundle_metadata "$tmp_dir/$APP_NAME"
-    codesign --verify --deep --strict --verbose=2 "$tmp_dir/$APP_NAME" >/dev/null
+    copy_app_without_extended_attrs "$target" "$tmp_dir/$APP_NAME"
+    codesign --verify --deep --strict --verbose=2 "$tmp_dir/$APP_NAME" >/dev/null || verify_status=$?
     rm -rf "$tmp_dir"
+    return "$verify_status"
 }
 
-sign_and_verify_app "$APP_DIR"
-if [ -x "$APP_DIR/Contents/Resources/bin/llama-completion" ] || [ -x "$APP_DIR/Contents/Resources/bin/llama-cli" ]; then
-    "$PROJECT_DIR/scripts/check_bundled_llama_runtime.sh" "$APP_DIR"
+SIGNED_APP_PARENT="$(mktemp -d /tmp/macdictate-signed-app.XXXXXX)"
+SIGNED_APP_DIR="$SIGNED_APP_PARENT/$APP_NAME"
+copy_app_without_extended_attrs "$APP_DIR" "$SIGNED_APP_DIR"
+sign_and_verify_app "$SIGNED_APP_DIR"
+if [ -x "$SIGNED_APP_DIR/Contents/Resources/bin/llama-completion" ] || [ -x "$SIGNED_APP_DIR/Contents/Resources/bin/llama-cli" ]; then
+    "$PROJECT_DIR/scripts/check_bundled_llama_runtime.sh" "$SIGNED_APP_DIR"
 fi
+if [ -x "$SIGNED_APP_DIR/Contents/Resources/bin/whisper-cli" ]; then
+    "$PROJECT_DIR/scripts/check_bundled_whisper_runtime.sh" "$SIGNED_APP_DIR"
+fi
+copy_app_without_extended_attrs "$SIGNED_APP_DIR" "$APP_DIR"
 
 # 6. Сборка легкого DMG-образа
 DMG_NAME="MacDictate_Final_v1.5.2.dmg"
@@ -254,13 +327,17 @@ if ! command -v create-dmg >/dev/null 2>&1; then
 fi
 
 echo "💿 Упаковка в DMG-образ..."
-# Создаем фолдер для сборки DMG
-DMG_SRC_DIR="$BUILD_DIR/dmg_src"
+# Создаем staging для DMG вне Documents/iCloud/File Provider, чтобы не ловить FinderInfo/xattr после подписи.
+DMG_SRC_PARENT="$(mktemp -d /tmp/macdictate-dmg-src.XXXXXX)"
+DMG_SRC_DIR="$DMG_SRC_PARENT/root"
 mkdir -p "$DMG_SRC_DIR"
-ditto --noextattr --noqtn "$APP_DIR" "$DMG_SRC_DIR/$APP_NAME"
+copy_app_without_extended_attrs "$SIGNED_APP_DIR" "$DMG_SRC_DIR/$APP_NAME"
 sign_and_verify_app "$DMG_SRC_DIR/$APP_NAME"
 if [ -x "$DMG_SRC_DIR/$APP_NAME/Contents/Resources/bin/llama-completion" ] || [ -x "$DMG_SRC_DIR/$APP_NAME/Contents/Resources/bin/llama-cli" ]; then
     "$PROJECT_DIR/scripts/check_bundled_llama_runtime.sh" "$DMG_SRC_DIR/$APP_NAME"
+fi
+if [ -x "$DMG_SRC_DIR/$APP_NAME/Contents/Resources/bin/whisper-cli" ]; then
+    "$PROJECT_DIR/scripts/check_bundled_whisper_runtime.sh" "$DMG_SRC_DIR/$APP_NAME"
 fi
 
 cd "$PROJECT_DIR"
@@ -275,17 +352,16 @@ create-dmg \
   --app-drop-link 460 190 \
   --eula "assets/license.txt" \
   --no-internet-enable \
+  --skip-jenkins \
   --hdiutil-retries 20 \
   "$DMG_PATH" \
   "$DMG_SRC_DIR"
 
-sign_and_verify_app "$APP_DIR"
-sign_and_verify_app "$DMG_SRC_DIR/$APP_NAME"
 sign_and_verify_dmg "$DMG_PATH"
 hdiutil verify "$DMG_PATH" >/dev/null
 verify_strict_app_copy "$APP_DIR"
-verify_strict_app_copy "$DMG_SRC_DIR/$APP_NAME"
 notarize_dmg_if_requested "$DMG_PATH"
+"$PROJECT_DIR/scripts/check_install_artifact_flow.sh" "$DMG_PATH"
 
 echo "✅ ГОТОВО! Ваш нативный профессиональный дистрибутив (с иконками): $DMG_PATH"
 echo "ℹ️  Для release перенесите DMG/build log в releases/versions/<version>/artifacts/ и обновите registry."

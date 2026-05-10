@@ -45,7 +45,8 @@ MacDictate — menu bar utility для локальной диктовки на 
 
 - Модели живут в `~/.macdictate/models`.
 - Первый запуск идет через `src/AppDelegate.swift` и `src/ModelDownloader.swift`.
-- Вторая модель Qwen скачивается лениво после включения `Улучшить текст`; runtime для неё (`llama-completion` + `.dylib`) должен быть уже bundled внутри `.app`, без требования ставить Homebrew пользователю.
+- Первая runtime-нейросеть (`whisper-cli` + `.dylib` + ggml backend plugins) и runtime второй нейросети (`llama-completion` + `.dylib`) должны быть bundled внутри `.app`, без требования ставить Homebrew пользователю.
+- Вторая модель Qwen скачивается лениво после включения `Улучшить текст`.
 - Сборка выполняется через `./build.sh`.
 - Результат обычной сборки: `build/MacDictate.app` и `build/artifacts/MacDictate_Final_v*.dmg`.
 - Для release-candidate перенесите DMG и build log в `releases/versions/<version>/artifacts/`, обновите `SHA256SUMS`, `ARTIFACTS.md` и `releases/registry.json`.
@@ -74,5 +75,7 @@ MacDictate — menu bar utility для локальной диктовки на 
 - `web-landing/index.html` должен отправлять в checkout только `deviceId`, `email`, `planId`.
 - `GET /api/license/status` используется текущим macOS app и не должен ломаться при backend-изменениях.
 - `scripts/check_bundled_llama_runtime.sh build/MacDictate.app` проверяет, что runtime второй нейросети self-contained и не зависит от `/opt/homebrew` / `/usr/local`.
+- `scripts/check_bundled_whisper_runtime.sh build/MacDictate.app` проверяет, что runtime первой нейросети self-contained и не зависит от `/opt/homebrew` / `/usr/local`.
+- `scripts/check_install_artifact_flow.sh build/artifacts/MacDictate_Final_v*.dmg` проверяет финальный DMG: mounted app и временная installed-copy должны проходить strict codesign, microphone entitlement и bundled runtime checks.
 - Больше проектных правил и rollback discipline: `docs/0_Project_Operating_Model.md`.
 - Больше правил по версиям, GitHub Releases и локальному складу артефактов: `docs/7_Release_Governance.md`.

@@ -84,12 +84,34 @@ scripts/test_llama_runtime_locator.sh
 
 Обычно запускается только через `./build.sh`.
 
+## `bundle_whisper_runtime.py`
+
+Сборочный helper для `build.sh`: копирует локальный `whisper-cli` в `MacDictate.app/Contents/Resources/bin`, собирает transitive `.dylib` dependencies в `Contents/Resources/lib`, копирует ggml backend plugins в `Contents/Resources/libexec/ggml` и переписывает install names на bundle-relative `@rpath`.
+
+Обычно запускается только через `./build.sh`.
+
 ## `check_bundled_llama_runtime.sh`
 
 Проверяет собранный `.app`: bundled llama runtime должен быть arm64, подписан, запускаться без `dyld` ошибок и не ссылаться на Homebrew/local install paths.
 
 ```bash
 scripts/check_bundled_llama_runtime.sh build/MacDictate.app
+```
+
+## `check_bundled_whisper_runtime.sh`
+
+Проверяет собранный `.app`: bundled whisper runtime, dylibs и ggml backend plugins должны быть arm64/Mach-O, подписаны, запускаться без `dyld` ошибок и не ссылаться на Homebrew/local install paths.
+
+```bash
+scripts/check_bundled_whisper_runtime.sh build/MacDictate.app
+```
+
+## `check_install_artifact_flow.sh`
+
+Проверяет финальный пользовательский DMG как установочный артефакт: принимает EULA для `hdiutil`, монтирует образ, проверяет `MacDictate.app` внутри DMG, копирует его во временную `Applications`-папку и повторно валидирует strict codesign, microphone entitlement и bundled whisper/llama runtimes.
+
+```bash
+scripts/check_install_artifact_flow.sh build/artifacts/MacDictate_Final_v1.5.2.dmg
 ```
 
 ## `test_debug_session_logger.sh`

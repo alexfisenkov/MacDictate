@@ -30,6 +30,8 @@
 - [ ] `scripts/test_license_machine_id_timeout.sh` проходит.
 - [ ] `scripts/test_recording_temp_cleanup.sh` проходит.
 - [ ] `scripts/test_text_improvement_runner.sh` проходит.
+- [ ] `scripts/check_bundled_whisper_runtime.sh build/MacDictate.app` проходит.
+- [ ] `scripts/check_bundled_llama_runtime.sh build/MacDictate.app` проходит.
 - [ ] `node --check backend/*.js` проходит.
 - [ ] `./build.sh` проходит на чистой рабочей копии.
 - [ ] Ясно, какой DMG является release source of truth.
@@ -38,6 +40,7 @@
 - [ ] `./build.sh` выполнен с `MACDICTATE_SIGN_IDENTITY`, `MACDICTATE_NOTARY_PROFILE` и `MACDICTATE_NOTARIZE=true` для публичного release.
 - [ ] Выполнены steps по Developer ID подписи / notarization / stapling.
 - [ ] `spctl` принимает notarized DMG primary signature.
+- [ ] `scripts/check_install_artifact_flow.sh <release-dmg>` проходит: mounted app и временная installed-copy валидны.
 - [ ] Проверен install/open path на целевом macOS.
 
 ## Verification

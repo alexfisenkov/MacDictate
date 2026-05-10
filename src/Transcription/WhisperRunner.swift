@@ -106,6 +106,11 @@ final class WhisperRunner {
 
         task.launchPath = whisperCli
         task.arguments = ["-m", modelPath, "-f", audioPath, "-l", "ru", "-nt", "-otxt"]
+        if let backendPath = Self.bundledGGMLBackendPath(forWhisperCli: whisperCli) {
+            var environment = ProcessInfo.processInfo.environment
+            environment["GGML_BACKEND_PATH"] = backendPath
+            task.environment = environment
+        }
         task.standardOutput = FileHandle.nullDevice
         task.standardError = stderrPipe
         stderrHandle.readabilityHandler = { handle in
@@ -192,6 +197,22 @@ final class WhisperRunner {
     private func dispatchDeadline(after seconds: TimeInterval) -> DispatchTime {
         let milliseconds = max(0, Int(seconds * 1000))
         return .now() + .milliseconds(milliseconds)
+    }
+
+    private static func bundledGGMLBackendPath(forWhisperCli whisperCli: String) -> String? {
+        let cliURL = URL(fileURLWithPath: whisperCli)
+        let resourcesURL = cliURL.deletingLastPathComponent().deletingLastPathComponent()
+        guard resourcesURL.lastPathComponent == "Resources" else {
+            return nil
+        }
+
+        let backendURL = resourcesURL.appendingPathComponent("libexec/ggml", isDirectory: true)
+        var isDirectory: ObjCBool = false
+        if FileManager.default.fileExists(atPath: backendURL.path, isDirectory: &isDirectory), isDirectory.boolValue {
+            return backendURL.path
+        }
+
+        return nil
     }
 }
 

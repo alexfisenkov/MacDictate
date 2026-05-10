@@ -78,6 +78,13 @@ if [ -d "$APP_PATH" ]; then
         echo "   This is expected for ad-hoc local builds or unsigned/not-notarized artifacts."
     fi
 
+    if "$ROOT_DIR/scripts/check_bundled_whisper_runtime.sh" "$APP_PATH"; then
+        echo "✅ Bundled whisper.cpp runtime is self-contained."
+    else
+        echo "❌ Bundled whisper.cpp runtime check failed."
+        status=1
+    fi
+
     if "$ROOT_DIR/scripts/check_bundled_llama_runtime.sh" "$APP_PATH"; then
         echo "✅ Bundled llama.cpp runtime is self-contained."
     else
