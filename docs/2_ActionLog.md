@@ -9,6 +9,7 @@
 - `AppIcon.icns`, landing/legal/payment pages и iOS AppIcon/recording controls синхронизированы на новый визуальный знак; публичный release не публиковался.
 - Добавлена safety-система последней диктовки: финальный текст сохраняется в `UserDefaults` до попытки вставки, а menu bar получил action `Скопировать последнюю диктовку`, чтобы пользователь мог восстановить текст при смене активного окна/курсора.
 - Добавлен targeted harness `scripts/test_last_dictation_store.sh`; полноценная desktop-история диктовок вынесена в backlog как отдельный UX item.
+- Возвращена динамическая status bar индикация: idle использует новый template microphone icon, а запись/обработка/ошибки снова показывают короткие status symbols (`🔴`, `⏳`, `✨`, `⚠️`).
 
 ## 2026-05-09 — v1.5.0 release
 

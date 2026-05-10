@@ -21,6 +21,7 @@
 
 - Brand icon standardization: macOS menu bar, app icon source, web landing/legal/payment pages and iOS app/keyboard microphone controls now use the user-provided `mic_logo.svg` / `mic_menubar.svg` family instead of emoji/system mic glyphs where this is product branding.
 - Last dictation safety copy: macOS now stores the final non-empty dictation text before paste and exposes `Скопировать последнюю диктовку` in the menu bar for manual recovery if focus/cursor/window changes during processing.
+- Dynamic status bar state indicators are restored: idle shows the branded microphone icon, while recording/processing/error states show compact status symbols.
 
 ## Release Rule
 

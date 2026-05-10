@@ -62,9 +62,13 @@ final class AppController: NSObject {
     }
 
     private func configureStatusBarButton() {
+        renderStatusBarIcon("")
+    }
+
+    private func renderStatusBarIcon(_ icon: String) {
         guard let button = statusItem.button else { return }
 
-        if let image = NSImage(named: "mic_menubar") {
+        if icon.isEmpty, let image = NSImage(named: "mic_menubar") {
             image.isTemplate = true
             image.size = NSSize(width: 17, height: 17)
             button.image = image
@@ -72,7 +76,8 @@ final class AppController: NSObject {
             button.title = ""
         } else {
             button.image = nil
-            button.title = "MacDictate"
+            button.imagePosition = .noImage
+            button.title = icon.isEmpty ? "MacDictate" : icon
         }
     }
 
@@ -174,9 +179,9 @@ final class AppController: NSObject {
         setStatus(idleStatus.text, icon: idleStatus.icon)
     }
 
-    private func setStatus(_ text: String, icon _: String) {
+    private func setStatus(_ text: String, icon: String) {
         DispatchQueue.main.async {
-            self.configureStatusBarButton()
+            self.renderStatusBarIcon(icon)
             self.menuComponents.statusItem.title = "Status: \(text)"
         }
     }
