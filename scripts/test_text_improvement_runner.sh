@@ -694,6 +694,7 @@ swiftc \
     "$ROOT_DIR/src/TextImprovement/TextImprovementFormatter.swift" \
     "$ROOT_DIR/src/TextImprovement/TextImprovementOutputCleaner.swift" \
     "$ROOT_DIR/src/TextImprovement/TextImprovementOutputValidator.swift" \
+    "$ROOT_DIR/src/TextImprovement/LlamaRuntimeLocator.swift" \
     "$ROOT_DIR/src/TextImprovement/LlamaCompletionRuntime.swift" \
     "$ROOT_DIR/src/TextImprovement/TextImprovementRunner.swift" \
     "$TEST_SWIFT" \

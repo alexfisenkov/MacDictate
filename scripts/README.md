@@ -70,6 +70,28 @@ scripts/test_recording_temp_cleanup.sh
 scripts/test_text_improvement_runner.sh
 ```
 
+## `test_llama_runtime_locator.sh`
+
+Компилирует `LlamaRuntimeLocator` и проверяет порядок поиска runtime второй нейросети: bundled `llama-completion`, bundled `llama-cli`, затем developer fallback paths.
+
+```bash
+scripts/test_llama_runtime_locator.sh
+```
+
+## `bundle_llama_runtime.py`
+
+Сборочный helper для `build.sh`: копирует локальный `llama-completion`/`llama-cli` в `MacDictate.app/Contents/Resources/bin`, собирает transitive `.dylib` dependencies в `Contents/Resources/lib` и переписывает install names на bundle-relative `@rpath`.
+
+Обычно запускается только через `./build.sh`.
+
+## `check_bundled_llama_runtime.sh`
+
+Проверяет собранный `.app`: bundled llama runtime должен быть arm64, подписан, запускаться без `dyld` ошибок и не ссылаться на Homebrew/local install paths.
+
+```bash
+scripts/check_bundled_llama_runtime.sh build/MacDictate.app
+```
+
 ## `test_debug_session_logger.sh`
 
 Компилирует `DebugSessionLogger` и проверяет opt-in debug session folder, `metadata.json`, `events.jsonl`, `audio.wav`, staged text artifacts и disabled-mode no-op.

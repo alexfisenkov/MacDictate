@@ -77,6 +77,13 @@ if [ -d "$APP_PATH" ]; then
         echo "⚠️  spctl does not accept app yet: $APP_PATH"
         echo "   This is expected for ad-hoc local builds or unsigned/not-notarized artifacts."
     fi
+
+    if "$ROOT_DIR/scripts/check_bundled_llama_runtime.sh" "$APP_PATH"; then
+        echo "✅ Bundled llama.cpp runtime is self-contained."
+    else
+        echo "❌ Bundled llama.cpp runtime check failed."
+        status=1
+    fi
 else
     echo "ℹ️  App not found for inspection: $APP_PATH"
 fi

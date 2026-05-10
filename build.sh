@@ -12,6 +12,10 @@ APP_DIR="$BUILD_DIR/$APP_NAME"
 CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
+LLAMA_BIN_DIR="$RESOURCES_DIR/bin"
+LLAMA_LIB_DIR="$RESOURCES_DIR/lib"
+BUNDLE_LLAMA_RUNTIME="${MACDICTATE_BUNDLE_LLAMA_RUNTIME:-required}"
+LLAMA_RUNTIME_SOURCE="${MACDICTATE_LLAMA_RUNTIME_PATH:-}"
 SIGN_IDENTITY="${MACDICTATE_SIGN_IDENTITY:-${DEVELOPER_ID_APPLICATION:-}}"
 SIGN_IDENTITY="${SIGN_IDENTITY:-"-"}"
 SIGN_MODE="ad-hoc"
@@ -43,7 +47,8 @@ fi
 # 1. Очистка и создание структуры
 rm -rf "$BUILD_DIR"
 mkdir -p "$MACOS_DIR"
-mkdir -p "$RESOURCES_DIR/bin"
+mkdir -p "$LLAMA_BIN_DIR"
+mkdir -p "$LLAMA_LIB_DIR"
 
 # 2. Копирование Info.plist
 cp "$PROJECT_DIR/assets/Info.plist" "$CONTENTS_DIR/Info.plist"
@@ -62,9 +67,43 @@ swiftc -O -target arm64-apple-macosx11.0 \
     "${SWIFT_FILES[@]}" \
     -o "$MACOS_DIR/MacDictate"
 
-# 4. (Пропущено) Использование whisper-cli напрямую из Homebrew
-# Мы используем системный /opt/homebrew/bin/whisper-cli, так как он зависит от
-# множества динамических библиотек (libggml, libwhisper) и путей @rpath.
+# 4. Bundled runtime для второй локальной модели
+bundle_llama_runtime() {
+    case "$BUNDLE_LLAMA_RUNTIME" in
+        0|false|FALSE|no|NO)
+            echo "ℹ️  Bundled llama.cpp runtime skipped by MACDICTATE_BUNDLE_LLAMA_RUNTIME=$BUNDLE_LLAMA_RUNTIME"
+            return 0
+            ;;
+        auto|required|1|true|TRUE|yes|YES)
+            ;;
+        *)
+            echo "❌ Unsupported MACDICTATE_BUNDLE_LLAMA_RUNTIME value: $BUNDLE_LLAMA_RUNTIME" >&2
+            echo "   Use required, auto, true, or false." >&2
+            exit 1
+            ;;
+    esac
+
+    echo "🧠 Упаковка llama.cpp runtime для второй нейросети..."
+    local bundle_args=(--resources "$RESOURCES_DIR")
+    if [ -n "$LLAMA_RUNTIME_SOURCE" ]; then
+        bundle_args+=(--runtime "$LLAMA_RUNTIME_SOURCE")
+    fi
+
+    if "$PROJECT_DIR/scripts/bundle_llama_runtime.py" "${bundle_args[@]}"; then
+        return 0
+    fi
+
+    if [ "$BUNDLE_LLAMA_RUNTIME" = "auto" ]; then
+        echo "⚠️  llama.cpp runtime не найден; сборка продолжится без bundled text-improvement runtime." >&2
+        return 0
+    fi
+
+    echo "❌ llama.cpp runtime is required for this build." >&2
+    echo "   Install llama.cpp locally or set MACDICTATE_BUNDLE_LLAMA_RUNTIME=false for a developer-only build." >&2
+    exit 1
+}
+
+bundle_llama_runtime
 
 # 5. Подпись бинарников
 echo "🔐 Подписание приложения ($SIGN_MODE)..."
@@ -74,8 +113,28 @@ clean_bundle_metadata() {
     dot_clean -m "$target" >/dev/null 2>&1 || true
     xattr -cr "$target" >/dev/null 2>&1 || true
     xattr -c "$target" >/dev/null 2>&1 || true
+    find "$target" -exec xattr -c {} + >/dev/null 2>&1 || true
     xattr -dr com.apple.FinderInfo "$target" >/dev/null 2>&1 || true
     xattr -d com.apple.FinderInfo "$target" >/dev/null 2>&1 || true
+    xattr -dr com.apple.ResourceFork "$target" >/dev/null 2>&1 || true
+    xattr -d com.apple.ResourceFork "$target" >/dev/null 2>&1 || true
+}
+
+sign_nested_code() {
+    local target="$1"
+    local nested_root="$target/Contents/Resources"
+    [ -d "$nested_root" ] || return 0
+
+    while IFS= read -r -d '' nested; do
+        if file "$nested" | grep -q "Mach-O"; then
+            local nested_args=(--force --sign "$SIGN_IDENTITY")
+            if [ "$SIGN_MODE" = "developer-id" ]; then
+                nested_args+=(--timestamp --options runtime)
+            fi
+            codesign "${nested_args[@]}" "$nested" >/dev/null
+            codesign --verify --strict --verbose=2 "$nested" >/dev/null
+        fi
+    done < <(find "$nested_root/bin" "$nested_root/lib" -type f \( -perm -111 -o -name "*.dylib" \) -print0 2>/dev/null || true)
 }
 
 sign_and_verify_app() {
@@ -86,7 +145,9 @@ sign_and_verify_app() {
 
     while [ "$attempt" -le 3 ]; do
         clean_bundle_metadata "$target"
-        codesign_args=(--force --deep --sign "$SIGN_IDENTITY")
+        sign_nested_code "$target"
+        clean_bundle_metadata "$target"
+        codesign_args=(--force --sign "$SIGN_IDENTITY")
         if [ "$SIGN_MODE" = "developer-id" ]; then
             codesign_args+=(--timestamp --options runtime)
             if [ -n "$SIGN_ENTITLEMENTS" ]; then
@@ -176,6 +237,9 @@ verify_strict_app_copy() {
 }
 
 sign_and_verify_app "$APP_DIR"
+if [ -x "$APP_DIR/Contents/Resources/bin/llama-completion" ] || [ -x "$APP_DIR/Contents/Resources/bin/llama-cli" ]; then
+    "$PROJECT_DIR/scripts/check_bundled_llama_runtime.sh" "$APP_DIR"
+fi
 
 # 6. Сборка легкого DMG-образа
 DMG_NAME="MacDictate_Final_v1.5.2.dmg"
@@ -195,6 +259,9 @@ DMG_SRC_DIR="$BUILD_DIR/dmg_src"
 mkdir -p "$DMG_SRC_DIR"
 ditto --noextattr --noqtn "$APP_DIR" "$DMG_SRC_DIR/$APP_NAME"
 sign_and_verify_app "$DMG_SRC_DIR/$APP_NAME"
+if [ -x "$DMG_SRC_DIR/$APP_NAME/Contents/Resources/bin/llama-completion" ] || [ -x "$DMG_SRC_DIR/$APP_NAME/Contents/Resources/bin/llama-cli" ]; then
+    "$PROJECT_DIR/scripts/check_bundled_llama_runtime.sh" "$DMG_SRC_DIR/$APP_NAME"
+fi
 
 cd "$PROJECT_DIR"
 create-dmg \

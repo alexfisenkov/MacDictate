@@ -8,7 +8,7 @@
 
 - **Ядро:** нативный Swift + AppKit, сборка через `swiftc`.
 - **Speech-to-text:** `whisper-cli` (Whisper.cpp), запускается как внешний процесс.
-- **Text improvement:** `llama.cpp` (`llama-completion`, fallback search включает `llama-cli`) + preferred `Qwen2.5-3B-Instruct-GGUF` Q4_K_M; `Qwen2.5-1.5B-Instruct-GGUF` Q4_K_M остается legacy fallback, запускается как второй локальный CLI-процесс.
+- **Text improvement:** bundled `llama.cpp` runtime (`Contents/Resources/bin/llama-completion`, fallback search включает `llama-cli`) + preferred `Qwen2.5-3B-Instruct-GGUF` Q4_K_M; `Qwen2.5-1.5B-Instruct-GGUF` Q4_K_M остается legacy fallback, запускается как второй локальный CLI-процесс.
 - **Сборка:** `build.sh`, который рекурсивно собирает все `.swift` в `src/`.
 - **Упаковка:** DMG через `create-dmg`.
 
@@ -57,6 +57,7 @@
   - `TextImprovementFormatter.swift` — deterministic guardrail для частых терминов и очевидных ordered-list markers; применяется и как pre-formatting перед Qwen, и как post-processing после Qwen.
   - `TextImprovementOutputCleaner.swift` — очистка model output от служебных токенов, leaked prompt scaffold, markdown wrappers и preamble lines.
   - `TextImprovementOutputValidator.swift` — fail-closed semantic/content-preservation validation, retry decision и fallback к source при assistant/commentary leakage.
+  - `LlamaRuntimeLocator.swift` — lookup bundled `llama.cpp` executable в app resources с Homebrew fallback только для developer/debug окружений.
   - `LlamaCompletionRuntime.swift` — isolated `llama.cpp` subprocess layer: prompt temp file, arguments, timeout, stdout/stderr drain и bounded output collection.
   - `TextImprovementRunner.swift` — orchestration слоя второй модели: input guard, prompt profile, runtime call, cleaner/validator, retry/fallback integration и trace assembly.
 
@@ -89,7 +90,8 @@
 - Machine ID resolution не должен блокировать startup бесконечно: `/usr/sbin/ioreg` ограничен коротким timeout, fallback генерирует и кеширует `MD-*`.
 - Transcription subprocess не должен блокировать app бесконечно: зависший `whisper-cli` завершается после timeout и возвращает runtime diagnostic.
 - `stderr` subprocess читается во время выполнения, чтобы verbose/error-heavy `whisper-cli` не мог заблокироваться на заполненном pipe.
-- Text improvement является optional enhancement, а не блокером базовой диктовки. Если Qwen/`llama.cpp` runtime отсутствует или падает при включенном toggle, app вставляет cleaned Whisper-текст и показывает warning diagnostic.
+- Text improvement является optional enhancement, а не блокером базовой диктовки. Если Qwen model отсутствует, menu action открывает downloader; если bundled `llama.cpp` runtime отсутствует или падает при включенном toggle, app вставляет cleaned Whisper-текст и показывает warning diagnostic.
+- Пользовательская установка не должна требовать Homebrew для второй нейросети: `build.sh` упаковывает `llama-completion` и transitive `.dylib` dependencies в `Contents/Resources/bin` / `Contents/Resources/lib`, переписывает install names на bundle-relative `@rpath`, подписывает nested Mach-O до подписи `.app` и проверяет отсутствие `/opt/homebrew` / `/usr/local` ссылок через `scripts/check_bundled_llama_runtime.sh`.
 - Вторая модель выбирается из typed `.gguf` candidates: preferred `qwen2.5-3b-instruct-q4_k_m.gguf`, затем fallback `qwen2.5-1.5b-instruct-q4_k_m.gguf`; `.gguf` не участвует в выборе Whisper model.
 - Поведение второй модели задается через `TextImprovementProfile.professionalCopyEditor`: она должна исправлять и оформлять текст, но не менять смысл, факты, цифры, имена, бренды и профессиональные термины.
 - До Qwen применяется `TextImprovementFormatter.normalize` как lightweight pre-formatting: он исправляет заранее известные ASR-ошибки терминов (`ChaiJPT` / `Чай и GPT` -> `ChatGPT`) и оформляет очевидные `во-первых/во-вторых` перечисления, чтобы локальная модель не потеряла структуру.
@@ -104,6 +106,8 @@
 
 `build.sh` должен оставаться совместимым с модульной структурой: при добавлении новых `.swift` файлов они должны подхватываться автоматически, а не вручную дописываться в один список.
 
+`build.sh` по умолчанию требует bundled `llama.cpp` runtime для второй нейросети. Для developer-only сборок без этого компонента допускается `MACDICTATE_BUNDLE_LLAMA_RUNTIME=false`, но такие артефакты нельзя считать нормальным установочным кандидатом для пользователей.
+
 ## Architecture Guardrail Note
 
 `scripts/check_architecture_guardrails.sh` является обязательной локальной проверкой для app-side изменений. Он не заменяет инженерное решение, но ловит два главных регресса: рост hotspot-файлов выше лимита и возврат scratch/source файлов в root layout.
@@ -113,6 +117,8 @@
 - `scripts/test_whisper_runner_timeout.sh` компилирует `WhisperRunner` с fake `whisper-cli` и проверяет timeout recovery, cleanup temp audio и large-stderr subprocess path.
 - `scripts/test_license_machine_id_timeout.sh` проверяет parsing/cache machine ID и fallback при зависшем fake `ioreg`.
 - `scripts/test_recording_temp_cleanup.sh` проверяет cleanup stale temp WAV/TXT.
+- `scripts/test_llama_runtime_locator.sh` проверяет приоритет bundled `llama-completion`/`llama-cli` над developer fallback paths.
+- `scripts/check_bundled_llama_runtime.sh` проверяет собранный `.app`: bundled `llama` runtime должен быть arm64, подписан, запускаться без `dyld` errors и не ссылаться на Homebrew/local install paths.
 - `scripts/test_text_improvement_runner.sh` компилирует `TextImprovementRunner` с fake llama.cpp executable и проверяет profile prompt content, formatter guardrails, success cleanup, timeout recovery, missing runtime/model, safe input limit и non-zero stderr diagnostics.
 - `scripts/test_text_improvement_runner.sh` также проверяет regression из real debug-сессии: `ChaiJPT -> ChatGPT`, heading cue `И вот к чему пришли` и numbered list до отправки prompt в Qwen.
 - `scripts/test_debug_session_logger.sh` компилирует `DebugSessionLogger` и проверяет opt-in создание session folder, `metadata.json`, `events.jsonl`, `audio.wav`, staged text artifacts и disabled-mode no-op.

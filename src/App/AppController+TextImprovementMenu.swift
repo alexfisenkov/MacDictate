@@ -20,15 +20,28 @@ extension AppController {
     }
 
     @objc func downloadTextImprovementModel() {
+        guard ensureTextImprovementRuntimeAvailable() else {
+            refreshTextImprovementMenuItems()
+            return
+        }
+
         showTextImprovementModelDownloader(enableAfterDownload: false)
     }
 
     private func ensureTextImprovementReadyForInteractive(enableAfterDownload: Bool) -> Bool {
+        guard ensureTextImprovementRuntimeAvailable() else {
+            return false
+        }
+
         guard textImprovementRunner.availableModelPath() != nil else {
             showTextImprovementModelDownloader(enableAfterDownload: enableAfterDownload)
             return false
         }
 
+        return true
+    }
+
+    private func ensureTextImprovementRuntimeAvailable() -> Bool {
         guard textImprovementRunner.availableLlamaCliPath() != nil else {
             presentTextImprovementRuntimeAlert()
             return false
@@ -79,8 +92,8 @@ extension AppController {
 
     private func presentTextImprovementRuntimeAlert() {
         presentTextImprovementAlert(
-            title: "Нужен llama.cpp",
-            message: "Для второй локальной нейросети установите llama.cpp: brew install llama.cpp. После этого MacDictate сможет запускать Qwen локально."
+            title: "Нужен компонент улучшения текста",
+            message: "MacDictate не нашёл встроенный runtime второй нейросети. Переустановите последнюю версию MacDictate. Базовая диктовка продолжит работать без улучшения текста."
         )
     }
 

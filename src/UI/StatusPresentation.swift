@@ -117,7 +117,7 @@ enum StatusPresentation {
         }
 
         if isEnabled, !hasRuntime {
-            return "✨ Улучшение текста: нужен llama.cpp"
+            return "✨ Улучшение текста: нужен компонент runtime"
         }
 
         if hasModel, hasRuntime {
@@ -128,7 +128,7 @@ enum StatusPresentation {
             return "✨ Улучшение текста: модель не скачана"
         }
 
-        return "✨ Улучшение текста: нужен llama.cpp"
+        return "✨ Улучшение текста: нужен компонент runtime"
     }
 
     static func shortDateTime(_ date: Date) -> String {

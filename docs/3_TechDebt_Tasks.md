@@ -18,7 +18,7 @@
 | App | Open | P1 | Flexibility | M | Project | Сделать настраиваемую горячую клавишу без ломки menu bar utility UX. |
 | Repo | Done | P1 | Hygiene | S | Project | Root artifact clutter убран из активного root layout: icon scratch files и helper scripts перенесены в `archive/legacy-root-scratch/` с README. DMG/build logs уже расфасованы в release ledger. |
 | App | Open | P2 | Onboarding | L | Project | Уйти от зависимости на Homebrew `whisper-cli` или хотя бы сделать управляемый bundled runtime path. |
-| App | Open | P2 | Onboarding | M | Project | Уйти от зависимости на Homebrew `llama.cpp` runtime для второй нейросети или сделать управляемый bundled runtime path. |
+| App | Done | P2 | Onboarding | M | Project | Уйти от зависимости на Homebrew `llama.cpp` runtime для второй нейросети: `build.sh` bundles `llama-completion` + `.dylib` dependencies, `LlamaRuntimeLocator` предпочитает bundled runtime, artifact проверяется `scripts/check_bundled_llama_runtime.sh`. |
 | App | Open | P2 | UX | M | Project | После runtime smoke решить, нужен ли progress/cancel flow для долгого улучшения текста. |
 | App | Open | P2 | UX | M | Project | Решить, нужен ли chunking для улучшения длинных диктовок; текущая защита fallback-ит input > 6 000 символов к Whisper-тексту. |
 | App | Open | P2 | UX / Recovery | M | Project | Спроектировать полноценную desktop-историю диктовок по аналогии с iOS History: список последних текстов, copy/delete, локальное хранение, privacy/retention и UX для открытия истории из menu bar. |
@@ -34,6 +34,6 @@
 - Исторические TODO уровня `1.1` не удалены по смыслу: часть из них реализована, часть перенесена в таблицу выше.
 - Бесконечное ожидание `whisper-cli` закрыто в `release/1.5.0` через bounded 30-минутный timeout. Оставшийся долг — runtime evidence и UX для экстремально длинных диктовок.
 - Cleanup stale `/tmp/mac_dictate_dist.wav` и `.txt` закрыт в `release/1.5.0` через `RecordingService`.
-- Text improvement добавлен как optional enhancement: отсутствие Qwen/`llama.cpp` runtime не блокирует диктовку, длинный input > 6 000 символов fallback-ится к Whisper-тексту, preferred-моделью стала Qwen2.5-3B с fallback на 1.5B, а редакторское поведение управляется `TextImprovementProfile`; runtime distribution, long-text chunking, latency/RAM evidence и corpus-based quality tuning остаются отдельными debt items.
+- Text improvement добавлен как optional enhancement: отсутствие Qwen model или runtime failure не блокирует диктовку, длинный input > 6 000 символов fallback-ится к Whisper-тексту, preferred-моделью стала Qwen2.5-3B с fallback на 1.5B, а редакторское поведение управляется `TextImprovementProfile`. Runtime distribution для `llama.cpp` закрыт bundled path в `release/1.5.2`; long-text chunking, latency/RAM evidence и corpus-based quality tuning остаются отдельными debt items.
 - Debug session logging добавлен как локальный opt-in инструмент диагностики качества. Он сохраняет чувствительные аудио/текстовые artifacts только на устройстве; user-facing управление retention/cleanup остается отдельным debt item.
 - Каждый крупный спринт должен оставлять след здесь, если появились новые незавершенные риски или остаточные компромиссы.

@@ -116,3 +116,11 @@
 - **Почему:** реальные debug-сессии показали, что 1.5B часто слишком консервативна для смыслового форматирования диктовки: может не выделить абзацы/списки и не исправить очевидные ASR-искажения терминов. 7B дает больше качества, но пользовательский runtime-сбой после попытки тяжелой модели показал высокий риск для M1/16 GB. 3B — промежуточный вариант: больше capacity, чем 1.5B, но заметно меньше диск/RAM footprint, чем 7B.
 - **Runtime guardrails:** text improvement остается optional enhancement; отсутствие 3B не блокирует диктовку. Timeout увеличен до `10` минут, context до `8_192` tokens, input limit `6_000` символов сохранен.
 - **Источники:** `https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF`, `https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF`.
+
+## D-016 — Text-improvement runtime is bundled for user builds
+
+- **Дата:** 2026-05-10
+- **Решение:** начиная с рабочей линии `release/1.5.2`, пользовательский macOS artifact должен содержать `llama.cpp` runtime внутри `.app`: executable в `Contents/Resources/bin`, transitive `.dylib` dependencies в `Contents/Resources/lib`, install names переписаны на bundle-relative `@rpath`, nested Mach-O подписаны до подписи основного app bundle. Homebrew paths остаются только developer fallback, а не пользовательским требованием.
+- **Почему:** clean-install flow не должен требовать от обычного пользователя устанавливать Homebrew, `llama.cpp`, OpenSSL или понимать dynamic library paths. Модель Qwen может скачиваться лениво после включения `Улучшить текст`, но runtime, который запускает эту модель, обязан быть частью приложения.
+- **Проверка:** `build.sh` по умолчанию требует bundled runtime; `scripts/check_bundled_llama_runtime.sh` проверяет arm64, signatures, запуск без `dyld` errors и отсутствие `/opt/homebrew` / `/usr/local` ссылок; `scripts/check_distribution_signing.sh` включает эту проверку для distribution readiness.
+- **Ограничение:** `whisper-cli` пока остается внешней зависимостью и ведется отдельным debt item. Notarization для рабочих тестовых 1.5.2-сборок может быть отключена, но публичный release path должен проходить обычный Developer ID + notarization контур.

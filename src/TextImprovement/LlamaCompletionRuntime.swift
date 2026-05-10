@@ -26,21 +26,7 @@ final class LlamaCompletionRuntime {
     }
 
     static func findRuntimePath(in bundle: Bundle) -> String? {
-        var candidates: [String] = []
-        if let resourcePath = bundle.resourcePath {
-            candidates.append(resourcePath + "/bin/llama-completion")
-            candidates.append(resourcePath + "/bin/llama-cli")
-        }
-        candidates.append("/opt/homebrew/bin/llama-completion")
-        candidates.append("/opt/homebrew/bin/llama-cli")
-        candidates.append("/usr/local/bin/llama-completion")
-        candidates.append("/usr/local/bin/llama-cli")
-
-        for candidate in candidates where FileManager.default.isExecutableFile(atPath: candidate) {
-            return candidate
-        }
-
-        return nil
+        LlamaRuntimeLocator.findRuntimePath(in: bundle)
     }
 
     func run(
