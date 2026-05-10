@@ -77,3 +77,11 @@ scripts/test_text_improvement_runner.sh
 ```bash
 scripts/test_debug_session_logger.sh
 ```
+
+## `test_last_dictation_store.sh`
+
+Компилирует `LastDictationStore` и проверяет, что последняя диктовка сохраняется локально, пустой текст не затирает сохранённое значение, текст переживает пересоздание store и может быть очищен.
+
+```bash
+scripts/test_last_dictation_store.sh
+```

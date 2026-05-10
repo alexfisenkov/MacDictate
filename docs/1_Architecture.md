@@ -41,6 +41,7 @@
   - `ModelLocator.swift` — typed lookup: Whisper `.bin` отдельно, text-improvement `.gguf` отдельно.
   - `RecordingService.swift` — cleanup stale temp audio и запись WAV.
   - `WhisperRunner.swift` — запуск `whisper-cli`, timeout `30` минут, streaming drain `stderr`, controlled termination, cleanup temp files, различимые ошибки.
+  - `LastDictationStore.swift` — локальное сохранение последнего non-empty финального текста диктовки в `UserDefaults` до попытки paste, чтобы текст можно было восстановить через menu bar action.
 
 - `src/TextImprovement/*`
   - `TextImprovementSettings.swift` — persisted toggle `MacDictateTextImprovementEnabled`.
@@ -74,6 +75,7 @@
 - После Qwen применяется тот же `TextImprovementFormatter.normalize` как финальный guardrail: он не пересказывает текст, а только нормализует заранее известные терминологические варианты и очевидные ordered-list structures.
 - Для защиты от silent truncation Qwen-улучшение ограничено короткими/средними фрагментами: input больше `6_000` символов fallback-ится к исходному cleaned Whisper text.
 - Команда `Улучшить текст` в главном меню является toggle режима второй нейросети: когда галочка включена, cleaned Whisper text перед вставкой проходит через `TextImprovementRunner`; когда выключена, вставляется исходный cleaned Whisper text.
+- Финальный non-empty текст диктовки сохраняется в `LastDictationStore` перед попыткой `Cmd+V`; menu action `Скопировать последнюю диктовку` кладёт этот текст в системный буфер обмена, если активное окно/курсор изменились и автоматическая вставка не дошла до нужного места.
 - Debug session logging является только локальным opt-in диагностическим режимом (`MacDictateDebugSessionLoggingEnabled`). Он не должен менять результат диктовки и не должен отправлять аудио, текст, prompt или model output на сервер.
 
 ## Build note
@@ -88,3 +90,4 @@
 - `scripts/test_text_improvement_runner.sh` компилирует `TextImprovementRunner` с fake llama.cpp executable и проверяет profile prompt content, formatter guardrails, success cleanup, timeout recovery, missing runtime/model, safe input limit и non-zero stderr diagnostics.
 - `scripts/test_text_improvement_runner.sh` также проверяет regression из real debug-сессии: `ChaiJPT -> ChatGPT`, heading cue `И вот к чему пришли` и numbered list до отправки prompt в Qwen.
 - `scripts/test_debug_session_logger.sh` компилирует `DebugSessionLogger` и проверяет opt-in создание session folder, `metadata.json`, `events.jsonl`, `audio.wav`, staged text artifacts и disabled-mode no-op.
+- `scripts/test_last_dictation_store.sh` компилирует `LastDictationStore` и проверяет empty-input no-op, trim, persistence, replace и clear.

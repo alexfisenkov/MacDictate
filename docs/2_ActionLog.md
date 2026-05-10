@@ -7,6 +7,8 @@
 - Для рабочей линии `release/1.5.1` принят единый brand icon из пользовательских SVG `mic_logo.svg` и `mic_menubar.svg`.
 - macOS menu bar больше не использует emoji-микрофон: `NSStatusItem` переведен на template-иконку `mic_menubar`, а сборка копирует `mic_menubar.png` / `mic_menubar@2x.png` в app resources.
 - `AppIcon.icns`, landing/legal/payment pages и iOS AppIcon/recording controls синхронизированы на новый визуальный знак; публичный release не публиковался.
+- Добавлена safety-система последней диктовки: финальный текст сохраняется в `UserDefaults` до попытки вставки, а menu bar получил action `Скопировать последнюю диктовку`, чтобы пользователь мог восстановить текст при смене активного окна/курсора.
+- Добавлен targeted harness `scripts/test_last_dictation_store.sh`; полноценная desktop-история диктовок вынесена в backlog как отдельный UX item.
 
 ## 2026-05-09 — v1.5.0 release
 

@@ -43,6 +43,7 @@
 | Real Qwen editor profile smoke | Qwen + profile + formatter нормализуют `ChatGPT`, `Qwen`, `EBITDA`, `DaVinci Resolve` и оформляют `во-первых/во-вторых/в-третьих` как numbered list | Verified locally |
 | Real Qwen 3B correction smoke | локальная Qwen2.5-3B Q4_K_M выбирается runtime и улучшает короткий русский текст через `TextImprovementRunner` | Verified locally after 3B download |
 | Debug session logger opt-in | при включенном `MacDictateDebugSessionLoggingEnabled` создается локальная session folder с metadata, events, audio и staged text artifacts; при выключенном режиме logger no-op | Verified by `scripts/test_debug_session_logger.sh` |
+| Last dictation safety copy | финальный non-empty текст сохраняется до paste и может быть скопирован из menu bar через `Скопировать последнюю диктовку` | Store behavior verified by `scripts/test_last_dictation_store.sh`; menu action compile-level verified |
 | Transcription fail | user видит различимую диагностическую ошибку | Compile-level only |
 | Paste fail | отображается локально различимая ошибка вставки | Compile-level only |
 | Payment initiated via site/app path | `uid` / pricing path совпадают с current product contract | Backend/web smoke verified in Sprint 1 |

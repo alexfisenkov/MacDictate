@@ -9,6 +9,7 @@ final class AppController: NSObject {
     private let recordingService = RecordingService()
     private let pasteService = PasteService()
     private let debugSessionLogger = DebugSessionLogger()
+    private let lastDictationStore = LastDictationStore()
 
     private var statusItem: NSStatusItem!
     private var menuComponents: AppMenuComponents!
@@ -100,6 +101,7 @@ final class AppController: NSObject {
         refreshLicenseMenuItem()
         refreshPermissionMenuItems()
         refreshTextImprovementMenuItems()
+        refreshLastDictationMenuItem()
         refreshDiagnosticsMenuItem()
         refreshIdlePresentation()
     }
@@ -137,6 +139,18 @@ final class AppController: NSObject {
             ? "Переустановить модель улучшения текста"
             : "Скачать модель улучшения текста"
         menuComponents.improveTextItem.isEnabled = !isProcessing
+    }
+
+    private func refreshLastDictationMenuItem() {
+        if let entry = lastDictationStore.latest() {
+            menuComponents.copyLastDictationItem.title = "Скопировать последнюю диктовку"
+            menuComponents.copyLastDictationItem.toolTip = "Сохранено: \(StatusPresentation.shortDateTime(entry.createdAt)), \(entry.text.count) симв."
+            menuComponents.copyLastDictationItem.isEnabled = true
+        } else {
+            menuComponents.copyLastDictationItem.title = "Скопировать последнюю диктовку"
+            menuComponents.copyLastDictationItem.toolTip = "Последняя диктовка ещё не сохранена."
+            menuComponents.copyLastDictationItem.isEnabled = false
+        }
     }
 
     private func refreshDiagnosticsMenuItem() {
@@ -367,6 +381,10 @@ final class AppController: NSObject {
                         debugSession?.finish(finalText: "", warning: result.warning)
                         self.recordDiagnostic(nil)
                     } else {
+                        self.lastDictationStore.save(result.text)
+                        self.refreshLastDictationMenuItem()
+                        debugSession?.record("last_dictation_saved", details: ["characters": String(result.text.count)])
+
                         switch self.pasteService.paste(result.text) {
                         case .success:
                             debugSession?.record("paste_succeeded")
@@ -516,6 +534,26 @@ final class AppController: NSObject {
 
     @objc func downloadTextImprovementModel() {
         showTextImprovementModelDownloader(enableAfterDownload: false)
+    }
+
+    @objc func copyLastDictationToClipboard() {
+        guard let entry = lastDictationStore.latest() else {
+            recordDiagnostic("Нет сохранённой последней диктовки.", severity: .warning)
+            refreshLastDictationMenuItem()
+            return
+        }
+
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        guard pasteboard.setString(entry.text, forType: .string) else {
+            recordDiagnostic("Не удалось скопировать последнюю диктовку в буфер обмена.", severity: .error)
+            refreshLastDictationMenuItem()
+            return
+        }
+
+        NSSound(named: "Tink")?.play()
+        recordDiagnostic("Последняя диктовка скопирована в буфер обмена.", severity: .ok)
+        refreshLastDictationMenuItem()
     }
 
     private func ensureTextImprovementReadyForInteractive(enableAfterDownload: Bool) -> Bool {

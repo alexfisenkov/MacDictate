@@ -7,6 +7,7 @@ struct AppMenuComponents {
     let licenseItem: NSMenuItem
     let diagnosticsItem: NSMenuItem
     let improveTextItem: NSMenuItem
+    let copyLastDictationItem: NSMenuItem
     let accessibilityStateItem: NSMenuItem
     let microphoneStateItem: NSMenuItem
     let textImprovementStateItem: NSMenuItem
@@ -36,6 +37,11 @@ enum MenuBuilder {
         let improveTextItem = NSMenuItem(title: "✨ Улучшить текст", action: #selector(AppController.toggleTextImprovement), keyEquivalent: "")
         improveTextItem.target = controller
         menu.addItem(improveTextItem)
+
+        let copyLastDictationItem = NSMenuItem(title: "Скопировать последнюю диктовку", action: #selector(AppController.copyLastDictationToClipboard), keyEquivalent: "")
+        copyLastDictationItem.target = controller
+        copyLastDictationItem.isEnabled = false
+        menu.addItem(copyLastDictationItem)
         menu.addItem(NSMenuItem.separator())
 
         let settingsMenuItem = NSMenuItem(title: "⚙️ Настройки", action: nil, keyEquivalent: "")
@@ -104,6 +110,7 @@ enum MenuBuilder {
             licenseItem: licenseItem,
             diagnosticsItem: diagnosticsItem,
             improveTextItem: improveTextItem,
+            copyLastDictationItem: copyLastDictationItem,
             accessibilityStateItem: accessibilityStateItem,
             microphoneStateItem: microphoneStateItem,
             textImprovementStateItem: textImprovementStateItem,

@@ -20,6 +20,7 @@
 | App | Open | P2 | Onboarding | M | Project | Уйти от зависимости на Homebrew `llama.cpp` runtime для второй нейросети или сделать управляемый bundled runtime path. |
 | App | Open | P2 | UX | M | Project | После runtime smoke решить, нужен ли progress/cancel flow для долгого улучшения текста. |
 | App | Open | P2 | UX | M | Project | Решить, нужен ли chunking для улучшения длинных диктовок; текущая защита fallback-ит input > 6 000 символов к Whisper-тексту. |
+| App | Open | P2 | UX / Recovery | M | Project | Спроектировать полноценную desktop-историю диктовок по аналогии с iOS History: список последних текстов, copy/delete, локальное хранение, privacy/retention и UX для открытия истории из menu bar. |
 | App/AI | Open | P2 | Quality | M | Project | Накопить реальный корпус пар `raw Whisper text -> desired edited text` и на его базе решить, достаточно ли prompt/profile или нужен LoRA/fine-tune. |
 | App/AI | Open | P2 | Quality / Legal | S | Project | Провести license review HuggingFace copywriting datasets перед любым training/eval использованием; `jaykin01/advertisement-copy` сейчас имеет unknown license на HF card. |
 | App | Open | P2 | Runtime | S | Project | Собрать runtime evidence по экстремально длинным диктовкам и решить, нужен ли user-facing progress/cancel flow. |
