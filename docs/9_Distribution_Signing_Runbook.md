@@ -120,6 +120,14 @@ MACDICTATE_NOTARIZE=true \
 - `xcrun stapler validate`;
 - `spctl` проверку primary signature DMG.
 
+Developer ID build автоматически использует `assets/MacDictate.entitlements`. Для MacDictate этот файл обязан содержать:
+
+```text
+com.apple.security.device.audio-input = true
+```
+
+Это не заменяет `NSMicrophoneUsageDescription` в `Info.plist`: description нужен для текста системного запроса, entitlement нужен для hardened runtime доступа к микрофону. Если entitlement пропустить, macOS может не показать приложение в `System Settings -> Privacy & Security -> Microphone`.
+
 ## Release validation
 
 Минимальная проверка перед публикацией:
@@ -133,6 +141,7 @@ xattr -c "$tmp_app_dir/MacDictate.app" >/dev/null 2>&1 || true
 xattr -d com.apple.FinderInfo "$tmp_app_dir/MacDictate.app" >/dev/null 2>&1 || true
 codesign --verify --deep --strict --verbose=2 "$tmp_app_dir/MacDictate.app"
 codesign -dv --verbose=4 build/MacDictate.app
+codesign -d --entitlements :- build/MacDictate.app | grep com.apple.security.device.audio-input
 hdiutil verify build/artifacts/MacDictate_Final_v1.5.1.dmg
 xcrun stapler validate build/artifacts/MacDictate_Final_v1.5.1.dmg
 spctl -a -vv -t open --context context:primary-signature build/artifacts/MacDictate_Final_v1.5.1.dmg
@@ -144,6 +153,7 @@ rm -rf "$tmp_app_dir"
 ```bash
 codesign --verify --deep --strict --verbose=2 /Applications/MacDictate.app
 codesign -dv --verbose=4 /Applications/MacDictate.app
+codesign -d --entitlements :- /Applications/MacDictate.app | grep com.apple.security.device.audio-input
 spctl -a -vv --type execute /Applications/MacDictate.app
 ```
 

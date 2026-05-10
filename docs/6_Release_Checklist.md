@@ -23,6 +23,7 @@
 
 - [ ] `scripts/check_distribution_signing.sh` проходит для release-machine.
 - [ ] В Keychain доступен `Developer ID Application` certificate; `Apple Development` не используется для публичного DMG.
+- [ ] Developer ID `.app` подписан с `assets/MacDictate.entitlements`, включая `com.apple.security.device.audio-input`.
 - [ ] Настроен и проверен `MACDICTATE_NOTARY_PROFILE`, если это публичный release.
 - [ ] `swiftc`/typecheck проходит по всем `.swift` файлам.
 - [ ] `scripts/test_whisper_runner_timeout.sh` проходит.

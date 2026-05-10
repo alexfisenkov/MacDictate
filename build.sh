@@ -18,11 +18,16 @@ SIGN_MODE="ad-hoc"
 if [ "$SIGN_IDENTITY" != "-" ]; then
     SIGN_MODE="developer-id"
 fi
+DEFAULT_ENTITLEMENTS="$PROJECT_DIR/assets/MacDictate.entitlements"
 SIGN_ENTITLEMENTS="${MACDICTATE_CODESIGN_ENTITLEMENTS:-}"
 NOTARY_PROFILE="${MACDICTATE_NOTARY_PROFILE:-}"
 NOTARIZE_MODE="${MACDICTATE_NOTARIZE:-auto}"
 
 if [ "$SIGN_MODE" = "developer-id" ]; then
+    if [ -z "$SIGN_ENTITLEMENTS" ] && [ -f "$DEFAULT_ENTITLEMENTS" ]; then
+        SIGN_ENTITLEMENTS="$DEFAULT_ENTITLEMENTS"
+    fi
+
     if ! security find-identity -v -p codesigning | grep -Fq "$SIGN_IDENTITY"; then
         echo "❌ Signing identity not found in Keychain: $SIGN_IDENTITY" >&2
         echo "   Install a Developer ID Application certificate or set MACDICTATE_SIGN_IDENTITY correctly." >&2
