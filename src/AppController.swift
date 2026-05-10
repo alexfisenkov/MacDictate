@@ -263,10 +263,13 @@ final class AppController: NSObject {
             case .accessibilityMissing:
                 primaryButton = "Открыть настройки"
                 primaryAction = { [weak self] in self?.openAccessibilitySettings() }
+            case .microphonePending:
+                primaryButton = "Разрешить микрофон"
+                primaryAction = { [weak self] in self?.requestMicrophonePermission() }
             case .microphoneDenied:
                 primaryButton = "Открыть микрофон"
                 primaryAction = { [weak self] in self?.openMicrophoneSettings() }
-            case .microphonePending, .modelMissing, .whisperMissing:
+            case .modelMissing, .whisperMissing:
                 primaryButton = nil
                 primaryAction = nil
             }
@@ -490,17 +493,7 @@ final class AppController: NSObject {
     private func checkPermissions() {
         let microphoneState = diagnostics.currentMicrophonePermissionState()
         if microphoneState == .notDetermined {
-            diagnostics.requestMicrophoneAccess { [weak self] granted in
-                DispatchQueue.main.async {
-                    if granted {
-                        self?.recordDiagnostic(nil)
-                    } else {
-                        self?.recordDiagnostic("Доступ к микрофону отклонён.", severity: .warning)
-                    }
-                    self?.refreshPermissionMenuItems()
-                    self?.refreshIdlePresentation()
-                }
-            }
+            requestMicrophonePermission()
         } else if microphoneState == .denied {
             recordDiagnostic("Доступ к микрофону не выдан.", severity: .warning)
         }
@@ -511,6 +504,20 @@ final class AppController: NSObject {
 
         refreshPermissionMenuItems()
         refreshIdlePresentation()
+    }
+
+    private func requestMicrophonePermission() {
+        diagnostics.requestMicrophoneAccess { [weak self] granted in
+            DispatchQueue.main.async {
+                if granted {
+                    self?.recordDiagnostic(nil)
+                } else {
+                    self?.recordDiagnostic("Доступ к микрофону отклонён.", severity: .warning)
+                    self?.openMicrophoneSettings()
+                }
+                self?.refreshPresentation()
+            }
+        }
     }
 
     @objc func openLicensePage() {
@@ -699,7 +706,7 @@ final class AppController: NSObject {
         NSApp.activate(ignoringOtherApps: true)
 
         if !AXIsProcessTrusted() {
-            startPermissionPolling()
+            startPermissionPolling(watchAccessibility: true, watchMicrophone: false)
         }
 
         alert.runModal()
@@ -708,6 +715,7 @@ final class AppController: NSObject {
     @objc func openMicrophoneSettings() {
         let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!
         NSWorkspace.shared.open(url)
+        startPermissionPolling(watchAccessibility: false, watchMicrophone: true)
     }
 
     private func promptAccessibility() {
@@ -721,20 +729,37 @@ final class AppController: NSObject {
         if alert.runModal() == .alertFirstButtonReturn {
             let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
             NSWorkspace.shared.open(url)
-            startPermissionPolling()
+            startPermissionPolling(watchAccessibility: true, watchMicrophone: false)
         }
     }
 
-    private func startPermissionPolling() {
+    private func startPermissionPolling(watchAccessibility: Bool, watchMicrophone: Bool) {
         permissionTimer?.invalidate()
         permissionTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
             guard let self else { return }
-            self.refreshPermissionMenuItems()
-            if AXIsProcessTrusted() {
+
+            let microphoneState = self.diagnostics.currentMicrophonePermissionState()
+            self.refreshPresentation()
+
+            let accessibilityResolved = !watchAccessibility || AXIsProcessTrusted()
+            let microphoneResolved = !watchMicrophone || microphoneState != .notDetermined
+
+            guard accessibilityResolved && microphoneResolved else { return }
+
+            if watchMicrophone, microphoneState == .denied {
+                self.recordDiagnostic("Доступ к микрофону не выдан.", severity: .warning)
+            } else if watchMicrophone, microphoneState == .authorized {
+                self.recordDiagnostic(nil)
+            }
+
+            if watchAccessibility, AXIsProcessTrusted() {
                 timer.invalidate()
                 self.recordDiagnostic(nil)
                 self.promptRestart()
+                return
             }
+
+            timer.invalidate()
         }
     }
 

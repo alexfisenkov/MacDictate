@@ -14,6 +14,7 @@
 - Создан и импортирован `Developer ID Application: Aleksander Fisenkov (5BABN9U6WS)` certificate; первая Developer ID signed DMG-сборка `MacDictate_Final_v1.5.1.dmg` прошла без notarization.
 - После первой notarization проверки добавлены обязательные bundle metadata `CFBundleExecutable=MacDictate` и `CFBundlePackageType=APPL`, чтобы Gatekeeper/spctl классифицировал signed bundle как приложение.
 - Настроен `macdictate-notary` keychain profile; финальная Developer ID signed DMG-сборка прошла Apple notarization (`Accepted`), `stapler validate`, `spctl` для DMG и `spctl --type execute` для `.app`, скопированной из DMG.
+- По инциденту после перехода на Developer ID подтверждено, что macOS TCC может удерживать старое/битое Microphone-состояние. Старый `Microphone` approval reset-нут через `tccutil`, а app-side permission flow усилен: `notDetermined` теперь можно повторно запросить из blocked-alert, а `Открыть настройки микрофона` запускает polling и обновляет menu/status после изменения разрешения.
 
 ## 2026-05-09 — v1.5.0 release
 
