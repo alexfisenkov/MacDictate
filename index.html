@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacDictate — Бесплатная диктовка для macOS</title>
+    <link rel="icon" href="./assets/mic_logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./assets/mic_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        if (window.tailwind) window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#007AFF', // Apple Blue
+                        brandDark: '#0A0A0A',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-brandDark text-white selection:bg-brand selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <img src="./assets/mic_logo.svg" width="32" height="32" alt="" class="h-8 w-8 rounded-lg">
+                    <span class="font-bold text-xl tracking-tight">MacDictate</span>
+                </div>
+                <div class="flex gap-4 items-center">
+                    <a href="#features" class="hidden sm:inline text-sm text-gray-300 hover:text-white transition" data-i18n="nav_features">Функции</a>
+                    <a href="#download" class="inline-flex items-center min-h-[44px] text-base text-gray-300 hover:text-white transition" data-i18n="nav_download_info">Установка</a>
+                    <button id="langToggle" class="text-sm bg-white/10 hover:bg-white/20 px-3 py-2.5 min-h-[44px] min-w-[44px] rounded-full transition">EN</button>
+                    <a href="https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg" class="hidden sm:inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg text-white bg-brand hover:bg-blue-600 transition" data-i18n="nav_download">Скачать</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 text-center">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500" data-i18n="hero_title_gradient">Бесплатная</span>
+                <span data-i18n="hero_title">диктовка для macOS</span>
+            </h1>
+            <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto" data-i18n="hero_subtitle">
+                Распознавайте речь на своём Mac и вставляйте текст в активное окно. После загрузки модели диктовка работает без интернета.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition shadow-[0_0_20px_rgba(0,122,255,0.4)] hover:shadow-[0_0_30px_rgba(0,122,255,0.6)] transform hover:-translate-y-1">
+                    <span class="mr-2" data-i18n="btn_download">Скачать для macOS</span>
+                    <span class="text-sm font-normal opacity-80">( Silicon)</span>
+                </a>
+                <a href="#download" class="inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-2xl text-white bg-white/10 hover:bg-white/20 transition">
+                    <span data-i18n="btn_install">Как установить</span>
+                </a>
+            </div>
+            <p class="mt-6 text-base text-gray-300" data-i18n="hero_free">Бесплатно без ограничения срока. Без регистрации и активации.</p>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-20 bg-black/50">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16" data-i18n="feat_title">Идеально для работы</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="glass p-8 rounded-3xl">
+                    <div class="text-4xl mb-4">⚡️</div>
+                    <h3 class="text-xl font-bold mb-3" data-i18n="feat_1_title">Локальное распознавание</h3>
+                    <p class="text-gray-400 leading-relaxed" data-i18n="feat_1_desc">Whisper обрабатывает речь на вашем Mac. Для диктовки не нужен удалённый сервис распознавания.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="glass p-8 rounded-3xl">
+                    <div class="text-4xl mb-4">🔒</div>
+                    <h3 class="text-xl font-bold mb-3" data-i18n="feat_2_title">Приватность диктовки</h3>
+                    <p class="text-gray-400 leading-relaxed" data-i18n="feat_2_desc">Распознавание и улучшение текста выполняются локально. Аудио и текст диктовки не отправляются на сервер.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="glass p-8 rounded-3xl">
+                    <div class="text-4xl mb-4">⌨️</div>
+                    <h3 class="text-xl font-bold mb-3" data-i18n="feat_3_title">Текст в активном окне</h3>
+                    <p class="text-gray-400 leading-relaxed" data-i18n="feat_3_desc">Пишите в редакторе, мессенджере или таблице. MacDictate вставляет распознанный текст туда, где установлен курсор.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download and setup -->
+    <section id="download" class="py-24">
+        <div class="max-w-3xl mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6" data-i18n="download_title">Скачайте и начните диктовать</h2>
+            <p class="text-lg text-gray-400 leading-relaxed mb-8" data-i18n="download_steps">Установите MacDictate на Mac с Apple Silicon. При первом запуске загрузите модель Whisper и разрешите доступ к микрофону и «Универсальному доступу». Дважды нажмите Option для начала записи и один раз — для завершения.</p>
+            <a href="https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition" data-i18n="btn_download">Скачать для macOS</a>
+            <p class="mt-6 text-sm text-gray-400"><span data-i18n="download_help">Нужна помощь?</span> <a href="mailto:a.fisenkov@gmail.com" class="text-blue-400 hover:text-blue-300 underline">a.fisenkov@gmail.com</a></p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-12 mt-10">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-gray-500 text-sm">
+                &copy; <span id="year"></span> ИП Фисенков Александр Андреевич. ИНН: 772607547835
+            </div>
+            <div class="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
+                <a href="./legal.html#privacy" class="inline-flex items-center min-h-[44px] text-gray-300 hover:text-white transition" data-i18n="foot_privacy">Политика конфиденциальности</a>
+                <a href="./legal.html#eula" class="inline-flex items-center min-h-[44px] text-gray-300 hover:text-white transition" data-i18n="foot_terms">Условия использования</a>
+                <a href="./legal.html#consent" class="inline-flex items-center min-h-[44px] text-gray-300 hover:text-white transition" data-i18n="foot_consent">Обработка данных</a>
+                <a href="mailto:a.fisenkov@gmail.com" class="inline-flex items-center min-h-[44px] text-gray-300 hover:text-white transition" data-i18n="foot_contact">Контакты</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const translations = {
+            ru: {
+                nav_features: "Функции", nav_download_info: "Установка", nav_download: "Скачать",
+                hero_title_gradient: "Бесплатная", hero_title: "диктовка для macOS",
+                hero_subtitle: "Распознавайте речь на своём Mac и вставляйте текст в активное окно. После загрузки модели диктовка работает без интернета.",
+                btn_download: "Скачать для macOS", btn_install: "Как установить", hero_free: "Бесплатно без ограничения срока. Без регистрации и активации.",
+                feat_title: "Идеально для работы",
+                feat_1_title: "Локальное распознавание", feat_1_desc: "Whisper обрабатывает речь на вашем Mac. Для диктовки не нужен удалённый сервис распознавания.",
+                feat_2_title: "Приватность диктовки", feat_2_desc: "Распознавание и улучшение текста выполняются локально. Аудио и текст диктовки не отправляются на сервер.",
+                feat_3_title: "Текст в активном окне", feat_3_desc: "Пишите в редакторе, мессенджере или таблице. MacDictate вставляет распознанный текст туда, где установлен курсор.",
+                download_title: "Скачайте и начните диктовать",
+                download_steps: "Установите MacDictate на Mac с Apple Silicon. При первом запуске загрузите модель Whisper и разрешите доступ к микрофону и «Универсальному доступу». Дважды нажмите Option для начала записи и один раз — для завершения.",
+                download_help: "Нужна помощь?",
+                foot_privacy: "Политика конфиденциальности", foot_terms: "Условия использования", foot_consent: "Обработка данных", foot_contact: "Контакты"
+            },
+            en: {
+                nav_features: "Features", nav_download_info: "Setup", nav_download: "Download",
+                hero_title_gradient: "Free", hero_title: "dictation for macOS",
+                hero_subtitle: "Recognize speech on your Mac and insert text into the active window. Once the model is downloaded, dictation works offline.",
+                btn_download: "Download for macOS", btn_install: "How to install", hero_free: "Free with no time limit. No registration or activation.",
+                feat_title: "Built for everyday work",
+                feat_1_title: "Local recognition", feat_1_desc: "Whisper processes speech on your Mac. Dictation does not need a remote speech recognition service.",
+                feat_2_title: "Private dictation", feat_2_desc: "Speech recognition and text improvement run locally. Dictation audio and text are not sent to a server.",
+                feat_3_title: "Text in the active window", feat_3_desc: "Write in an editor, messenger, or spreadsheet. MacDictate inserts recognized text where your cursor is.",
+                download_title: "Download and start dictating",
+                download_steps: "Install MacDictate on a Mac with Apple Silicon. On first launch, download the Whisper model and allow Microphone and Accessibility access. Press Option twice to start recording and once to finish.",
+                download_help: "Need help?",
+                foot_privacy: "Privacy Policy", foot_terms: "Terms of Use", foot_consent: "Data Processing", foot_contact: "Contact"
+            }
+        };
+
+        const requestedLang = new URLSearchParams(window.location.search).get('lang');
+        let currentLang = ['ru', 'en'].includes(requestedLang) ? requestedLang : ((navigator.language || '').toLowerCase().includes('ru') ? 'ru' : 'en');
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-i18n]').forEach((element) => {
+                const text = translations[lang][element.dataset.i18n];
+                if (text) element.textContent = text;
+            });
+            document.querySelectorAll('[data-i18n="foot_privacy"], [data-i18n="foot_terms"], [data-i18n="foot_consent"]').forEach((link) => {
+                const url = new URL(link.href);
+                url.searchParams.set('lang', lang);
+                link.href = './legal.html' + url.search + url.hash;
+            });
+            document.getElementById('langToggle').textContent = lang === 'ru' ? 'EN' : 'RU';
+            document.title = lang === 'ru' ? 'MacDictate — Бесплатная диктовка для macOS' : 'MacDictate — Free dictation for macOS';
+        }
+
+        setLanguage(currentLang);
+        document.getElementById('langToggle').addEventListener('click', () => {
+            setLanguage(currentLang === 'ru' ? 'en' : 'ru');
+        });
+    </script>
+</body>
+</html>
