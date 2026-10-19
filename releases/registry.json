@@ -486,7 +486,9 @@
         "websiteMirrorRequired": false,
         "latestAssetName": "MacDictate_Latest.dmg",
         "latestSha256": "d2c582541991b83973362cd8e926c651f85b595252b74825cbb2e05f13c3fe18",
-        "websiteURL": "https://alexfisenkov.github.io/MacDictate/"
+        "websiteURL": "https://alexfisenkov.github.io/MacDictate/",
+        "pagesCommit": "b48db9f99e80d16f7b4c1e24d6fe47456b0e67b9",
+        "pagesDeploymentRun": "https://github.com/alexfisenkov/MacDictate/actions/runs/39263614091"
       },
       "notarization": {
         "status": "Accepted",
@@ -496,7 +498,11 @@
       "verification": {
         "sourceSHA": "e80a4a094affb65457c4f3f77e090b84d6aef210",
         "ciRunURL": "https://github.com/alexfisenkov/MacDictate/actions/runs/39259656403",
-        "publicReleaseDigestReadback": "9/9 PASS"
+        "publicReleaseDigestReadback": "9/9 PASS",
+        "publicAliasDownloads": "3/3 unauthenticated complete SHA256/size PASS",
+        "pagesReadback": "16/16 HTTP files exact PASS",
+        "installedMacOS": "1.6.0 build14; public DMG; signature/Gatekeeper/designated requirement/process/binary PASS",
+        "physicalMicHotkeyEditor": "NOT_RUN"
       },
       "windows": {
         "platform": "win-x64",

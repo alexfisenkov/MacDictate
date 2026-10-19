@@ -100,5 +100,5 @@
 - [x] macOS bundle1.6.0/build14 DeveloperID+AppleAccepted/stapled/Gatekeeper/mounted-install PASS.
 - [x] Versioned/alias DMG, WindowsEXE/ZIP, manifests/checksums uploaded in draft; all9public digest/size readbacks PASS.
 - [x] Annotated tagv1.6.0 at checked build source, published latest complete release.
-- [ ] GitHub Pages final deploy/readback — append actual evidence after execution.
+- [x] GitHub Pages b48db9f/run39263614091 success,16HTTPfiles exactbytePASS; all3public platformalias download hashes PASS; installedMac1.6.0build14 signature/Gatekeeper/process/binary/DR PASS.
 - Physical Windows10/11 mic/Alt/editor and macOS mic/Option/editor remain NOT_RUN.

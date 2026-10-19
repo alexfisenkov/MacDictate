@@ -208,3 +208,4 @@
 - macOS: dynamic1.6.0filename/volume corrected, DeveloperID build14, AppleAccepted/stapled/Gatekeeper/mountedinstall PASS. No Apple rejection occurred; prior submit stopped locally on obsolete filename.
 - Published complete9asset draft as latestv1.6.0 at2026-10-19T13:39:24Z; public API digest/size readback9/9PASS. No partial latest release exposed.
 - Public Pages/readback and local install evidence appended after completion.
+- Final post-publication evidence: all3platformaliases fully downloaded WITHOUTauthentication and matched expectedSHA/size. Pagesonepushb48db9f, automaticrun39263614091success;16HTTPSfiles exactbytePASS including both manifests. InstalledpublicMac1.6.0/build14 after idlecheck; strictsignature/Gatekeeper, unchangedDR, exactmountedbinary/currentPID PASS; priorfree13 preserved privately. No models/preferences/iOSwrapper change. Physicalmic/hotkey/editor remainsNOT_RUN.

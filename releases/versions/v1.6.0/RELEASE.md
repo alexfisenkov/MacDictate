@@ -30,3 +30,7 @@ Physical microphone, physical Alt and third-party editor path on Windows10/11: N
 ## Rollback
 
 Prior v1.5.2 release and local free app backup preserved. No user models, old license data or historical payment records were changed. Legacy server remains off and was not accessed or deployed.
+
+## Final public / installed read-back
+
+All3platformaliases fully downloaded without authentication and exactSHA/size matched. Pagescommitb48db9f/run39263614091success,16HTTPfiles exactbytePASS. PublicDMG installed on thisMac as1.6.0/build14; strictsignature, Gatekeeper, sameDR, currentprocess and executablehash equal mountedpublicapp PASS. Priorfree13backup retained privately; models/preferences/iOSwrapper untouched. Physicalmic/hotkey/editor remainsNOT_RUN.
