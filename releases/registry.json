@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "product": "MacDictate macOS desktop",
+  "product": "MacDictate desktop (macOS and Windows)",
   "registryUpdatedAt": "2026-10-19",
   "governanceDocument": "docs/7_Release_Governance.md",
   "current": {
     "publicStable": "v1.5.2",
-    "workingLine": "v1.5.2-working",
-    "developmentBranch": "main",
-    "bundleShortVersion": "1.5.2",
-    "bundleVersion": "13",
+    "workingLine": "v1.6.0-working",
+    "developmentBranch": "release/1.6.0",
+    "bundleShortVersion": "1.6.0",
+    "bundleVersion": "14",
     "distributionChannel": "github-releases"
   },
   "versions": [
@@ -421,6 +421,64 @@
         "submissionId": "7eb345bb-f692-49c9-8f5e-23c1e0ad6aea",
         "stapled": true
       }
+    },
+    {
+      "version": "v1.6.0-working",
+      "status": "working_line",
+      "channel": "development",
+      "bundle": {
+        "shortVersion": "1.6.0",
+        "build": "14"
+      },
+      "git": {
+        "commit": null,
+        "localTag": null,
+        "remoteTags": [],
+        "tagRequiredLocally": false
+      },
+      "github": {
+        "releaseUrl": null,
+        "assetName": null,
+        "githubAssetSha256": null,
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.6.0-working",
+        "artifactPath": null,
+        "localArtifactSha256": null,
+        "buildLogPath": null
+      },
+      "summary": "Windows x64 local dictation, double Alt; coordinated GitHub checks and desktop1.6.0 preparation.",
+      "sourceConfidence": "in_development"
+    },
+    {
+      "version": "v1.6.0",
+      "status": "local_only",
+      "channel": "candidate",
+      "bundle": {
+        "shortVersion": "1.6.0",
+        "build": "14"
+      },
+      "git": {
+        "commit": null,
+        "localTag": null,
+        "remoteTags": [],
+        "tagRequiredLocally": false
+      },
+      "github": {
+        "releaseUrl": null,
+        "assetName": null,
+        "githubAssetSha256": null,
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.6.0",
+        "artifactPath": null,
+        "localArtifactSha256": null,
+        "buildLogPath": null
+      },
+      "summary": "Windows x64 local dictation, double Alt; coordinated GitHub checks and desktop1.6.0 preparation.",
+      "sourceConfidence": "in_development"
     }
   ],
   "checkpoints": [

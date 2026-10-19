@@ -42,6 +42,12 @@
 
 | App/Models | Open | P1 | Recovery | S | Project | Existing ModelDownloader removes a prior model before moving its replacement. Preserve/stage the new file before atomic replacement to avoid a re-download if move fails. This predates free rollout; no user models were replaced in this task. |
 
+| Windows/QA | Open | P1 | Acceptance | M | Project | Physical Windows10/11 mic → double/single Alt → active-editor paste and denied-mic test. Hosted Windows Server2025 native/synthetic checks cannot substitute for client OS acceptance. |
+| Windows/Distribution | Open | P1 | Trust | M | Project | Obtain Authenticode publisher certificate and establish signed Windows release path. Current unsigned EXE/ZIP must disclose SmartScreen/Smart App Control limitations; never instruct blanket protection disablement. |
+| Windows/Compatibility | Open | P2 | OS lifecycle | M | Project | Measure Windows10 target compatibility on a maintained LTSC/Enterprise installation. Ordinary Home/Pro is outside the current .NET10 support matrix. ARM-native Windows and optional LLM correction are not part of first x64 dictation release. |
+
+| Windows/Recovery | Open | P2 | UX | M | Project | Isolate UI Automation provider for restartable recovery; a hung provider currently requires app restart and safely falls back to manual copy. Add explicit corrupted-model backup/repair UI; current different-hash file is preserved and manual move/reselect is explained. |
+
 ## Notes
 
 - Исторические TODO уровня `1.1` не удалены по смыслу: часть из них реализована, часть перенесена в таблицу выше.

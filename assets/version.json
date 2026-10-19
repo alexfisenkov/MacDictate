@@ -1,5 +1,5 @@
 {
-  "version": "1.5.2",
+  "version": "1.6.0",
   "download_url": "https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg",
-  "release_notes": "Бесплатная локальная диктовка без активации и серверной проверки лицензии; обновления напрямую через GitHub."
+  "release_notes": "Бесплатная диктовка для macOS и Windows x64; Windows: двойной левый Alt, локальный Whisper, EXE и ZIP."
 }

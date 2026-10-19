@@ -45,7 +45,7 @@ done < <(find "$ROOT_DIR/src" -name "*.swift" -print0)
 
 while IFS= read -r path; do
   case "$path" in
-    .github/*|archive/*|assets/*|backend/*|docs/*|releases/*|scripts/*|src/*|web-landing/*)
+    .github/*|archive/*|assets/*|backend/*|docs/*|releases/*|scripts/*|src/*|web-landing/*|windows/*)
       ;;
     .gitignore|AGENTS.md|CHANGELOG.md|CLAUDE.md|README.md|build.sh)
       ;;

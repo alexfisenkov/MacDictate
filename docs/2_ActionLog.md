@@ -187,3 +187,10 @@
 - Проект был переведен с Python/Rumps на native Swift/AppKit.
 - Для стабильного runtime был принят внешний `whisper-cli` вместо хрупкого bundle с dylib.
 - `ModelDownloader` и permission auto-restart стали частью первого рабочего app-layer.
+
+## 2026-10-19 — Windows desktop 1.6.0 preparation
+
+- Owner requested Windows support, GitHub checks and a new release; chose double Alt.
+- Baseline release governance PASS, clean main72cd20d; implementation branch release/1.6.0.
+- Added Windows scope and plan, isolated portable policy/native/UI services, pinned runtime/model distribution and final manual CI design. Public stable remains v1.5.2 until verified release publication.
+- CI/build/runtime/publication evidence will be appended after execution; no production completion is claimed here.

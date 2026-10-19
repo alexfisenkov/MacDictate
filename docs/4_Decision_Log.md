@@ -154,3 +154,19 @@
 - **Решение:** public release assets и stable download alias размещаются на GitHub Releases; app проверяет updates непосредственно через GitHub API. Отключённый website/API не является зависимостью бесплатного app. D-019 website mirror применяется только к прежнему серверному каналу; для GitHub-канала проверяется publicUrl из version manifest и asset digest.
 - **Страница продукта:** статический сайт без checkout опубликован на https://alexfisenkov.github.io/MacDictate/; HTTPS read-back 14 файлов подтвердил snapshot. DNS и прежний backend не менялись. Старые приложения получают бесплатный runtime только после установки новой версии; их прежний badge/offline cache серверным ответом удалить нельзя.
 - **Данные:** прежний сервер не включается и неизвестный новый SSH-ключ не принимается. Старые платежные записи/секреты не переносятся; backend free policy хранится в исходниках для возможного последующего восстановления совместимости.
+
+## D-023 — Windows desktop in the existing desktop repository
+
+- **Дата:** 2026-10-19.
+- **Решение:** Add `windows/` to the existing desktop Git repo. The physical repository root remains `macos/`; Swift stays in `src/`, Windows policy/runtime in `windows/src/`. Avoid renaming mature sources or creating another public repo. .NET10 WinForms + Win32 wrappers; self-contained x64 distribution with pinned CPU whisper.cpp and explicitly downloaded multilingual Whisper small. No licensing and no default Qwen correction on Windows.
+- **Почему:** The user requested Windows support and selected double Alt. Native UI and separated policy/native services preserve architecture and can be checked on a Windows runner.
+- **Ограничение:** Windows10/11 are compatibility targets; hosted `windows-2025` is Server2025, not client-OS physical acceptance. Windows10 Home/Pro is outside .NET10's official OS lifecycle support. No Authenticode certificate is available, so current Windows packages are unsigned. Microphone/hotkey/real editor acceptance remains explicit.
+
+## D-024 — Final coordinated GitHub desktop verification
+
+- **Дата:** 2026-10-19.
+- **Решение:** The owner explicitly requested GitHub checks for desktop1.6.0. Use one manual `.github/workflows/desktop-release.yml` run after local source/tests/review, on exact main SHA. No push/PR triggers; final Windows release artifacts come from that run. macOS signed/notarized distribution is built locally from the same checked SHA; keep private signing material off hosted runners.
+- **Почему:** Adds native Windows build/integration evidence while preserving the owner’s one-final-CI policy and Apple signing boundary.
+- **Ограничение:** A failed check blocks publication. A targeted rerun requires a recorded concrete failure/fix. Pages branch push is a separate automatic deployment and occurs only after complete staging QA.
+
+- D-023 implementation refinement: the native CLI embeds UTF-8 process-codepage manifest, verified by mt.exe read-back. Minimum installer Windows10 build19041 (2004+) to support Unicode profile/model/WAV/temp paths; ASR CI explicitly exercises Cyrillic, spaces and emoji for all inputs and temporary output.

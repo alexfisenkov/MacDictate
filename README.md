@@ -1,18 +1,19 @@
 # MacDictate
 
-MacDictate — menu bar utility для локальной диктовки на macOS с Whisper.cpp. Приложение бесплатно без срока действия, активации и проверки лицензии.
+MacDictate — бесплатная локальная диктовка с Whisper.cpp для macOS и Windows (новая версия готовится). Приложение бесплатно без срока действия, активации и проверки лицензии.
 
 ## Versioning
 
 - Публичная стабильная база: `v1.5.2` (бесплатно)
-- Следующая рабочая линия: `release/1.5.2`
+- Следующая рабочая линия: `release/1.6.0`
 - Канон по версиям и артефактам: `docs/7_Release_Governance.md` + `releases/registry.json`
 - Обычный `./build.sh` кладет временный DMG в `build/artifacts/`.
 - Release DMG/build logs должны переноситься в `releases/versions/<version>/artifacts/` или `releases/archive/`, а не оставаться в корне проекта.
 
 ## Product Surfaces
 
-- `src/`, `assets/`, `build.sh` — основной macOS product.
+- `src/`, `assets/`, `build.sh` — macOS product.
+- `windows/` — Windows x64 tray app, build/test/package commands in `windows/README.md`.
 - `backend/` — API совместимости старых клиентов и история прежних платежей. Новые оплаты отключены.
 - `web-landing/` — публичный лендинг и бесплатное скачивание.
 - `docs/legal/` — legal-тексты, используемые сайтом.

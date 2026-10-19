@@ -1,0 +1,100 @@
+name: Desktop Release Checks
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  governance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - name: Release ledger and architecture
+        run: |
+          scripts/check_architecture_guardrails.sh
+          scripts/verify_release_governance.sh
+          python3 -m json.tool windows/runtime-lock.json >/dev/null
+          node --check backend/server.js
+          node --check backend/access-policy.js
+      - name: Install locked legacy-backend dependencies for regression test
+        run: npm ci --prefix backend --no-audit --no-fund
+      - name: Free compatibility HTTP regression
+        run: python3 scripts/test_free_access_backend.py
+
+  macos:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Compile complete native app
+        run: |
+          swiftc $(find src -name '*.swift' | sort) -o "$RUNNER_TEMP/MacDictate"
+          plutil -lint assets/Info.plist
+      - name: Desktop regression harnesses
+        run: |
+          scripts/test_free_desktop.sh
+          scripts/test_update_checker_response.sh
+          scripts/test_whisper_runner_timeout.sh
+          scripts/test_whisper_model_selection.sh
+          scripts/test_recording_temp_cleanup.sh
+          scripts/test_last_dictation_store.sh
+          scripts/test_debug_session_logger.sh
+          scripts/test_text_improvement_runner.sh
+          scripts/test_llama_runtime_locator.sh
+
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          global-json-file: windows/global.json
+      - name: Portable policy and failure tests
+        working-directory: windows
+        run: dotnet run --project tests/MacDictate.Core.Tests -c Release
+      - name: Packaging data preservation guards
+        run: windows/scripts/test-packaging-guards.ps1
+      - name: Build self-contained app, pinned CPU runtime, installer and ZIP
+        run: windows/scripts/build.ps1
+      - name: Native tray, keyboard and paste smoke
+        run: windows/scripts/smoke.ps1
+      - name: Create synthetic speech locally on runner
+        shell: powershell
+        run: |
+          Add-Type -AssemblyName System.Speech
+          $voice = New-Object System.Speech.Synthesis.SpeechSynthesizer
+          if (@($voice.GetInstalledVoices() | Where-Object { $_.Enabled }).Count -eq 0) { throw 'Runner has no TTS voice for synthetic speech integration' }
+          $format = New-Object System.Speech.AudioFormat.SpeechAudioFormatInfo(16000, [System.Speech.AudioFormat.AudioBitsPerSample]::Sixteen, [System.Speech.AudioFormat.AudioChannel]::Mono)
+          try {
+            $voice.SetOutputToWaveFile("$env:RUNNER_TEMP\macdictate-synthetic.wav", $format)
+            $voice.Speak('The quick brown fox jumps over the lazy dog.')
+          } finally { $voice.Dispose() }
+      - name: Bundled ASR integration on synthetic speech
+        run: windows/scripts/test-asr.ps1 -WavePath "$env:RUNNER_TEMP/macdictate-synthetic.wav"
+      - name: Verify installer extraction and uninstaller
+        run: windows/scripts/test-install.ps1
+      - name: Retain exact release artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: windows-x64-${{ github.sha }}
+          path: |
+            windows/dist/MacDictate_Windows_v1.6.0_x64.exe
+            windows/dist/MacDictate_Windows_v1.6.0_x64.zip
+            windows/dist/windows-build-manifest.json
+            windows/dist/WINDOWS-SHA256SUMS
+            windows/dist/*-smoke.json
+          if-no-files-found: error
+          retention-days: 14

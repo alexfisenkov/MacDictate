@@ -8,7 +8,8 @@
 
 Эта папка — самостоятельный рабочий контур desktop-продукта MacDictate.
 
-- Runtime app: `macos/src/`, `macos/assets/`, `macos/build.sh`.
+- macOS runtime: `macos/src/`, `macos/assets/`, `macos/build.sh`.
+- Windows desktop: `macos/windows/`; native source, policy tests, pinned build/installer.
 - Licensing/payment backend: `macos/backend/`.
 - Landing/checkout: `macos/web-landing/`.
 - Engineering canon: `macos/docs/` — полная опись в `macos/docs/00-индекс.md`.

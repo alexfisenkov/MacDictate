@@ -49,3 +49,11 @@ npm-debug.log*
 # Python packaging helpers generate local bytecode only
 __pycache__/
 *.pyc
+
+# Windows desktop build output and local SDK
+windows/**/bin/
+windows/**/obj/
+windows/dist/
+windows/.runtime-build/
+windows/**/TestResults/
+*.user

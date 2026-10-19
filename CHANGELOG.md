@@ -2,6 +2,17 @@
 
 Этот changelog фиксирует только пользовательски и релизно значимые изменения.
 
+## [v1.6.0] - preparation 2026-10-19
+
+### Added
+- Windows x64 tray application: local Whisper dictation, double Alt to start and stop, configurable alternative hotkeys, language selection, verified model setup and last-text recovery.
+- Self-contained Windows ZIP and per-user EXE installer; no subscription, activation or license checks.
+- Manual GitHub desktop workflow: release governance, macOS compilation/regressions, Windows build, native integration smoke, synthetic speech recognition and install/uninstall checks.
+
+### Limits
+- Windows distribution is unsigned. Physical Windows10/11 microphone/keyboard/paste acceptance is separate from hosted Windows Server2025 checks.
+- Windows supports dictation; optional macOS LLM correction remains macOS-only.
+
 ## [v1.5.2] - 2026-10-19
 
 ### Added

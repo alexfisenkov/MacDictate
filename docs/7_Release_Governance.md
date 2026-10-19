@@ -218,3 +218,11 @@ Push в connected `gh-pages` считается внешней публикац�
 и legal QA) отдельно, затем сделать один финальный commit/push. В итерации
 2026-10-19 фактически прошли три автоматические Pages выкладки; это отклонение
 зафиксировано в ActionLog, а не выдано за одну финальную CI.
+
+## Coordinated Windows/macOS release (D-023/D-024)
+
+`windows/` is an active desktop source zone in this same Git repository. Windows distribution is self-contained x64: versioned ZIP and per-user EXE, pinned runtime source/model metadata, SHA256 and `windows-build-manifest.json` containing exact sourceSHA. Current signing status must be explicit. Windows native code must build/run on the final GitHub runner before publication; physical microphone/client-OS acceptance is reported independently.
+
+For desktop1.6.0 the final manual `desktop-release.yml` validates governance, Swift source/regressions, Windows portable tests, native keyboard/paste integration, synthetic ASR, installer/uninstaller and creates Windows release artifacts. The GitHub source SHA must equal the local notarized macOS build source SHA. GitHub latest release must include both platform aliases, so Mac updater cannot point at a Windows-only release with a stale DMG. Do not publish partial latest assets.
+
+Windows release metadata is additive under `versions[].windows`; macOS legacy manifest stays schema1. A separate `latest-windows.json` exposes the Windows asset/version/hash. CI runner OS is Windows Server2025, never describe it as Windows11. Final Pages content is staged away from gh-pages and pushed only after completed QA.
