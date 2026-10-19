@@ -2,7 +2,7 @@
 
 - Status: `local_only`
 - Bundle: `1.5.2` / build `13`
-- Public website rollout: pending trusted server access; not yet deployed.
+- Distribution: GitHub Releases (retired server is switched off by owner); static public page pending.
 
 ## Changes
 
@@ -13,7 +13,7 @@ Legacy desktop clients receive free active access without changing billing recor
 
 ## Verification
 
-The source/menu, diagnostic logger and backend HTTP harnesses passed locally.
+The source/menu, diagnostic logger and backend HTTP harnesses passed locally. Update checks use GitHub directly, with no request to the retired server.
 The earlier local build was installed and synthetic speech was transcribed correctly.
 Build 13 signing/notarization and public download verification are pending.
 Older app binaries retain their old trial badge and offline grace behavior; install this free version to remove those checks permanently. The compatibility endpoint does not falsely mark a purchase as paid.

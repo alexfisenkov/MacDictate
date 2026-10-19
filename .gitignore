@@ -45,3 +45,7 @@ npm-debug.log*
 
 # Bundled public end-user license (not a generated transcript)
 !assets/license.txt
+
+# Python packaging helpers generate local bytecode only
+__pycache__/
+*.pyc
