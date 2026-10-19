@@ -24,7 +24,15 @@ try {
     $env:TMP = $testDirectory
     $process = Start-Process $app -ArgumentList $arguments -PassThru -RedirectStandardError $stderr
     if (!$process.WaitForExit(240000)) { $process.Kill(); throw 'ASR smoke timed out' }
-    if ($process.ExitCode -ne 0) { Get-Content $stderr; throw "ASR smoke failed: exit $($process.ExitCode)" }
+    if ($process.ExitCode -ne 0) {
+        if (Test-Path $report) { Get-Content $report }
+        Get-Content $stderr
+        # This script only processes the runner's synthetic fixture. App runtime never logs user text.
+        Write-Host 'Native diagnostics on the same synthetic Unicode fixture:'
+        & (Join-Path $root 'dist/MacDictate/runtime/whisper-cli.exe') -m $model -f $fixtureWave -l en -otxt -of (Join-Path $testDirectory 'synthetic-debug') -nt -t 2
+        Write-Host "Native diagnostic exit: $LASTEXITCODE"
+        throw "ASR smoke failed: exit $($process.ExitCode)"
+    }
     $result = Get-Content $report -Raw | ConvertFrom-Json
     if (!$result.success -or $result.text -notmatch '(?i)quick brown fox') { throw 'Synthetic speech did not transcribe the expected phrase' }
     if (@(Get-ChildItem $testDirectory -Filter '*.txt').Count -ne 0) { throw 'Temporary native transcript was not cleaned up' }
@@ -32,6 +40,6 @@ try {
 } finally {
     $env:TEMP = $previousTemp
     $env:TMP = $previousTmp
-    Remove-Item $model, "$model.part", $fixtureWave -Force -ErrorAction SilentlyContinue
+    Remove-Item $model, "$model.part", $fixtureWave, (Join-Path $testDirectory 'synthetic-debug.txt') -Force -ErrorAction SilentlyContinue
     Remove-Item $testDirectory -ErrorAction SilentlyContinue
 }

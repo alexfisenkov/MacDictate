@@ -19,7 +19,7 @@ Assert-Exit 'Git source identity'
 $dirty = & git -C $root status --porcelain --untracked-files=no
 Assert-Exit 'Check source tree'
 if ($dirty) { throw 'Commit source changes before building a release artifact' }
-$untracked = & git -C $root ls-files --others --exclude-standard windows/src windows/runtime-lock.json windows/global.json
+$untracked = & git -C $root ls-files --others --exclude-standard src runtime-lock.json global.json
 Assert-Exit 'Check untracked build inputs'
 if ($untracked) { throw 'Untracked application inputs would break source SHA identity; commit them before release build' }
 if (Test-Path (Join-Path $out 'MacDictate')) { throw 'Output app folder already exists; choose a fresh OutputDirectory. Existing files were preserved.' }
