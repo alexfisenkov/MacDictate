@@ -14,11 +14,11 @@
 - [x] Проверить реальное меню, diagnostic logger и установленный Whisper на synthetic speech.
 - [x] Установить локальную бесплатную сборку с резервной копией.
 - [x] Отключить новые платежи; интеграционный HTTP-тест проверяет отсутствие новых orders/devices.
-- [ ] Проверить free landing, RU/EN legal и ссылки, desktop/mobile rendering.
-- [ ] Зафиксировать цельный источник в GitHub и собрать build13 из точного SHA main.
-- [ ] Нотарифицировать DMG в Apple, staple, проверить подпись и смонтированную установку.
-- [ ] Опубликовать GitHub asset и одинаковые байты на сайте; сверить manifest и SHA.
-- [ ] Перезапустить backend из GitHub SHA, проверить free access и HTTP410 без изменений прежних заказов.
+- [x] Проверить free landing, RU/EN legal и ссылки, desktop/mobile rendering.
+- [x] Зафиксировать цельный источник в GitHub и собрать build13 из точного SHA main.
+- [x] Нотарифицировать DMG в Apple, staple, проверить подпись и смонтированную установку.
+- [x] Опубликовать GitHub asset/alias, сверить SHA, выпустить статический Pages и прочитать 14 файлов обратно.
+- [x] Backend free policy проверена локально без изменений прежних заказов; по D-022 выключенный сервер не запускается, новый клиент использует GitHub без legacy API.
 
 Риски проверки: старый expired cache; outage license API; прямой старый payment URL; дубликат bundle ID у iOS-wrapper; смешение runtime libs. Они покрываются source guard, HTTP harness, exact-path/hash install read-back и artifact checks.
 

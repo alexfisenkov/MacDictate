@@ -13,7 +13,7 @@
 | Free desktop diagnostics | microphone denial и runtime failure остаются видимыми без license gate | Verified 2026-10-19 by `scripts/test_free_desktop.sh`; actual recording/permission prompts not covered by harness |
 | Legacy license cache / license API outage | старые paid/expired cache и недоступность license API не влияют на доступ к записи | Source guard verified by `scripts/test_free_desktop.sh`; live dictation not yet verified |
 | Free desktop debug metadata | новые `metadata.json` не содержат machine ID, сохраняют ASR mode и остальные diagnostic artifacts | Verified 2026-10-19 by `scripts/test_debug_session_logger.sh`; old sessions are not rewritten |
-| Free desktop local install | на Mac установлена новая signed сборка; menu без лицензирования, базовая диктовка работает | Build12 signed DMG/install-flow/installed strict signature/executable SHA and exact desktop process: PASS; installed Whisper synthetic ASR: PASS; live microphone/hotkey/paste: NOT_RUN (native UI timeout) |
+| Free desktop local install | на Mac установлена новая signed сборка; menu без лицензирования, базовая диктовка работает | Public build13 downloaded DMG SHA / mounted-install / installed strict signature / Gatekeeper / executable SHA / exact desktop process: PASS; installed automatic-backend WhisperRunner synthetic ASR: PASS; live microphone/hotkey/paste: NOT_RUN (native UI timeout) |
 | Hung / stderr-heavy `whisper-cli` subprocess | зависший процесс завершается timeout diagnostic, temp audio чистится; большой `stderr` не блокирует успешный subprocess | Verified by `scripts/test_whisper_runner_timeout.sh` |
 | Whisper bundled runtime artifact | собранный `.app` содержит arm64 `whisper-cli`, `libwhisper`, ggml dylibs/backend plugins в isolated `lib/whisper` + `libexec/ggml-whisper`; `otool` не содержит `/opt/homebrew` / `/usr/local` ссылок; Mach-O `minos` не выше `LSMinimumSystemVersion`; runtime запускается с bundled `GGML_BACKEND_PATH` без `dyld` error | Verified by `scripts/build_clean_runtimes.sh`, `scripts/check_bundled_whisper_runtime.sh`, `./build.sh`, direct `otool`/`vtool` audit, and `scripts/check_install_artifact_flow.sh` |
 | Whisper model selection | balanced mode выбирает `large-v3-turbo`, maximumAccuracy mode выбирает `large-v3`; установленная heavy-модель не подменяет дефолт, fallback между валидными `.bin` сохраняется | Verified by `scripts/test_whisper_model_selection.sh` |
@@ -50,10 +50,12 @@
 | Last dictation safety copy | финальный non-empty текст сохраняется до paste и может быть скопирован из menu bar через `Скопировать последнюю диктовку` | Store behavior verified by `scripts/test_last_dictation_store.sh`; menu action compile-level verified |
 | Transcription fail | user видит различимую диагностическую ошибку | Compile-level only |
 | Paste fail | отображается локально различимая ошибка вставки | Compile-level only |
-| Legacy site/backend payment path | прежний `uid` / pricing contract остается совместимым для старых клиентов; бесплатный app не имеет payment action | Current local free HTTP harness PASS: active/no expiry, empty plans, payments410, no device/order writes; free landing/legal responsive QA PASS; production rollout BLOCKED pending trusted host access |
+| Legacy site/backend payment path | прежний `uid` / pricing contract остается совместимым для старых клиентов; бесплатный app не имеет payment action | Local free HTTP harness PASS only (retired API not deployed); GitHub public assets and 14 Pages HTTPS files read back exactly; RU/EN/responsive/CDN-fallback browser QA PASS |
 
 ## Notes
 
 - Этот документ описывает минимум smoke coverage, а не полный regression plan. Записи без даты 2026-10-19 описывают прежние проверки и не подтверждают новую installed-copy.
 - Licensing smoke старых версий сохранен в исторических harness `archive/legacy-licensing/scripts/`; это не критерий готовности бесплатного desktop.
 - `Verified locally` обязан обновляться после реального runtime smoke, а не только после typecheck/build.
+
+Public GitHub update check from 1.5.1 to free1.5.2 uses GitHub directly; no retired-server request in default configuration. App-side release CI is local under OWNER_LOCAL_RELEASE_20261015. Pages actually performed three automatic deployments; final run39245114809 succeeded (process deviation documented in ActionLog).

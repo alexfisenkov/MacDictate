@@ -18,12 +18,15 @@ Legacy desktop clients receive free active access without changing billing recor
 
 The source/menu, diagnostic logger and backend HTTP harnesses passed locally. Update checks use GitHub directly, with no request to the retired server.
 The earlier local build was installed and synthetic speech was transcribed correctly.
-Build13 signed/notarized/stapled, Gatekeeper and mounted-install checks: PASS. GitHub reports identical digests for the versioned DMG and stable alias; public-byte read-back recorded separately.
+Build13 signed/notarized/stapled, Gatekeeper and mounted-install checks: PASS. GitHub reports identical digests for the versioned DMG and stable alias; public-byte read-back PASS. GitHub Pages14-file HTTPS read-back PASS.
 Older app binaries retain their old trial badge and offline grace behavior; install this free version to remove those checks permanently. The compatibility endpoint does not falsely mark a purchase as paid.
 
 Live microphone/hotkey/paste UI was not verified: native UI automation times out.
 
 ## Rollback
 
-Previous signed installer remains in v1.5.1 release history. Local pre-free application
-is retained independently. Do not enable new payments as part of an application rollback.
+Local owner rollback preserves the earlier FREE build12 independently. v1.5.1 remains historical; it retains old licensing and is not the recommended free-app rollback. New public fixes must preserve free access and be signed/notarized again. Do not enable new payments as part of rollback.
+
+## Verification limits
+
+Live microphone/hotkey/paste remains NOT_RUN (native UI timeout); installed automatic-backend WhisperRunner synthetic speech passed. Optional Qwen3B model rights are separate from free MacDictate/Whisper, as explicitly stated in RU/EN terms. Pages made three automatic deployments during preparation; final run39245114809 succeeded.

@@ -159,7 +159,7 @@ app.get('/api/plans', plansLimiter, (_req, res) => {
 // No new orders or provider requests after the free desktop transition.
 // Existing order callbacks below remain supported for payment reconciliation.
 app.post('/api/payment/create', paymentCreateLimiter, (_req, res) => {
-    sendError(res, 410, 'PAYMENTS_DISABLED', 'MacDictate is free. Download it at https://macdictate.pro/');
+    sendError(res, 410, 'PAYMENTS_DISABLED', 'MacDictate is free. Download it at https://alexfisenkov.github.io/MacDictate/');
 });
 
 // 3. Tinkoff Webhook Callback

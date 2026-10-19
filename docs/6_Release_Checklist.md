@@ -25,7 +25,7 @@
 - [ ] `scripts/check_distribution_signing.sh` проходит для release-machine.
 - [ ] В Keychain доступен `Developer ID Application` certificate; `Apple Development` не используется для публичного DMG.
 - [ ] Developer ID `.app` подписан с `assets/MacDictate.entitlements`, включая `com.apple.security.device.audio-input`.
-- [ ] Настроен и проверен `MACDICTATE_NOTARY_PROFILE`, если это публичный release.
+- [ ] Проверена notary authentication: `MACDICTATE_NOTARY_PROFILE` либо API-key mode из signing runbook.
 - [ ] `swiftc`/typecheck проходит по всем `.swift` файлам.
 - [ ] `scripts/test_whisper_runner_timeout.sh` проходит.
 - [ ] `scripts/test_free_desktop.sh` проходит: текущий app не содержит license gate, machine ID, paywall и license timer.
@@ -39,7 +39,7 @@
 - [ ] Обычный build output лежит в `build/artifacts/`, а release DMG перенесен в `releases/versions/<version>/artifacts/`.
 - [ ] GitHub Release asset и локальный artifact имеют зафиксированные SHA256.
 - [ ] Те же байты DMG загружены на сайт как `/downloads/MacDictate_Latest.dmg`.
-- [ ] `./build.sh` выполнен с `MACDICTATE_SIGN_IDENTITY`, `MACDICTATE_NOTARY_PROFILE` и `MACDICTATE_NOTARIZE=true` для публичного release.
+- [ ] Developer ID build нотарифицирован через profile-mode либо отдельный API-key submit/staple/verify того же DMG по signing runbook.
 - [ ] Выполнены steps по Developer ID подписи / notarization / stapling.
 - [ ] `spctl` принимает notarized DMG primary signature.
 - [ ] `scripts/check_install_artifact_flow.sh <release-dmg>` проходит: mounted app и временная installed-copy валидны.
@@ -88,7 +88,7 @@
 - [x] Developer ID build13 from exact GitHub main SHA; notarization Accepted, stapled DMG, Gatekeeper and mounted-install checks PASS.
 - [x] Annotated v1.5.2 source tag and public GitHub release with matching versioned/alias digests.
 - [x] Static site RU/EN, prefix routing, legal documents, mobile/wide, CDN fallback QA PASS.
-- [ ] GitHub Pages live deployment/read-back (record after completion).
-- [ ] Final installed build13 read-back (record after completion).
+- [x] GitHub Pages live deployment/read-back: 14 files exact, final source6d02041, run39245114809 success.
+- [x] Final installed build13 read-back from public downloaded DMG: SHA/strictsignature/Gatekeeper/process and synthetic WhisperRunner PASS.
 - Live microphone/hotkey/paste: NOT_RUN; native UI automation times out. Installed-bundle WhisperRunner synthetic ASR: PASS.
-- Hosted app CI not run under OWNER_LOCAL_RELEASE_20261015; Pages performs the one final hosted deployment.
+- Hosted app CI not run under OWNER_LOCAL_RELEASE_20261015; Pages performed three automatic hosted deployments during branch preparation, all successful; final run39245114809. This deviated from the one-final-run policy; no additional Pages push is needed.

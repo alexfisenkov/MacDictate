@@ -176,3 +176,18 @@ spctl -a -vv --type execute /Applications/MacDictate.app
 ## Accessibility migration note
 
 Переход с ad-hoc на Developer ID может потребовать один раз заново выдать Accessibility permission, потому что identity меняется. После этого следующие Developer ID signed updates должны сохранять разрешение без удаления старой записи через минус.
+
+## API-key alternative after Mac migration (verified 2026-10-19)
+
+If the old Keychain profile is absent, existing App Store Connect API credentials
+can notarize the same Developer ID artifact. Keep values outside git. After
+building the exact main SHA with `MACDICTATE_NOTARIZE=false`:
+
+```bash
+xcrun notarytool submit "$MACDICTATE_DMG_PATH" --key "$MACDICTATE_NOTARY_KEY_FILE" --key-id "$MACDICTATE_NOTARY_KEY_ID" --issuer "$MACDICTATE_NOTARY_ISSUER_ID" --wait
+xcrun stapler staple "$MACDICTATE_DMG_PATH"
+xcrun stapler validate "$MACDICTATE_DMG_PATH"
+spctl -a -vv -t open --context context:primary-signature "$MACDICTATE_DMG_PATH"
+```
+
+Require Accepted, install-flow PASS and compute SHA256 AFTER stapling.

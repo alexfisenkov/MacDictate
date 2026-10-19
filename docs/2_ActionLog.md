@@ -14,12 +14,18 @@
 - Для публикации выделен clean release worktree: прежние незакоммиченные desktop/model/runtime изменения сохранены отдельным checkpoint, исходная рабочая копия не откатывалась. Кандидат `v1.5.2` build13 ведётся в release ledger.
 - Production `macdictate.pro` на прежнем DNS IP предъявляет изменённые SSH-ключи и HTTPS TLS internal error; то же подтверждено из независимого доверенного сервера. Неизвестный ключ не принимался, production не изменялся. Notarization возможна через существующий ASC API key без восстановления отсутствующего Keychain profile.
 
-- Владелец подтвердил: прежний сервер отключён. Выбран GitHub-only download/update канал (D-022), без принятия незнакомого SSH-ключа и без восстановления billing backend. Для публичной страницы готовится статический GitHub Pages без изменения DNS. Backend free policy остаётся проверенным исходником, не выдается за deployed API.
+- Владелец подтвердил: прежний сервер отключён. Выбран GitHub-only download/update канал (D-022), без принятия незнакомого SSH-ключа и без восстановления billing backend. Для публичной страницы используется статический GitHub Pages без изменения DNS. Backend free policy остаётся проверенным исходником, не выдается за deployed API.
 
-- Публичный `v1.5.2` build13 выпущен на GitHub: оба DMG имеют SHA256 `8cd4c00cb2ddaa7fef2f747cee8b28f4d46b6e3b317a8e39206ac04c3752a261`, Apple notarization Accepted, staple/Gatekeeper/mounted install PASS; source main SHA `b8158a6a73f33e07cf548fa46658511f95c59811`. Статическая страница GitHub Pages и окончательная установка build13 фиксируются после read-back.
+- Публичный `v1.5.2` build13 выпущен на GitHub: оба DMG имеют SHA256 `8cd4c00cb2ddaa7fef2f747cee8b28f4d46b6e3b317a8e39206ac04c3752a261`, Apple notarization Accepted, staple/Gatekeeper/mounted install PASS; source main SHA `b8158a6a73f33e07cf548fa46658511f95c59811`. Статическая страница GitHub Pages и установка build13 подтверждены последующим read-back.
 
 - Публичный download byte-read-back совпал с notarized SHA; установлен именно app из скачанного DMG build13, strict codesign/Gatekeeper/hash/process PASS. Реальный WhisperRunner установленного bundle с автоматическим выбором backend распознал synthetic speech. Полный mic/hotkey/paste остаётся NOT_RUN (native UI timeout).
 - Факт-чек юридических текстов выявил отдельную лицензию Qwen2.5-3B-Instruct-GGUF для research/evaluation и необходимость отдельного разрешения производителя для коммерческого применения. RU/EN EULA явно отделяет это от бесплатного MacDictate/Whisper; модели и настройки пользователя не менялись. Рекламная абсолютность приватности и лишние банковские реквизиты убраны, гиперссылки указывают на новый статический сайт.
+
+- GitHub Pages по адресу https://alexfisenkov.github.io/MacDictate/ опубликован из gh-pages6d02041. Системный HTTPS-клиент прочитал 14 страниц/документов/assets/manifest: все байты совпали с проверенным static snapshot, download ведёт на GitHub alias с тем же notarized SHA.
+- Отклонение от правила одной финальной hosted-проверки: несмотря на первоначальный Pages API404, push ветки gh-pages автоматически включил Pages. Выполнились три автоматические выкладки:39244037539,39244118426,39245114809; все successful, финальная6d02041. Основной агент поздно проверил триггер. Дополнительных Pages push после финальной проверки нет; app CI не запускался по активному local-release режиму. Для следующих итераций staging должен оставаться вне connected gh-pages до полного QA.
+- Основная рабочая копия приведена к main GitHub. Исходные незакоммиченные desktop/model/runtime изменения сохранены отдельным checkpoint03ef117 и pre-sync backups; пользовательские модели, настройки, история оплат, iOS и Transcribe не переписывались.
+
+- Live default UpdateChecker получил публичный free1.5.2 при currentVersion1.5.1 напрямую из GitHub. Read-only TCC lookup показал microphone/accessibility allowed для app; Developer ID designated requirement совпадает с прежней desktop-подписью. Разрешения не изменялись, полный live mic/paste при этом не объявлен PASS. API-key notarization route задокументирован без секретных значений.
 
 ## 2026-05-12 — optional Whisper large-v3 test mode
 

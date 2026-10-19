@@ -209,3 +209,12 @@ git -C macos worktree add ../MacDictate-macos-v1.4.2 v1.4.2
 на выключенном сервере больше не release gate. App updater использует GitHub
 API напрямую. Статический сайт не должен зависеть от backend или оплаты.
 Проверяются публичный asset, checksum, notarization, install flow и publicUrl.
+
+## GitHub Pages publication gate
+
+Push в connected `gh-pages` считается внешней публикацией и может автоматически
+запустить deployment даже после предварительного Pages API404. Не использовать
+эту ветку как staging: собрать и проверить статический snapshot (включая content
+и legal QA) отдельно, затем сделать один финальный commit/push. В итерации
+2026-10-19 фактически прошли три автоматические Pages выкладки; это отклонение
+зафиксировано в ActionLog, а не выдано за одну финальную CI.

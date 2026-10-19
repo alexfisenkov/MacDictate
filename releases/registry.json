@@ -405,14 +405,16 @@
         "localArtifactSha256": "8cd4c00cb2ddaa7fef2f747cee8b28f4d46b6e3b317a8e39206ac04c3752a261",
         "buildLogPath": "releases/versions/v1.5.2/artifacts/build_log_v1.5.2.txt"
       },
-      "summary": "Free desktop: no licensing, no new payments, compatible free access for old apps. Public website rollout pending trusted server access.",
+      "summary": "Permanently free desktop, no license requests or billing identity; notarized build13 published on GitHub, installed and verified locally; free product site live on GitHub Pages.",
       "sourceConfidence": "verified_github_notarized_artifact",
       "distribution": {
         "channel": "github-releases",
         "websiteMirrorRequired": false,
         "latestAssetName": "MacDictate_Latest.dmg",
         "latestSha256": "8cd4c00cb2ddaa7fef2f747cee8b28f4d46b6e3b317a8e39206ac04c3752a261",
-        "websiteURL": "https://alexfisenkov.github.io/MacDictate/"
+        "websiteURL": "https://alexfisenkov.github.io/MacDictate/",
+        "pagesCommit": "6d020413ad9f557687ca1a392ac005501664e730",
+        "pagesDeploymentRun": "https://github.com/alexfisenkov/MacDictate/actions/runs/39245114809"
       },
       "notarization": {
         "status": "Accepted",

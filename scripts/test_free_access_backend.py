@@ -51,6 +51,7 @@ with tempfile.TemporaryDirectory(prefix="macdictate-free-api-") as temp:
         for body in [{}, {"deviceId": "MD-FREE-TEST", "email": "synthetic@example.invalid", "planId": "yearly"}]:
             status, result = request("/api/payment/create", body)
             assert status == 410 and result["code"] == "PAYMENTS_DISABLED", result
+            assert "https://alexfisenkov.github.io/MacDictate/" in result["error"], result
         with sqlite3.connect(env["DB_PATH"]) as database:
             assert database.execute("SELECT COUNT(*) FROM devices").fetchone()[0] == 0
             assert database.execute("SELECT COUNT(*) FROM orders").fetchone()[0] == 0
