@@ -36,6 +36,8 @@
 
 | Backend | Open | P1 | Historical reconciliation | M | Project | Historical webhook ACK-before-write and split order/device updates predate free rollout; preserve current credentials for pending callbacks and design idempotent/atomic reconciliation separately. Do not rewrite prior paid history for free access. |
 
+| App/AI | Open | P1 | Commercial model licensing | M | Project | Qwen2.5-3B-Instruct-GGUF uses qwen-research, with commercial use requiring a separate provider license. Public RU/EN EULA explicitly separates optional model rights from free MacDictate/Whisper dictation. Evaluate an appropriately licensed default correction model in a separate change; do not remove or modify model files silently. |
+
 ## Notes
 
 - Исторические TODO уровня `1.1` не удалены по смыслу: часть из них реализована, часть перенесена в таблицу выше.

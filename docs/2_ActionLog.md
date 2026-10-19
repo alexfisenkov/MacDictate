@@ -18,6 +18,9 @@
 
 - Публичный `v1.5.2` build13 выпущен на GitHub: оба DMG имеют SHA256 `8cd4c00cb2ddaa7fef2f747cee8b28f4d46b6e3b317a8e39206ac04c3752a261`, Apple notarization Accepted, staple/Gatekeeper/mounted install PASS; source main SHA `b8158a6a73f33e07cf548fa46658511f95c59811`. Статическая страница GitHub Pages и окончательная установка build13 фиксируются после read-back.
 
+- Публичный download byte-read-back совпал с notarized SHA; установлен именно app из скачанного DMG build13, strict codesign/Gatekeeper/hash/process PASS. Реальный WhisperRunner установленного bundle с автоматическим выбором backend распознал synthetic speech. Полный mic/hotkey/paste остаётся NOT_RUN (native UI timeout).
+- Факт-чек юридических текстов выявил отдельную лицензию Qwen2.5-3B-Instruct-GGUF для research/evaluation и необходимость отдельного разрешения производителя для коммерческого применения. RU/EN EULA явно отделяет это от бесплатного MacDictate/Whisper; модели и настройки пользователя не менялись. Рекламная абсолютность приватности и лишние банковские реквизиты убраны, гиперссылки указывают на новый статический сайт.
+
 ## 2026-05-12 — optional Whisper large-v3 test mode
 
 - В рабочей линии `release/1.5.2` добавлен тестовый режим максимальной точности ASR без публикации релиза: settings menu получил toggle `Точная модель Whisper large-v3` и action `Скачать точную модель Whisper`.

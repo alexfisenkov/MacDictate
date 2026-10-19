@@ -24,7 +24,7 @@ By installing or launching the Software, the User agrees to these terms of use.
 
 ## 5. INTELLECTUAL PROPERTY
 5.1. All rights to the application code, scripts, interface, and the "MacDictate" brand belong to the Licensor.
-5.2. The Whisper neural network used in the application is distributed under the MIT license and belongs to OpenAI. Optional text improvement may use a local Qwen2.5-Instruct family model (preferred 3B, fallback 1.5B; the applicable model license terms apply). Model weights are downloaded locally either automatically or by a user action in the application.
+5.2. Whisper is distributed under the MIT license. Optional text correction may use Qwen2.5-3B-Instruct. Its [manufacturer license](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/blob/main/LICENSE) permits research and evaluation; commercial use of this model requires a separate license from Alibaba Cloud. Permission to use MacDictate itself commercially does not grant that separate model permission. Qwen is not required for dictation with text correction disabled. Model weights are downloaded separately to the device.
 
 ## 6. FINAL PROVISIONS
 6.1. The current terms are published at https://alexfisenkov.github.io/MacDictate/legal.html.

@@ -1,11 +1,10 @@
 # PRIVACY POLICY
-For MacDictate Software and MacDictate.pro website
+For MacDictate Software and MacDictate website
 
-This Policy regulates the collection, use, and protection of personal and technical data of Users of the "MacDictate" application and visitors of the MacDictate.pro website.
+This Policy regulates the collection, use, and protection of personal and technical data of Users of the "MacDictate" application and visitors of the MacDictate website.
 
 ## 1. INTRODUCTION AND ARCHITECTURE (IMPORTANT!)
-**1.1. Local Speech and Text Processing:** The main principle of MacDictate is ABSOLUTE PRIVACY. The application uses the offline neural network OpenAI Whisper for speech recognition and may use a local Qwen model for improving recognized text.
-Your voice, audio recordings, background noise, transcribed text, and text passed to the improvement feature are processed EXCLUSIVELY on your device's processor (locally on macOS). **Not a single byte of dictation audio or text is sent to our servers or third-party servers.**
+**1.1. Local speech and text processing:** MacDictate uses Whisper for speech recognition and may use a local Qwen model for optional text correction. Audio and text are processed locally on your Mac. The application does not send dictation audio or text to remote servers for recognition or correction.
 
 **1.2. Local Diagnostic Logs:** During testing, the user or support may explicitly enable a local debug mode. In this mode, the application stores diagnostic dictation files on the device: a copy of the audio, Whisper output, the prompt and outputs of the local Qwen model, the final inserted text, and service events. These files are stored locally in `~/.macdictate/debug-sessions/`, are not sent to any server, and may contain sensitive information that the user dictated or processed. When debug mode is disabled, these session files are not created.
 
@@ -16,7 +15,7 @@ Your voice, audio recordings, background noise, transcribed text, and text passe
 
 **2.3. Support requests:** if the User voluntarily contacts a.fisenkov@gmail.com, we use the contact information and message they provide to respond and resolve the issue. Sending dictation audio or text to support is a separate action by the User.
 
-**2.4. Previous purchases and old versions:** previously received order information, email addresses, and device identifiers may be retained for support, handling previous orders, and fulfilling applicable obligations. Old versions may contact the compatible license API. The current free version does not request this data or create new payments. We do not store full bank card numbers; previous payments were processed within the payment provider's secure environment.
+**2.4. Previous purchases and old versions:** previously received order information, email addresses, and device identifiers may be retained for support, handling previous orders, and fulfilling applicable obligations. Old versions still contain requests to the previous license API; the new version does not depend on it. The current free version does not request this data or create new payments. Bank account and card details are not required to download or use the free version.
 
 ## 3. DATA PROTECTION
 3.1. Access to previous order information and support requests is restricted. This data is not made publicly available.
