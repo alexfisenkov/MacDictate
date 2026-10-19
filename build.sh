@@ -7,6 +7,11 @@ cd "$PROJECT_DIR"
 echo "🚀 Начинаем сборку 100% Native macOS приложения MacDictate (Swift)..."
 
 APP_NAME="MacDictate.app"
+APP_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$PROJECT_DIR/assets/Info.plist")"
+if [[ ! "$APP_VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+    echo "Invalid release version in assets/Info.plist" >&2
+    exit 1
+fi
 BUILD_DIR="$PROJECT_DIR/build"
 APP_DIR="$BUILD_DIR/$APP_NAME"
 CONTENTS_DIR="$APP_DIR/Contents"
@@ -319,7 +324,7 @@ fi
 copy_app_without_extended_attrs "$SIGNED_APP_DIR" "$APP_DIR"
 
 # 6. Сборка легкого DMG-образа
-DMG_NAME="MacDictate_Final_v1.5.2.dmg"
+DMG_NAME="MacDictate_Final_v${APP_VERSION}.dmg"
 DMG_OUTPUT_DIR="$BUILD_DIR/artifacts"
 mkdir -p "$DMG_OUTPUT_DIR"
 DMG_PATH="$DMG_OUTPUT_DIR/$DMG_NAME"
@@ -346,7 +351,7 @@ fi
 
 cd "$PROJECT_DIR"
 create-dmg \
-  --volname "MacDictate_v1_5_2" \
+  --volname "MacDictate_v${APP_VERSION//./_}" \
   --volicon "assets/AppIcon.icns" \
   --background "assets/dmg_background.png" \
   --window-pos 200 120 \

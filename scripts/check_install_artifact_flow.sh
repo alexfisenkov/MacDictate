@@ -2,7 +2,8 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DMG_PATH="${1:-"$ROOT_DIR/build/artifacts/MacDictate_Final_v1.5.2.dmg"}"
+APP_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$ROOT_DIR/assets/Info.plist")"
+DMG_PATH="${1:-"$ROOT_DIR/build/artifacts/MacDictate_Final_v${APP_VERSION}.dmg"}"
 TMPROOT="$(mktemp -d /tmp/macdictate-install-flow.XXXXXX)"
 MOUNT_DIR="$TMPROOT/mount"
 INSTALL_DIR="$TMPROOT/Applications"

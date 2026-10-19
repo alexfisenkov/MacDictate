@@ -37,6 +37,8 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Compile complete native app
         run: |
+          bash -n build.sh
+          bash -n scripts/check_install_artifact_flow.sh
           swiftc $(find src -name '*.swift' | sort) -o "$RUNNER_TEMP/MacDictate"
           plutil -lint assets/Info.plist
       - name: Desktop regression harnesses
