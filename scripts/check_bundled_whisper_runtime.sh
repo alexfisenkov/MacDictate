@@ -10,7 +10,14 @@ RESOURCES_DIR="$APP_PATH/Contents/Resources"
 INFO_PLIST="$APP_PATH/Contents/Info.plist"
 BIN_DIR="$RESOURCES_DIR/bin"
 LIB_DIR="$RESOURCES_DIR/lib"
-GGML_BACKEND_DIR="$RESOURCES_DIR/libexec/ggml"
+WHISPER_LIB_DIR="$RESOURCES_DIR/lib/whisper"
+GGML_BACKEND_DIR="$RESOURCES_DIR/libexec/ggml-whisper"
+if [ ! -d "$WHISPER_LIB_DIR" ]; then
+  WHISPER_LIB_DIR="$LIB_DIR"
+fi
+if [ ! -d "$GGML_BACKEND_DIR" ]; then
+  GGML_BACKEND_DIR="$RESOURCES_DIR/libexec/ggml"
+fi
 RUNTIME="$BIN_DIR/whisper-cli"
 status=0
 
@@ -82,12 +89,12 @@ check_macho_file() {
 
 check_macho_file "$RUNTIME"
 
-if [ ! -d "$LIB_DIR" ]; then
-  fail "Bundled lib directory not found: $LIB_DIR"
+if [ ! -d "$WHISPER_LIB_DIR" ]; then
+  fail "Bundled whisper lib directory not found: $WHISPER_LIB_DIR"
 else
   while IFS= read -r -d '' macho_file; do
     check_macho_file "$macho_file"
-  done < <(find "$LIB_DIR" -type f \( -name "*.dylib" -o -name "*.so" \) -print0)
+  done < <(find "$WHISPER_LIB_DIR" -type f \( -name "*.dylib" -o -name "*.so" \) -print0)
 fi
 
 if [ ! -d "$GGML_BACKEND_DIR" ]; then

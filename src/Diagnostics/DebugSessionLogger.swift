@@ -3,6 +3,7 @@ import Foundation
 struct DebugSessionContext: Codable {
     let appVersion: String
     let textImprovementEnabled: Bool
+    let whisperModelMode: String
     let machineID: String
 }
 
@@ -55,10 +56,12 @@ final class DebugSessionLogger {
                 createdAt: Date(),
                 appVersion: context.appVersion,
                 textImprovementEnabled: context.textImprovementEnabled,
+                whisperModelMode: context.whisperModelMode,
                 machineID: context.machineID
             ))
             session.record("session_started", details: [
-                "textImprovementEnabled": String(context.textImprovementEnabled)
+                "textImprovementEnabled": String(context.textImprovementEnabled),
+                "whisperModelMode": context.whisperModelMode
             ])
             return session
         } catch {
@@ -80,6 +83,7 @@ struct DebugSessionMetadata: Codable {
     let createdAt: Date
     let appVersion: String
     let textImprovementEnabled: Bool
+    let whisperModelMode: String
     let machineID: String
 }
 

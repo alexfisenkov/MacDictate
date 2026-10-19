@@ -103,6 +103,28 @@ enum StatusPresentation {
         }
     }
 
+    static func whisperModelMenuTitle(
+        mode: WhisperModelMode,
+        hasMaximumAccuracyModel: Bool,
+        hasBalancedModel: Bool
+    ) -> String {
+        switch mode {
+        case .balanced:
+            if hasBalancedModel {
+                return "Whisper: быстрая large-v3-turbo"
+            }
+            return "Whisper: базовая модель не скачана"
+        case .maximumAccuracy:
+            if hasMaximumAccuracyModel {
+                return "Whisper: точная large-v3"
+            }
+            if hasBalancedModel {
+                return "Whisper: large-v3 нужна загрузка, сейчас fallback turbo"
+            }
+            return "Whisper: точная модель не скачана"
+        }
+    }
+
     static func textImprovementMenuTitle(
         isEnabled: Bool,
         hasModel: Bool,

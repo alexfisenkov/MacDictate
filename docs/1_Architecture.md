@@ -7,7 +7,7 @@
 ## Технологический стек
 
 - **Ядро:** нативный Swift + AppKit, сборка через `swiftc`.
-- **Speech-to-text:** bundled `whisper-cli` (Whisper.cpp) в `Contents/Resources/bin`, запускается как внешний процесс; Homebrew path остается только developer fallback.
+- **Speech-to-text:** bundled `whisper-cli` (Whisper.cpp) в `Contents/Resources/bin`, запускается как внешний процесс; Homebrew path остается только developer fallback. Default ASR-модель — `ggml-large-v3-turbo.bin`; тестовый режим максимальной точности использует optional `ggml-large-v3.bin`.
 - **Text improvement:** bundled `llama.cpp` runtime (`Contents/Resources/bin/llama-completion`, fallback search включает `llama-cli`) + preferred `Qwen2.5-3B-Instruct-GGUF` Q4_K_M; `Qwen2.5-1.5B-Instruct-GGUF` Q4_K_M остается legacy fallback, запускается как второй локальный CLI-процесс.
 - **Сборка:** `build.sh`, который рекурсивно собирает все `.swift` в `src/`.
 - **Упаковка:** DMG через `create-dmg`.
@@ -16,7 +16,7 @@
 
 - `src/main.swift` — entry point.
 - `src/AppDelegate.swift` — lifecycle bootstrap, проверка модели и показ `ModelDownloader`.
-- `src/ModelDownloader.swift` — downloader для Whisper model и optional Qwen text-improvement model.
+- `src/ModelDownloader.swift` — downloader для default Whisper model, optional heavy Whisper model и optional Qwen text-improvement model.
 
 ## App Composition Root
 
@@ -24,6 +24,7 @@
 - `src/App/AppController+DictationFlow.swift` — orchestration записи: recording → Whisper → optional Qwen → last-dictation save → paste.
 - `src/App/AppController+Permissions.swift` — microphone/accessibility permission flow и polling.
 - `src/App/AppController+TextImprovementMenu.swift` — menu actions/download/readiness для второй модели.
+- `src/App/AppController+WhisperModelMenu.swift` — menu actions/download/readiness для тестового режима Whisper `large-v3`.
 - `src/App/AppController+LastDictation.swift` — recovery action `Скопировать последнюю диктовку`.
 - `src/App/AppController+SystemActions.swift` — instructions, restart, uninstall, launch-at-login menu actions.
 - `src/App/AppController+Updates.swift` — update-check UI reactions.
@@ -45,7 +46,8 @@
   - `HotkeyMonitor.swift` — double `Option` start и single `Option` stop.
 
 - `src/Transcription/*`
-  - `ModelLocator.swift` — typed lookup: Whisper `.bin` отдельно, text-improvement `.gguf` отдельно.
+  - `WhisperModelSettings.swift` — persisted ASR model mode (`balanced` / `maximumAccuracy`).
+  - `ModelLocator.swift` — typed lookup: Whisper `.bin` отдельно, text-improvement `.gguf` отдельно; в balanced mode предпочитает `large-v3-turbo`, в maximumAccuracy mode — `large-v3` с fallback на turbo.
   - `RecordingService.swift` — cleanup stale temp audio и запись WAV.
   - `WhisperRunner.swift` — запуск `whisper-cli`, timeout `30` минут, streaming drain `stderr`, controlled termination, cleanup temp files, различимые ошибки.
   - `LastDictationStore.swift` — локальное сохранение последнего non-empty финального текста диктовки в `UserDefaults` до попытки paste, чтобы текст можно было восстановить через menu bar action.
@@ -91,7 +93,8 @@
 - Transcription subprocess не должен блокировать app бесконечно: зависший `whisper-cli` завершается после timeout и возвращает runtime diagnostic.
 - `stderr` subprocess читается во время выполнения, чтобы verbose/error-heavy `whisper-cli` не мог заблокироваться на заполненном pipe.
 - Text improvement является optional enhancement, а не блокером базовой диктовки. Если Qwen model отсутствует, menu action открывает downloader; если bundled `llama.cpp` runtime отсутствует или падает при включенном toggle, app вставляет cleaned Whisper-текст и показывает warning diagnostic.
-- Пользовательская установка не должна требовать Homebrew для первой или второй нейросети: `build.sh` упаковывает `whisper-cli`, `llama-completion`, transitive `.dylib` dependencies и ggml backend plugins в `Contents/Resources/bin`, `Contents/Resources/lib` и `Contents/Resources/libexec/ggml`, переписывает install names на bundle-relative `@rpath`, подписывает nested Mach-O до подписи `.app` и проверяет отсутствие `/opt/homebrew` / `/usr/local` ссылок через `scripts/check_bundled_whisper_runtime.sh` и `scripts/check_bundled_llama_runtime.sh`.
+- Whisper heavy-модель является optional test mode, а не новым дефолтом. В обычном режиме MacDictate продолжает использовать `ggml-large-v3-turbo.bin`; включение `Точная модель Whisper large-v3` в настройках скачивает `ggml-large-v3.bin` при необходимости и после успешной загрузки переключает persisted `MacDictateWhisperModelMode` на `maximumAccuracy`. Если heavy-модель удалена, runtime fallback-ится к установленной turbo-модели.
+- Пользовательская установка не должна требовать Homebrew для первой или второй нейросети: `build.sh` упаковывает `whisper-cli` и `llama-completion` в `Contents/Resources/bin`, transitive `.dylib` dependencies в раздельные `Contents/Resources/lib/whisper` и `Contents/Resources/lib/llama`, а ggml backend plugins в `Contents/Resources/libexec/ggml-whisper` и `Contents/Resources/libexec/ggml-llama`. Разделение не даёт Whisper и llama.cpp случайно поделить несовместимые версии `libggml`. Bundler переписывает install names на bundle-relative `@rpath`, подписывает nested Mach-O до подписи `.app` и проверяет отсутствие `/opt/homebrew` / `/usr/local` ссылок через `scripts/check_bundled_whisper_runtime.sh` и `scripts/check_bundled_llama_runtime.sh`.
 - Вторая модель выбирается из typed `.gguf` candidates: preferred `qwen2.5-3b-instruct-q4_k_m.gguf`, затем fallback `qwen2.5-1.5b-instruct-q4_k_m.gguf`; `.gguf` не участвует в выборе Whisper model.
 - Поведение второй модели задается через `TextImprovementProfile.professionalCopyEditor`: она должна исправлять и оформлять текст, но не менять смысл, факты, цифры, имена, бренды и профессиональные термины.
 - До Qwen применяется `TextImprovementFormatter.normalize` как lightweight pre-formatting: он исправляет заранее известные ASR-ошибки терминов (`ChaiJPT` / `Чай и GPT` -> `ChatGPT`) и оформляет очевидные `во-первых/во-вторых` перечисления, чтобы локальная модель не потеряла структуру.
@@ -108,6 +111,8 @@
 
 `build.sh` по умолчанию требует bundled `whisper.cpp` runtime для первой нейросети и bundled `llama.cpp` runtime для второй. Для developer-only сборок без этих компонентов допускаются `MACDICTATE_BUNDLE_WHISPER_RUNTIME=false` и/или `MACDICTATE_BUNDLE_LLAMA_RUNTIME=false`, но такие артефакты нельзя считать нормальным установочным кандидатом для пользователей.
 
+Если Homebrew runtime собран под слишком новый macOS deployment target, перед release-style сборкой нужно выполнить `scripts/build_clean_runtimes.sh`. Скрипт скачивает/использует source tarballs `llama.cpp` и `whisper.cpp`, собирает `arm64` runtimes под `LSMinimumSystemVersion` приложения, отключает `LLAMA_OPENSSL`, `WHISPER_CURL`, OpenMP/BLAS и проверяет, что итоговые Mach-O имеют нужный `minos` и не ссылаются на Homebrew. Затем `./build.sh` запускается с напечатанными `MACDICTATE_*_RUNTIME_PATH` и `MACDICTATE_*_GGML_BACKEND_PATH`.
+
 Финальный DMG не считается проверенным только по `build/MacDictate.app`: после создания образа нужно монтировать именно `build/artifacts/MacDictate_Final_v*.dmg` и проверять `.app` внутри mounted volume и copied install target. Это закреплено в `scripts/check_install_artifact_flow.sh`, потому что Finder/create-dmg metadata может отличаться от staging folder. Signed app и DMG source staging создаются во временных `/tmp/macdictate-*` папках, чтобы `Documents`/File Provider xattrs не ломали строгую подпись shipped artifact.
 
 ## Architecture Guardrail Note
@@ -117,6 +122,7 @@
 ## Local Verification Notes
 
 - `scripts/test_whisper_runner_timeout.sh` компилирует `WhisperRunner` с fake `whisper-cli` и проверяет timeout recovery, cleanup temp audio и large-stderr subprocess path.
+- `scripts/test_whisper_model_selection.sh` проверяет persisted ASR mode, приоритет `large-v3-turbo` в balanced mode, приоритет `large-v3` в maximumAccuracy mode и fallback между моделями.
 - `scripts/test_license_machine_id_timeout.sh` проверяет parsing/cache machine ID и fallback при зависшем fake `ioreg`.
 - `scripts/test_recording_temp_cleanup.sh` проверяет cleanup stale temp WAV/TXT.
 - `scripts/test_llama_runtime_locator.sh` проверяет приоритет bundled `llama-completion`/`llama-cli` над developer fallback paths.

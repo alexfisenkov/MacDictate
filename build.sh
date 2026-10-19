@@ -16,9 +16,10 @@ LLAMA_BIN_DIR="$RESOURCES_DIR/bin"
 LLAMA_LIB_DIR="$RESOURCES_DIR/lib"
 BUNDLE_LLAMA_RUNTIME="${MACDICTATE_BUNDLE_LLAMA_RUNTIME:-required}"
 LLAMA_RUNTIME_SOURCE="${MACDICTATE_LLAMA_RUNTIME_PATH:-}"
+LLAMA_GGML_BACKEND_SOURCE="${MACDICTATE_LLAMA_GGML_BACKEND_PATH:-}"
 BUNDLE_WHISPER_RUNTIME="${MACDICTATE_BUNDLE_WHISPER_RUNTIME:-required}"
 WHISPER_RUNTIME_SOURCE="${MACDICTATE_WHISPER_RUNTIME_PATH:-}"
-GGML_BACKEND_SOURCE="${MACDICTATE_GGML_BACKEND_PATH:-}"
+WHISPER_GGML_BACKEND_SOURCE="${MACDICTATE_WHISPER_GGML_BACKEND_PATH:-${MACDICTATE_GGML_BACKEND_PATH:-}}"
 SIGN_IDENTITY="${MACDICTATE_SIGN_IDENTITY:-${DEVELOPER_ID_APPLICATION:-}}"
 SIGN_IDENTITY="${SIGN_IDENTITY:-"-"}"
 SIGN_MODE="ad-hoc"
@@ -104,6 +105,9 @@ bundle_llama_runtime() {
     if [ -n "$LLAMA_RUNTIME_SOURCE" ]; then
         bundle_args+=(--runtime "$LLAMA_RUNTIME_SOURCE")
     fi
+    if [ -n "$LLAMA_GGML_BACKEND_SOURCE" ]; then
+        bundle_args+=(--ggml-backends "$LLAMA_GGML_BACKEND_SOURCE")
+    fi
 
     if "$PROJECT_DIR/scripts/bundle_llama_runtime.py" "${bundle_args[@]}"; then
         return 0
@@ -141,8 +145,8 @@ bundle_whisper_runtime() {
     if [ -n "$WHISPER_RUNTIME_SOURCE" ]; then
         bundle_args+=(--runtime "$WHISPER_RUNTIME_SOURCE")
     fi
-    if [ -n "$GGML_BACKEND_SOURCE" ]; then
-        bundle_args+=(--ggml-backends "$GGML_BACKEND_SOURCE")
+    if [ -n "$WHISPER_GGML_BACKEND_SOURCE" ]; then
+        bundle_args+=(--ggml-backends "$WHISPER_GGML_BACKEND_SOURCE")
     fi
 
     if "$PROJECT_DIR/scripts/bundle_whisper_runtime.py" "${bundle_args[@]}"; then

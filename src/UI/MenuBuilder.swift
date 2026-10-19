@@ -9,6 +9,9 @@ struct AppMenuComponents {
     let copyLastDictationItem: NSMenuItem
     let accessibilityStateItem: NSMenuItem
     let microphoneStateItem: NSMenuItem
+    let whisperModelStateItem: NSMenuItem
+    let maximumAccuracyWhisperToggleItem: NSMenuItem
+    let maximumAccuracyWhisperDownloadItem: NSMenuItem
     let textImprovementStateItem: NSMenuItem
     let textImprovementToggleItem: NSMenuItem
     let textImprovementDownloadItem: NSMenuItem
@@ -62,6 +65,18 @@ enum MenuBuilder {
         settingsSubmenu.addItem(microphoneAction)
         settingsSubmenu.addItem(NSMenuItem.separator())
 
+        let whisperModelStateItem = NSMenuItem(title: "Whisper: проверка...", action: nil, keyEquivalent: "")
+        settingsSubmenu.addItem(whisperModelStateItem)
+
+        let maximumAccuracyWhisperToggleItem = NSMenuItem(title: "Точная модель Whisper large-v3", action: #selector(AppController.toggleMaximumAccuracyWhisper), keyEquivalent: "")
+        maximumAccuracyWhisperToggleItem.target = controller
+        settingsSubmenu.addItem(maximumAccuracyWhisperToggleItem)
+
+        let maximumAccuracyWhisperDownloadItem = NSMenuItem(title: "Скачать точную модель Whisper", action: #selector(AppController.downloadMaximumAccuracyWhisperModel), keyEquivalent: "")
+        maximumAccuracyWhisperDownloadItem.target = controller
+        settingsSubmenu.addItem(maximumAccuracyWhisperDownloadItem)
+        settingsSubmenu.addItem(NSMenuItem.separator())
+
         let textImprovementStateItem = NSMenuItem(title: "✨ Улучшение текста: проверка...", action: nil, keyEquivalent: "")
         settingsSubmenu.addItem(textImprovementStateItem)
 
@@ -112,6 +127,9 @@ enum MenuBuilder {
             copyLastDictationItem: copyLastDictationItem,
             accessibilityStateItem: accessibilityStateItem,
             microphoneStateItem: microphoneStateItem,
+            whisperModelStateItem: whisperModelStateItem,
+            maximumAccuracyWhisperToggleItem: maximumAccuracyWhisperToggleItem,
+            maximumAccuracyWhisperDownloadItem: maximumAccuracyWhisperDownloadItem,
             textImprovementStateItem: textImprovementStateItem,
             textImprovementToggleItem: textImprovementToggleItem,
             textImprovementDownloadItem: textImprovementDownloadItem

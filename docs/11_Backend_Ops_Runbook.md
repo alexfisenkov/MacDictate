@@ -8,6 +8,8 @@
 - Alias: `https://macdictate.pro/healthz`
 - License status smoke: `https://macdictate.pro/api/license/status?deviceId=MD-OPS-SMOKE`
 - Website download smoke: `https://macdictate.pro/downloads/MacDictate_Latest.dmg`
+- Current production host: `193.233.247.71`
+- SSH aliases from the maintainer machine: `ssh macdictate-prod`, `ssh macdictate-moscow`
 
 Quick local probe:
 
@@ -36,6 +38,27 @@ ss -ltnp | grep -E ':80|:443|:3000'
 df -h
 free -m
 ```
+
+`3000` должен слушать только `127.0.0.1`; публичный доступ к API идет через nginx `/api/*` на 80/443.
+
+## Production Host
+
+Current production layout on `193.233.247.71`:
+
+- Static website: `/var/www/macdictate.pro`
+- Backend: `/opt/macdictate-backend`
+- SQLite database: `/opt/macdictate-backend/data/database.sqlite`
+- Nginx vhost: `/etc/nginx/sites-available/macdictate.pro`
+- Backups: `/root/macdictate-backups`
+
+The Moscow host is the active production host. It runs nginx, Docker Compose v2, certbot, the current static site, backend code, and the `v1.5.1` DMG alias. Runtime credentials live only in server-local `/opt/macdictate-backend/.env` with `0600` permissions; do not copy them into the repo or logs.
+
+Registrar DNS:
+
+- `A macdictate.pro` -> `193.233.247.71`
+- `A www.macdictate.pro` -> `193.233.247.71`
+
+Post-deploy checks should be run with normal DNS. Use `--resolve macdictate.pro:443:193.233.247.71` only when bypassing DNS cache during incident triage.
 
 ## Backend hardening
 

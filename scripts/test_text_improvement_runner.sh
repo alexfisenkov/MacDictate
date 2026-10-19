@@ -689,6 +689,7 @@ SWIFT
 
 swiftc \
     "$ROOT_DIR/src/System/GGMLBackendLocator.swift" \
+    "$ROOT_DIR/src/Transcription/WhisperModelSettings.swift" \
     "$ROOT_DIR/src/Transcription/ModelLocator.swift" \
     "$ROOT_DIR/src/TextImprovement/TextImprovementTrace.swift" \
     "$ROOT_DIR/src/TextImprovement/TextImprovementProfile.swift" \

@@ -20,9 +20,22 @@ struct ModelDownloadConfiguration {
         statusReady: "Нажмите 'Скачать' для старта",
         statusConnecting: "Подключение к серверам HuggingFace...",
         statusFinished: "Загрузка завершена! Настройка окружения...",
-        destinationFilename: "ggml-large-v3-turbo.bin",
+        destinationFilename: ModelLocator.balancedWhisperModelFilename,
         modelURL: URL(string: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin")!,
-        minimumBytes: 50_000_000
+        minimumBytes: ModelLocator.minimumBalancedWhisperModelBytes
+    )
+
+    static let maximumAccuracyWhisper = ModelDownloadConfiguration(
+        windowTitle: "Точная модель Whisper",
+        title: "Скачать Whisper large-v3?",
+        description: "Это более тяжелая модель распознавания речи для теста максимальной точности. Она может лучше разбирать сложную речь, шум и термины, но будет работать медленнее и сильнее нагружать Mac. \n\nОбычная быстрая модель large-v3-turbo останется запасным вариантом.",
+        buttonTitle: "Скачать large-v3",
+        statusReady: "Нажмите 'Скачать large-v3' для старта",
+        statusConnecting: "Подключение к HuggingFace для загрузки Whisper large-v3...",
+        statusFinished: "Точная модель Whisper загружена.",
+        destinationFilename: ModelLocator.maximumAccuracyWhisperModelFilename,
+        modelURL: URL(string: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.bin")!,
+        minimumBytes: ModelLocator.minimumMaximumAccuracyWhisperModelBytes
     )
 
     static let textImprovement = ModelDownloadConfiguration(

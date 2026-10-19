@@ -129,6 +129,7 @@ SWIFT
 
 swiftc \
     "$ROOT_DIR/src/System/GGMLBackendLocator.swift" \
+    "$ROOT_DIR/src/Transcription/WhisperModelSettings.swift" \
     "$ROOT_DIR/src/Transcription/ModelLocator.swift" \
     "$ROOT_DIR/src/Transcription/WhisperRunner.swift" \
     "$TEST_SWIFT" \

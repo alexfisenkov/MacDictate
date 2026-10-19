@@ -12,21 +12,39 @@ enum GGMLBackendLocator {
 
         return bundledBackendPath(
             resourcesURL: resourcesURL,
+            preferredBackendDirectoryNames: preferredBackendDirectoryNames(forRuntimePath: runtimePath),
             preferredBackendFilenames: preferredBackendFilenames
         )
     }
 
     static func bundledBackendPath(
         resourcesURL: URL,
+        preferredBackendDirectoryNames: [String] = ["ggml"],
         preferredBackendFilenames: [String] = appleSiliconCPUBackendPreference()
     ) -> String? {
-        let backendDirectoryURL = resourcesURL.appendingPathComponent("libexec/ggml", isDirectory: true)
-        var isDirectory: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: backendDirectoryURL.path, isDirectory: &isDirectory),
-              isDirectory.boolValue else {
-            return nil
+        for directoryName in preferredBackendDirectoryNames {
+            let backendDirectoryURL = resourcesURL.appendingPathComponent("libexec/\(directoryName)", isDirectory: true)
+            var isDirectory: ObjCBool = false
+            guard FileManager.default.fileExists(atPath: backendDirectoryURL.path, isDirectory: &isDirectory),
+                  isDirectory.boolValue else {
+                continue
+            }
+
+            if let backendPath = bundledBackendPath(
+                backendDirectoryURL: backendDirectoryURL,
+                preferredBackendFilenames: preferredBackendFilenames
+            ) {
+                return backendPath
+            }
         }
 
+        return nil
+    }
+
+    private static func bundledBackendPath(
+        backendDirectoryURL: URL,
+        preferredBackendFilenames: [String]
+    ) -> String? {
         for filename in preferredBackendFilenames {
             let candidate = backendDirectoryURL.appendingPathComponent(filename)
             if FileManager.default.isReadableFile(atPath: candidate.path) {
@@ -44,6 +62,17 @@ enum GGMLBackendLocator {
             .sorted { $0.lastPathComponent < $1.lastPathComponent }
             .first?
             .path
+    }
+
+    private static func preferredBackendDirectoryNames(forRuntimePath runtimePath: String) -> [String] {
+        let executableName = URL(fileURLWithPath: runtimePath).lastPathComponent
+        if executableName == "whisper-cli" {
+            return ["ggml-whisper", "ggml"]
+        }
+        if executableName == "llama-completion" || executableName == "llama-cli" {
+            return ["ggml-llama", "ggml"]
+        }
+        return ["ggml"]
     }
 
     static func appleSiliconCPUBackendPreference() -> [String] {

@@ -26,6 +26,7 @@ let logger = DebugSessionLogger(baseDirectory: baseURL, userDefaults: defaults)
 guard let session = logger.startSession(context: DebugSessionContext(
     appVersion: "test",
     textImprovementEnabled: true,
+    whisperModelMode: "maximumAccuracy",
     machineID: "MD-TEST"
 )) else {
     fputs("Expected debug session\\n", stderr)
@@ -51,6 +52,7 @@ expect(files.contains("07_final_inserted.txt"), "final text should exist")
 
 let metadata = try String(contentsOf: session.directoryURL.appendingPathComponent("metadata.json"), encoding: .utf8)
 expect(metadata.contains("\"textImprovementEnabled\" : true") || metadata.contains("\"textImprovementEnabled\":true"), "metadata should include improvement flag")
+expect(metadata.contains("maximumAccuracy"), "metadata should include Whisper model mode")
 expect(metadata.contains("MD-TEST"), "metadata should include machine ID")
 
 let events = try String(contentsOf: session.directoryURL.appendingPathComponent("events.jsonl"), encoding: .utf8)
@@ -61,7 +63,7 @@ let finalText = try String(contentsOf: session.directoryURL.appendingPathCompone
 expect(finalText == "финальный текст", "final text should match")
 
 defaults.set(false, forKey: DebugSessionLogger.enabledKey)
-expect(logger.startSession(context: DebugSessionContext(appVersion: "test", textImprovementEnabled: false, machineID: "MD-TEST")) == nil, "disabled logger should not create session")
+expect(logger.startSession(context: DebugSessionContext(appVersion: "test", textImprovementEnabled: false, whisperModelMode: "balanced", machineID: "MD-TEST")) == nil, "disabled logger should not create session")
 
 print("DebugSessionLogger test passed.")
 SWIFT

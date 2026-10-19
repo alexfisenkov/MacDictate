@@ -1,74 +1,86 @@
 # CLAUDE.md — MacDictate macOS Desktop Context
 
-> Этот файл задает локальные правила для работы именно с desktop/macOS-версией MacDictate.
-> `AGENTS.md` в этой же папке должен быть идентичной копией. Источник истины — `CLAUDE.md`; после изменения выполнить `cp CLAUDE.md AGENTS.md && cmp -s CLAUDE.md AGENTS.md`.
+> Этот файл задаёт локальные правила для работы именно с desktop/macOS-версией MacDictate.
+> `macos/AGENTS.md` должен быть побайтово идентичной копией `macos/CLAUDE.md`. После
+> изменения выполнить `cp macos/CLAUDE.md macos/AGENTS.md && cmp -s macos/CLAUDE.md macos/AGENTS.md`.
 
 ## Scope
 
 Эта папка — самостоятельный рабочий контур desktop-продукта MacDictate.
 
-- Runtime app: `src/`, `assets/`, `build.sh`.
-- Licensing/payment backend: `backend/`.
-- Landing/checkout: `web-landing/`.
-- Engineering canon: `docs/`.
-- Release ledger: `releases/`.
-- Local release checks: `scripts/`.
-- Historical/non-active scratch artifacts: `archive/`.
+- Runtime app: `macos/src/`, `macos/assets/`, `macos/build.sh`.
+- Licensing/payment backend: `macos/backend/`.
+- Landing/checkout: `macos/web-landing/`.
+- Engineering canon: `macos/docs/` — полная опись в `macos/docs/00-индекс.md`.
+- Release ledger: `macos/releases/`.
+- Local release checks: `macos/scripts/`.
+- Historical/non-active scratch artifacts: `macos/archive/`.
 
 Не смешивать desktop-release discipline с iOS и Transcribe ветками из родительского проекта.
+
+## Куда идти дальше
+
+Этот файл — только release governance и hard guardrails macOS-контура. Он не пересказывает
+общий контекст — тот живёт в двух индексах:
+
+| Нужно | Файл |
+|---|---|
+| Весь инженерный канон macOS (архитектура app, техдолг, QA, release governance, legal, backend runbook) | `macos/docs/00-индекс.md` |
+| Продукт целиком, три поверхности, состояние версий | `docs/01-продукт.md` |
+| Дерево репозитория и назначение папок | `docs/02-структура.md` |
+| Технический стек по поверхностям | `docs/03-стек.md` |
+| Потоки управления `AppController` | `docs/04-архитектура-macos.md` |
+| Якоря `file:line` в исходниках | `docs/05-якоря.md` |
+| Таймауты, пути, горячие клавиши, звуки | `docs/06-константы.md` |
+| HTTP API лицензий и платежей, каталог тарифов | `docs/07-бэкенд.md` |
+| iOS-клавиатура и оглавление мастер-спека | `docs/08-ios.md` |
+| Команды сборки и типовые процессы | `docs/09-процессы.md` |
+| Операционные правила и красные линии всего проекта | `docs/10-правила.md` |
+| Skills и агенты, правила брифинга | `docs/11-навыки-и-агенты.md` |
+| Полная опись документационного слоя | `docs/00-индекс.md` |
+| Общий обзор и маршрутизация по задачам | корневой `CLAUDE.md` |
 
 ## Release Source Of Truth
 
 Перед любой работой с версиями сначала читать:
 
-1. `docs/7_Release_Governance.md`;
-2. `releases/registry.json`;
-3. `releases/versions/<version>/RELEASE.md`;
-4. `CHANGELOG.md`;
-5. `docs/6_Release_Checklist.md`.
+1. `macos/docs/7_Release_Governance.md`;
+2. `macos/releases/registry.json`;
+3. `macos/releases/versions/<version>/RELEASE.md`;
+4. `macos/CHANGELOG.md`;
+5. `macos/docs/6_Release_Checklist.md`.
 
-Если эти источники расходятся, не угадывать по DMG-файлам. Сначала восстановить канон в registry и `RELEASE.md`.
+Если эти источники расходятся, не угадывать по DMG-файлам. Сначала восстановить канон в registry и в `macos/releases/versions/<version>/RELEASE.md`.
 
 ## Hard Guardrails
 
 Эти правила нельзя обходить:
 
-- Не создавать `releases/versions/<version>/` вручную без одновременной записи в `releases/registry.json`.
-- Не менять статус версии, bundle version, Git tag, GitHub asset или artifact path вне `releases/registry.json`.
+- Не создавать `macos/releases/versions/<version>/` вручную без одновременной записи в `macos/releases/registry.json`.
+- Не менять статус версии, bundle version, Git tag, GitHub asset или artifact path вне `macos/releases/registry.json`.
 - Не оставлять DMG/build logs в корне `macos/`.
-- Не считать локальную сборку релизом без `RELEASE.md`, registry entry, checksum и проверки.
-- Не считать публичный release завершенным, пока сайт не отдает тот же DMG через `/downloads/MacDictate_Latest.dmg` и `web-landing/downloads/latest-desktop.json` не совпадает с `registry.current.publicStable`.
-- Не начинать feature/release work, если `scripts/verify_release_governance.sh` падает.
-- Не добавлять новую версию по другой схеме: все следующие версии обязаны жить в `releases/versions/<version>/` и иметь запись с тем же именем в registry.
+- Не считать локальную сборку релизом без записи `macos/releases/versions/<version>/RELEASE.md`, registry entry, checksum и проверки.
+- Не считать публичный release завершенным, пока сайт не отдает тот же DMG через `/downloads/MacDictate_Latest.dmg` и `macos/web-landing/downloads/latest-desktop.json` не совпадает с `registry.current.publicStable`.
+- Не начинать feature/release work, если `macos/scripts/verify_release_governance.sh` падает.
+- Не добавлять новую версию по другой схеме: все следующие версии обязаны жить в `macos/releases/versions/<version>/` и иметь запись с тем же именем в registry.
 - Если есть противоречие между docs, registry, GitHub и DMG, остановиться и сначала восстановить release ledger.
-- Перед app-side правками читать `docs/10_App_Architecture_Guardrails.md`; не наращивать `AppController`, `AppController+*.swift`, runner или validator выше лимитов, а выделять новый слой/файл.
-- Перед завершением app-side правки запускать `scripts/check_architecture_guardrails.sh`.
+- Перед app-side правками читать `macos/docs/10_App_Architecture_Guardrails.md`; не наращивать `AppController`, `AppController+*.swift`, runner или validator выше лимитов, а выделять новый слой/файл.
+- Перед завершением app-side правки запускать `macos/scripts/check_architecture_guardrails.sh`.
 
 ## Current Version State
 
-- Текущая публичная stable: `v1.5.1`.
-- Bundle в `assets/Info.plist`: `1.5.2` / build `12`.
-- Рабочая линия: `release/1.5.2`.
-- `v1.5.0` считается релизом только при наличии tag `v1.5.0`, GitHub Release, registry entry, DMG asset и smoke evidence.
-- В `1.5.0` `WhisperRunner` ограничивает зависший `whisper-cli` timeout `30` минут и читает `stderr` во время работы процесса; `LicenseService` ограничивает первый `ioreg`, использует license request timeout `20` секунд и не показывает runtime-warning при transient license failure, если активен valid cached grace; `RecordingService` чистит stale temp audio.
-- В `1.5.0` добавлен optional second-AI layer: preferred Qwen2.5-3B-Instruct Q4_K_M (`.gguf`) через `llama.cpp` (`llama-completion`) с fallback на Qwen2.5-1.5B-Instruct Q4_K_M, persisted toggle `MacDictateTextImprovementEnabled`, top-level toggle `Улучшить текст`, downloader модели, safe input limit `6_000` символов, runtime timeout `10` минут, context `8_192` tokens, controlled retry для невалидного Qwen-output, `TextImprovementProfile.professionalCopyEditor` с editorial rules / terminology packs и `TextImprovementFormatter` для очевидных list/term guardrails.
-- Text improvement pipeline применяет `TextImprovementFormatter.normalize` до Qwen и после Qwen: pre-formatting защищает структуру перечислений и термины (`ChaiJPT`/`Чай и GPT` -> `ChatGPT`), post-processing страхует финальный output.
-- В `1.5.0` добавлен opt-in local debug session logging: `MacDictateDebugSessionLoggingEnabled` сохраняет аудио, raw/cleaned Whisper output, Qwen prompt/raw/cleaned/final output, final inserted text и `events.jsonl` в `~/.macdictate/debug-sessions/`. Эти artifacts чувствительны и не отправляются на сервер.
-- В `1.5.1-working` добавлена safety-система последней диктовки: финальный non-empty текст сохраняется в `MacDictateLastDictation` до попытки paste, а menu action `Скопировать последнюю диктовку` копирует его в системный буфер для восстановления при смене активного окна/курсора.
-- В `1.5.1` release-signing контур переведен на Developer ID: `build.sh` поддерживает `MACDICTATE_SIGN_IDENTITY`, hardened runtime, timestamp, DMG signing, default `assets/MacDictate.entitlements` с `com.apple.security.device.audio-input` и `MACDICTATE_NOTARY_PROFILE` / `MACDICTATE_NOTARIZE=true`; runbook — `docs/9_Distribution_Signing_Runbook.md`. Notarized/stapled DMG подтвержден с `Developer ID Application: Aleksander Fisenkov (5BABN9U6WS)` и notary profile `macdictate-notary`.
-- В `1.5.2-working` app-side структура повторно разгружена: `AppController.swift` держит composition/status, сценарные extension-файлы живут в `src/App/`, системные runtime wrappers — в `src/System/`, update checker — в `src/Updates/`, а text-improvement cleaner/validator/trace/llama runtime отделены от runner.
-- В `1.5.2-working` clean-install path обеих нейросетей закрыт bundled runtime: `build.sh` по умолчанию кладет `whisper-cli`/`llama-completion` в `Contents/Resources/bin`, transitive `.dylib` dependencies в `Contents/Resources/lib`, ggml backend plugins в `Contents/Resources/libexec/ggml`, переписывает install names на `@rpath`, подписывает nested Mach-O и проверяет artifact через `scripts/check_bundled_whisper_runtime.sh`, `scripts/check_bundled_llama_runtime.sh` и `scripts/check_install_artifact_flow.sh`. Homebrew runtime теперь только developer fallback, не пользовательское требование.
-- В `1.5.2-working` release/download discipline усилена: сайт должен зеркалить текущий `public_stable` DMG как `/downloads/MacDictate_Latest.dmg`, tracked manifest живет в `web-landing/downloads/latest-desktop.json`, backend health/ops runbook — `docs/11_Backend_Ops_Runbook.md`, а fresh install при временном license outage получает bounded 24h connectivity grace.
-- Будущий рост app-side governed by `docs/10_App_Architecture_Guardrails.md`: новая ответственность получает свой слой/файл, `AppController.swift` hard limit 250 строк, `src/App/AppController+*.swift` hard limit 320 строк, остальные Swift-файлы hard limit 350 строк, проверка — `scripts/check_architecture_guardrails.sh`.
-- Будущий AI corpus/fine-tune governed by `docs/8_AI_Corpus_Strategy.md`: primary corpus — approved real dictation pairs из debug-сессий; copywriting datasets HuggingFace — только secondary style/eval material после license review.
-- Локальные runtime harnesses/checks: `scripts/test_whisper_runner_timeout.sh`, `scripts/test_license_machine_id_timeout.sh`, `scripts/test_license_status_response.sh`, `scripts/test_license_grace_diagnostic.sh`, `scripts/test_recording_temp_cleanup.sh`, `scripts/test_llama_runtime_locator.sh`, `scripts/test_text_improvement_runner.sh`, `scripts/test_debug_session_logger.sh`, `scripts/test_last_dictation_store.sh`, `scripts/check_bundled_whisper_runtime.sh`, `scripts/check_bundled_llama_runtime.sh`, `scripts/check_install_artifact_flow.sh`, `scripts/check_distribution_signing.sh`.
+Текущий публичный тег, bundle version и рабочая ветка — `docs/01-продукт.md` (сверено 2026-09-10).
+Инженерная хронология рабочих линий и checkpoint-ов — `macos/docs/2_ActionLog.md`; пользовательски
+значимые изменения по релизам — `macos/CHANGELOG.md`; условия, при которых версия официально
+считается выпущенной, — `macos/docs/7_Release_Governance.md`; smoke-покрытие каждой фичи и её
+проверочный скрипт — `macos/docs/5_QA_Smoke_Matrix.md`.
 
 ## Version Folder Contract
 
 Каждая версия хранится так:
 
 ```text
-releases/versions/<version>/
+macos/releases/versions/<version>/
 ├── RELEASE.md
 └── artifacts/
     ├── ARTIFACTS.md
@@ -76,37 +88,37 @@ releases/versions/<version>/
     └── локальные DMG/build logs (git ignored)
 ```
 
-Новый DMG нельзя оставлять в корне `macos/`. Обычный `./build.sh` пишет временный DMG в `build/artifacts/`; release-candidate переносится в `releases/versions/<version>/artifacts/`.
+Новый DMG нельзя оставлять в корне `macos/`. Обычный `macos/build.sh` пишет временный DMG в `macos/build/artifacts/`; release-candidate переносится в `macos/releases/versions/<version>/artifacts/`.
 
 ## Required Release Updates
 
 Любое изменение release/status/version обязано обновить:
 
-- `releases/registry.json`;
-- `releases/versions/<version>/RELEASE.md`;
-- `CHANGELOG.md`;
-- `docs/2_ActionLog.md`;
-- `docs/6_Release_Checklist.md`;
-- `web-landing/downloads/latest-desktop.json`, если меняется публичный stable release;
-- `docs/4_Decision_Log.md`, если изменилось правило или архитектурное решение;
-- `docs/3_TechDebt_Tasks.md`, если остался новый долг.
+- `macos/releases/registry.json`;
+- `macos/releases/versions/<version>/RELEASE.md`;
+- `macos/CHANGELOG.md`;
+- `macos/docs/2_ActionLog.md`;
+- `macos/docs/6_Release_Checklist.md`;
+- `macos/web-landing/downloads/latest-desktop.json`, если меняется публичный stable release;
+- `macos/docs/4_Decision_Log.md`, если изменилось правило или архитектурное решение;
+- `macos/docs/3_TechDebt_Tasks.md`, если остался новый долг.
 
 После этого обязательно выполнить:
 
 ```bash
-scripts/verify_release_governance.sh
+macos/scripts/verify_release_governance.sh
 ```
 
 Для локального аудита ignored DMG/build logs:
 
 ```bash
-scripts/verify_release_governance.sh --strict-local-artifacts
+macos/scripts/verify_release_governance.sh --strict-local-artifacts
 ```
 
 Если работа касается GitHub Releases:
 
 ```bash
-scripts/verify_release_governance.sh --online
+macos/scripts/verify_release_governance.sh --online
 ```
 
 ## Git Rules
@@ -114,8 +126,10 @@ scripts/verify_release_governance.sh --online
 - Публичный release tag должен быть annotated.
 - Checkpoint tags имеют формат `checkpoint/<version>-<slug>`.
 - Hotfix старой версии делать от release tag через `hotfix/<version>-<topic>`.
-- Не менять `assets/Info.plist` из-за имени ветки; version bump только в release-cycle.
 - Не коммитить секреты, `.env`, runtime DB, node_modules, build output и локальные DMG.
+
+Версионирование (включая правило про `assets/Info.plist` и имя ветки), secrets policy и
+архитектурные красные линии всего проекта — целиком в `docs/10-правила.md`.
 
 ## Historical Caveats
 

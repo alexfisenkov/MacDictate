@@ -4,6 +4,17 @@
 
 ## [Unreleased] 1.5.2 Working Line
 
+### Added
+- Тестовый режим максимальной точности Whisper: в настройках можно включить `Whisper large-v3`; если модель не скачана, MacDictate открывает downloader, а после успешной загрузки переключает распознавание на heavy-модель.
+- Воспроизводимый helper `scripts/build_clean_runtimes.sh` для сборки `whisper-cli` и `llama-completion` под minimum macOS target приложения без Homebrew-linked runtime dependencies.
+
+### Changed
+- Выбор Whisper-модели стал явным: обычный режим продолжает использовать `large-v3-turbo`, а установленная heavy-модель больше не подменяет дефолт просто потому, что она крупнее.
+- Bundled runtime layout разделен для двух нейросетей: Whisper использует `lib/whisper` + `libexec/ggml-whisper`, Qwen/llama.cpp использует `lib/llama` + `libexec/ggml-llama`, чтобы разные версии `libggml` не конфликтовали внутри app bundle.
+
+### Fixed
+- Release-style desktop artifact больше не подтягивает Homebrew Mach-O с `minos` новее `LSMinimumSystemVersion`: clean runtimes собраны под macOS `11.0`, checks подтверждают отсутствие `/opt/homebrew` / `/usr/local` ссылок.
+
 ### Notes
 - Рабочая линия открыта после публикации `v1.5.1`.
 

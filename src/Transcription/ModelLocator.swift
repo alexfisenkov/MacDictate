@@ -1,6 +1,12 @@
 import Foundation
 
 enum ModelLocator {
+    static let balancedWhisperModelFilename = "ggml-large-v3-turbo.bin"
+    static let maximumAccuracyWhisperModelFilename = "ggml-large-v3.bin"
+    static let minimumBalancedWhisperModelBytes: Int64 = 500_000_000
+    static let minimumMaximumAccuracyWhisperModelBytes: Int64 = 1_500_000_000
+    static let minimumLegacyWhisperModelBytes: Int64 = 50_000_000
+
     static let preferredTextImprovementModelFilename = "qwen2.5-3b-instruct-q4_k_m.gguf"
     static let legacyTextImprovementModelFilename = "qwen2.5-1.5b-instruct-q4_k_m.gguf"
     static let minimumPreferredTextImprovementModelBytes: Int64 = 2_000_000_000
@@ -21,6 +27,10 @@ enum ModelLocator {
         modelsDirectoryPath + "/" + textImprovementModelFilename
     }
 
+    static var maximumAccuracyWhisperModelPath: String {
+        modelsDirectoryPath + "/" + maximumAccuracyWhisperModelFilename
+    }
+
     static func ensureModelsDirectoryExists() {
         try? FileManager.default.createDirectory(
             atPath: modelsDirectoryPath,
@@ -34,7 +44,38 @@ enum ModelLocator {
             return false
         }
 
-        return files.contains { $0.hasSuffix(".bin") }
+        return files.contains { filename in
+            guard filename.hasSuffix(".bin") else { return false }
+            let path = directory + "/" + filename
+            let size = (try? FileManager.default.attributesOfItem(atPath: path)[.size]) as? Int64 ?? 0
+            return size > minimumLegacyWhisperModelBytes
+        }
+    }
+
+    static func hasInstalledMaximumAccuracyWhisperModel(in directory: String = modelsDirectoryPath) -> Bool {
+        isInstalledWhisperModel(
+            maximumAccuracyWhisperModelFilename,
+            minimumBytes: minimumMaximumAccuracyWhisperModelBytes,
+            in: directory
+        )
+    }
+
+    static func hasInstalledBalancedWhisperModel(in directory: String = modelsDirectoryPath) -> Bool {
+        isInstalledWhisperModel(
+            balancedWhisperModelFilename,
+            minimumBytes: minimumBalancedWhisperModelBytes,
+            in: directory
+        )
+    }
+
+    static func isInstalledWhisperModel(_ filename: String, minimumBytes: Int64, in directory: String) -> Bool {
+        let modelPath = directory + "/" + filename
+        guard FileManager.default.fileExists(atPath: modelPath),
+              let size = (try? FileManager.default.attributesOfItem(atPath: modelPath)[.size]) as? Int64 else {
+            return false
+        }
+
+        return size > minimumBytes
     }
 
     static func hasInstalledTextImprovementModel(in directory: String = modelsDirectoryPath) -> Bool {
@@ -60,19 +101,46 @@ enum ModelLocator {
         return nil
     }
 
-    static func bestAvailableModelPath(in directory: String = modelsDirectoryPath) -> String? {
+    static func bestAvailableModelPath(
+        in directory: String = modelsDirectoryPath,
+        mode: WhisperModelMode = WhisperModelSettings.currentMode()
+    ) -> String? {
+        let preferredCandidates: [(filename: String, minimumBytes: Int64)]
+        switch mode {
+        case .balanced:
+            preferredCandidates = [
+                (balancedWhisperModelFilename, minimumBalancedWhisperModelBytes),
+                (maximumAccuracyWhisperModelFilename, minimumMaximumAccuracyWhisperModelBytes)
+            ]
+        case .maximumAccuracy:
+            preferredCandidates = [
+                (maximumAccuracyWhisperModelFilename, minimumMaximumAccuracyWhisperModelBytes),
+                (balancedWhisperModelFilename, minimumBalancedWhisperModelBytes)
+            ]
+        }
+
+        for candidate in preferredCandidates
+            where isInstalledWhisperModel(candidate.filename, minimumBytes: candidate.minimumBytes, in: directory) {
+            return directory + "/" + candidate.filename
+        }
+
         guard let files = try? FileManager.default.contentsOfDirectory(atPath: directory) else {
             return nil
         }
 
-        let binFiles = files.filter { $0.hasSuffix(".bin") }
+        let binFiles = files.filter { filename in
+            guard filename.hasSuffix(".bin") else { return false }
+            let path = directory + "/" + filename
+            let size = (try? FileManager.default.attributesOfItem(atPath: path)[.size]) as? Int64 ?? 0
+            return size > minimumLegacyWhisperModelBytes
+        }
         guard !binFiles.isEmpty else { return nil }
 
         let sorted = binFiles.sorted { lhs, rhs in
             let lhsPath = directory + "/" + lhs
             let rhsPath = directory + "/" + rhs
-            let lhsSize = (try? FileManager.default.attributesOfItem(atPath: lhsPath)[.size] as? Int) ?? 0
-            let rhsSize = (try? FileManager.default.attributesOfItem(atPath: rhsPath)[.size] as? Int) ?? 0
+            let lhsSize = (try? FileManager.default.attributesOfItem(atPath: lhsPath)[.size] as? Int64) ?? 0
+            let rhsSize = (try? FileManager.default.attributesOfItem(atPath: rhsPath)[.size] as? Int64) ?? 0
             return lhsSize > rhsSize
         }
 

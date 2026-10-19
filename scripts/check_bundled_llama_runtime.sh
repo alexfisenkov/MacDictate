@@ -10,7 +10,14 @@ RESOURCES_DIR="$APP_PATH/Contents/Resources"
 INFO_PLIST="$APP_PATH/Contents/Info.plist"
 BIN_DIR="$RESOURCES_DIR/bin"
 LIB_DIR="$RESOURCES_DIR/lib"
-GGML_BACKEND_DIR="$RESOURCES_DIR/libexec/ggml"
+LLAMA_LIB_DIR="$RESOURCES_DIR/lib/llama"
+GGML_BACKEND_DIR="$RESOURCES_DIR/libexec/ggml-llama"
+if [ ! -d "$LLAMA_LIB_DIR" ]; then
+  LLAMA_LIB_DIR="$LIB_DIR"
+fi
+if [ ! -d "$GGML_BACKEND_DIR" ]; then
+  GGML_BACKEND_DIR="$RESOURCES_DIR/libexec/ggml"
+fi
 status=0
 
 fail() {
@@ -93,12 +100,20 @@ check_macho_file() {
 
 check_macho_file "$runtime"
 
-if [ ! -d "$LIB_DIR" ]; then
-  fail "Bundled llama lib directory not found: $LIB_DIR"
+if [ ! -d "$LLAMA_LIB_DIR" ]; then
+  fail "Bundled llama lib directory not found: $LLAMA_LIB_DIR"
 else
   while IFS= read -r -d '' dylib; do
     check_macho_file "$dylib"
-  done < <(find "$LIB_DIR" -type f -name "*.dylib" -print0)
+  done < <(find "$LLAMA_LIB_DIR" -type f -name "*.dylib" -print0)
+fi
+
+if [ ! -d "$GGML_BACKEND_DIR" ]; then
+  fail "Bundled llama ggml backend directory not found: $GGML_BACKEND_DIR"
+else
+  while IFS= read -r -d '' backend; do
+    check_macho_file "$backend"
+  done < <(find "$GGML_BACKEND_DIR" -type f -name "*.so" -print0)
 fi
 
 runtime_stderr="$(mktemp)"

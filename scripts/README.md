@@ -46,6 +46,14 @@ GitHub Actions gate:
 scripts/test_whisper_runner_timeout.sh
 ```
 
+## `test_whisper_model_selection.sh`
+
+Компилирует `ModelLocator` и проверяет выбор ASR-модели: balanced mode предпочитает `large-v3-turbo`, maximumAccuracy mode предпочитает `large-v3`, а fallback между валидными `.bin` моделями сохраняется.
+
+```bash
+scripts/test_whisper_model_selection.sh
+```
+
 ## `test_license_machine_id_timeout.sh`
 
 Компилирует `LicenseService` с fake `ioreg` и проверяет parsing/cache machine ID, а также быстрый generated fallback при зависшем command.
@@ -80,15 +88,25 @@ scripts/test_llama_runtime_locator.sh
 
 ## `bundle_llama_runtime.py`
 
-Сборочный helper для `build.sh`: копирует локальный `llama-completion`/`llama-cli` в `MacDictate.app/Contents/Resources/bin`, собирает transitive `.dylib` dependencies в `Contents/Resources/lib` и переписывает install names на bundle-relative `@rpath`.
+Сборочный helper для `build.sh`: копирует локальный `llama-completion`/`llama-cli` в `MacDictate.app/Contents/Resources/bin`, собирает transitive `.dylib` dependencies в `Contents/Resources/lib/llama`, копирует ggml backend plugins в `Contents/Resources/libexec/ggml-llama` и переписывает install names на bundle-relative `@rpath`.
 
 Обычно запускается только через `./build.sh`.
 
 ## `bundle_whisper_runtime.py`
 
-Сборочный helper для `build.sh`: копирует локальный `whisper-cli` в `MacDictate.app/Contents/Resources/bin`, собирает transitive `.dylib` dependencies в `Contents/Resources/lib`, копирует ggml backend plugins в `Contents/Resources/libexec/ggml` и переписывает install names на bundle-relative `@rpath`.
+Сборочный helper для `build.sh`: копирует локальный `whisper-cli` в `MacDictate.app/Contents/Resources/bin`, собирает transitive `.dylib` dependencies в `Contents/Resources/lib/whisper`, копирует ggml backend plugins в `Contents/Resources/libexec/ggml-whisper` и переписывает install names на bundle-relative `@rpath`.
 
 Обычно запускается только через `./build.sh`.
+
+## `build_clean_runtimes.sh`
+
+Собирает clean `llama-completion` и `whisper-cli` из upstream source tarballs под `MACDICTATE_RUNTIME_DEPLOYMENT_TARGET` (по умолчанию `11.0`) без Homebrew-linked runtime dependencies. Скрипт нужен перед release-style сборкой, если локальный Homebrew уже собран под слишком новый macOS SDK/minos.
+
+```bash
+scripts/build_clean_runtimes.sh
+```
+
+После успешной сборки скрипт печатает `MACDICTATE_LLAMA_RUNTIME_PATH`, `MACDICTATE_LLAMA_GGML_BACKEND_PATH`, `MACDICTATE_WHISPER_RUNTIME_PATH` и `MACDICTATE_WHISPER_GGML_BACKEND_PATH` для `./build.sh`.
 
 ## `check_bundled_llama_runtime.sh`
 

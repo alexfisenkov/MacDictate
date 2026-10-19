@@ -28,7 +28,10 @@ extension AppController {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self else { return }
 
-            debugSession?.record("whisper_started")
+            debugSession?.record("whisper_started", details: [
+                "modelMode": WhisperModelSettings.currentMode().rawValue,
+                "modelPath": ModelLocator.bestAvailableModelPath() ?? ""
+            ])
             let transcription = self.whisperRunner.transcribe(audioPath: audioPath)
             let textResult: Result<(text: String, warning: String?), TranscriptionFailure>
 
@@ -220,6 +223,7 @@ extension AppController {
             activeDebugSession = debugSessionLogger.startSession(context: DebugSessionContext(
                 appVersion: appVersionString(),
                 textImprovementEnabled: TextImprovementSettings.isEnabled(),
+                whisperModelMode: WhisperModelSettings.currentMode().rawValue,
                 machineID: licenseService.machineID
             ))
             activeDebugSession?.record("recording_started")

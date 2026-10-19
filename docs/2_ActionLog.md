@@ -2,12 +2,32 @@
 
 Этот журнал фиксирует инженерные шаги и checkpoints, а не маркетинговое описание релиза.
 
+## 2026-05-12 — optional Whisper large-v3 test mode
+
+- В рабочей линии `release/1.5.2` добавлен тестовый режим максимальной точности ASR без публикации релиза: settings menu получил toggle `Точная модель Whisper large-v3` и action `Скачать точную модель Whisper`.
+- `ModelLocator` больше не выбирает Whisper-модель просто по максимальному размеру: balanced mode предпочитает `ggml-large-v3-turbo.bin`, maximumAccuracy mode предпочитает `ggml-large-v3.bin`, оба режима имеют fallback на другую валидную `.bin` модель.
+- Добавлен persisted mode `MacDictateWhisperModelMode` и отдельный app-layer menu handler `AppController+WhisperModelMenu.swift`; если heavy-модель отсутствует, включение toggle открывает downloader и переключает режим только после успешной загрузки.
+- Debug-session metadata/events теперь фиксируют `whisperModelMode`, а событие `whisper_started` пишет выбранный mode/path, чтобы сравнивать качество turbo и large-v3 по логам.
+- Добавлен targeted harness `scripts/test_whisper_model_selection.sh` для проверки выбора turbo/large-v3/fallback и сохранения режима.
+- После пользовательского smoke heavy-модели закрыт clean-Mac packaging blocker: `whisper.cpp` и `llama.cpp` runtimes пересобраны из upstream source tarballs под `macOS 11.0` deployment target, без Homebrew OpenSSL/OpenMP/BLAS dependencies.
+- Bundled runtime layout разделен по слоям: llama dependencies живут в `Contents/Resources/lib/llama` и `libexec/ggml-llama`, Whisper dependencies — в `Contents/Resources/lib/whisper` и `libexec/ggml-whisper`. Это устраняет риск ABI-конфликта разных `libggml` версий в одном app bundle.
+- `bundle_llama_runtime.py` / `bundle_whisper_runtime.py` больше не следуют install-name самой `.dylib` как runtime dependency, чтобы не подтягивать одноименные Homebrew dylibs через fallback search path.
+- Добавлен `scripts/build_clean_runtimes.sh`: воспроизводимая сборка clean `llama-completion` и `whisper-cli` с проверкой `minos` и отсутствия `/opt/homebrew` / `/usr/local` ссылок перед release-style `./build.sh`.
+- Локально собран `build/artifacts/MacDictate_Final_v1.5.2.dmg` с Developer ID подписью и без notarization для теста; `check_bundled_llama_runtime.sh`, `check_bundled_whisper_runtime.sh`, `check_distribution_signing.sh` и `check_install_artifact_flow.sh` подтверждают self-contained artifact path.
+
 ## 2026-05-11 — clean install release/download and license hardening
 
+- Production перенесен на московский host `193.233.247.71` для `macdictate.pro`: настроены ключевые SSH aliases `macdictate-prod` и `macdictate-moscow`, установлены nginx/Docker Compose v2/certbot/sqlite3, перенесены static site, legal docs, backend code, runtime `.env` без вывода секретов, Let's Encrypt certificate и SQLite database через `VACUUM INTO`.
+- DNS cutover подтвержден обычным live DNS: `macdictate.pro` и `www.macdictate.pro` резолвятся в `193.233.247.71`; `/`, `www`, `/api/health`, `/api/license/status`, `/api/plans` и `/downloads/MacDictate_Latest.dmg` работают; DMG SHA256 подтвержден как `f6234a26d09988bd9620e111717b631c5c5ea46d1621beffa46e5bea3ea6569e`.
+- Follow-up audit закрыл stale server references: прямые упоминания legacy IP удалены из текущего проекта, `macdictate-prod` и `macdictate-moscow` в локальном SSH config теперь ведут на московский production host, а активные production paths на сервере не содержат legacy IP.
+- Во время миграции между legacy host и Moscow host наблюдался TLS/HTTP timeout, поэтому прозрачный proxy не использовался; перед DNS cutover выполнен финальный SQLite snapshot, а новые live записи уже идут в московскую базу.
 - Публичный update/download metadata `assets/version.json` возвращен на stable `1.5.1` и сайт alias `/downloads/MacDictate_Latest.dmg`, чтобы внешний пользовательский контур не рекламировал рабочую `1.5.2` до отдельного release approval.
 - Зафиксировано release-правило: после каждого публичного desktop-релиза сайт обязан отдавать тот же stable DMG через `/downloads/MacDictate_Latest.dmg`; добавлен tracked manifest `web-landing/downloads/latest-desktop.json`, а `scripts/verify_release_governance.sh` теперь сверяет его с `registry.current.publicStable`.
 - `docs/6_Release_Checklist.md` и `docs/7_Release_Governance.md` обновлены: GitHub Release больше не считается финалом, пока сайт не обновлен на тот же DMG.
-- По live-проверке `macdictate.pro` подтвержден текущий симптом: TCP connect к `78.159.131.90:443` быстрый, но HTTPS/TLS handshake уходит в timeout; это указывает на reverse proxy / HTTPS / host layer до попадания запроса в Express route.
+- По pre-migration live-проверке `macdictate.pro` был подтвержден HTTPS/TLS timeout до Express route; production migration на московский host закрыла пользовательский download/API path.
+- Follow-up audit: прямой доступ из локальной сети к legacy host зависал до SSH/HTTPS banner, но через jump host production shell был доступен. Точный root cause локального route timeout не подтвержден; на legacy host `ufw`/fail2ban inactive и явного ban/tarpit для локального исходящего IP не найдено.
+- Production сайт обновлен из локального `web-landing/`, legal docs синхронизированы из `docs/legal/`, а `/var/www/macdictate.pro/downloads/MacDictate_Latest.dmg` заменен на `v1.5.1` bytes из `releases/versions/v1.5.1/artifacts/MacDictate_Final_v1.5.1.dmg`; SHA256 подтвержден как `f6234a26d09988bd9620e111717b631c5c5ea46d1621beffa46e5bea3ea6569e`.
+- Production backend в `/opt/macdictate-backend` обновлен до текущего кода с `/api/health`, `/api/plans` и hardened license/payment routes; перед заменой созданы backups в `/root/macdictate-backups/`. Runtime secrets перенесены из server-side `docker-compose.yml` в локальный `.env` с правами `0600`, а контейнер теперь слушает только `127.0.0.1:3000` за nginx.
 - Backend получил `/api/health` и `/healthz`, slow-request логирование без device ID, явные Node server timeout settings и SQLite WAL/busy-timeout для снижения риска локов на license/payment database.
 - `LicenseService` получил bounded first-run connectivity grace: если на чистом Mac сервер лицензий недоступен до первого успешного ответа, приложение включает 24-часовой локальный grace с warning diagnostic, чтобы пользователь мог начать диктовку и не упирался в разовый outage.
 - `WhisperRunner` и `LlamaCompletionRuntime` больше не передают `GGML_BACKEND_PATH` как директорию; добавлен `GGMLBackendLocator`, выбирающий конкретный bundled ggml backend file под Apple Silicon.

@@ -57,12 +57,14 @@ def copy_dependency(source, lib_dir):
     return dest
 
 
-def copy_ggml_backends(backend_dir, resources_dir, search_dirs):
+def copy_ggml_backends(backend_dir, resources_dir, search_dirs, backend_subdir="ggml-whisper", library_subdir="whisper"):
     if backend_dir is None:
         return []
 
     lib_dir = resources_dir / "lib"
-    bundled_backend_dir = resources_dir / "libexec" / "ggml"
+    if library_subdir:
+        lib_dir = lib_dir / library_subdir
+    bundled_backend_dir = resources_dir / "libexec" / backend_subdir
     lib_dir.mkdir(parents=True, exist_ok=True)
     bundled_backend_dir.mkdir(parents=True, exist_ok=True)
 
@@ -77,7 +79,7 @@ def copy_ggml_backends(backend_dir, resources_dir, search_dirs):
             copy_dependency(dependency_source, lib_dir)
 
         macho.patch_macho(backend_dest, is_library=True)
-        ensure_rpath(backend_dest, "@loader_path/../../lib")
+        ensure_rpath(backend_dest, f"@loader_path/../../lib/{library_subdir}" if library_subdir else "@loader_path/../../lib")
         copied_backends.append(backend_dest)
 
     return copied_backends
@@ -88,6 +90,8 @@ def main():
     parser.add_argument("--resources", required=True, help="Path to MacDictate.app/Contents/Resources")
     parser.add_argument("--runtime", default="", help="Optional path to whisper-cli")
     parser.add_argument("--ggml-backends", default="", help="Optional path to ggml libexec backend directory")
+    parser.add_argument("--lib-subdir", default="whisper", help="Runtime-specific subdirectory under Resources/lib")
+    parser.add_argument("--backend-subdir", default="ggml-whisper", help="Runtime-specific subdirectory under Resources/libexec")
     args = parser.parse_args()
 
     resources_dir = Path(args.resources)
@@ -97,9 +101,20 @@ def main():
         return 1
 
     search_dirs = [str(Path(path).resolve()) for path in DEFAULT_SEARCH_DIRS if Path(path).exists()]
-    runtime_dest, libraries = macho.copy_runtime(runtime_path, resources_dir, search_dirs)
+    runtime_dest, libraries = macho.copy_runtime(
+        runtime_path,
+        resources_dir,
+        search_dirs,
+        library_subdir=args.lib_subdir
+    )
     backend_dir = find_ggml_backend_dir(args.ggml_backends)
-    backends = copy_ggml_backends(backend_dir, resources_dir, search_dirs)
+    backends = copy_ggml_backends(
+        backend_dir,
+        resources_dir,
+        search_dirs,
+        backend_subdir=args.backend_subdir,
+        library_subdir=args.lib_subdir
+    )
 
     print(f"Bundled whisper runtime: {runtime_dest}")
     for lib in sorted(libraries):

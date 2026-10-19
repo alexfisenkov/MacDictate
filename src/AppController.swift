@@ -16,6 +16,8 @@ final class AppController: NSObject {
     var hotkeyMonitor: HotkeyMonitor?
     var permissionTimer: Timer?
     var wakeObserver: NSObjectProtocol?
+    var whisperModelWindowController: NSWindowController?
+    var activeWhisperModelDownloader: ModelDownloader?
     var textImprovementWindowController: NSWindowController?
     var activeTextImprovementDownloader: ModelDownloader?
     var activeDebugSession: DebugSession?
@@ -57,6 +59,7 @@ final class AppController: NSObject {
         licenseService.normalizeStateIfNeeded()
         refreshLicenseMenuItem()
         refreshPermissionMenuItems()
+        refreshWhisperModelMenuItems()
         refreshTextImprovementMenuItems()
         refreshLastDictationMenuItem()
         refreshDiagnosticsMenuItem()
@@ -70,6 +73,24 @@ final class AppController: NSObject {
         menuComponents.microphoneStateItem.title = StatusPresentation.microphoneMenuTitle(
             state: diagnostics.currentMicrophonePermissionState()
         )
+    }
+
+    func refreshWhisperModelMenuItems() {
+        let mode = WhisperModelSettings.currentMode()
+        let hasMaximumAccuracyModel = ModelLocator.hasInstalledMaximumAccuracyWhisperModel()
+        let hasBalancedModel = ModelLocator.hasInstalledBalancedWhisperModel()
+
+        menuComponents.whisperModelStateItem.title = StatusPresentation.whisperModelMenuTitle(
+            mode: mode,
+            hasMaximumAccuracyModel: hasMaximumAccuracyModel,
+            hasBalancedModel: hasBalancedModel
+        )
+        menuComponents.maximumAccuracyWhisperToggleItem.state = mode == .maximumAccuracy ? .on : .off
+        menuComponents.maximumAccuracyWhisperToggleItem.isEnabled = !isProcessing
+        menuComponents.maximumAccuracyWhisperDownloadItem.title = hasMaximumAccuracyModel
+            ? "Переустановить точную модель Whisper"
+            : "Скачать точную модель Whisper"
+        menuComponents.maximumAccuracyWhisperDownloadItem.isEnabled = !isProcessing
     }
 
     func refreshTextImprovementMenuItems() {
