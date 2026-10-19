@@ -4,9 +4,9 @@
   "registryUpdatedAt": "2026-10-19",
   "governanceDocument": "docs/7_Release_Governance.md",
   "current": {
-    "publicStable": "v1.5.2",
+    "publicStable": "v1.6.0",
     "workingLine": "v1.6.0-working",
-    "developmentBranch": "release/1.6.0",
+    "developmentBranch": "main",
     "bundleShortVersion": "1.6.0",
     "bundleVersion": "14",
     "distributionChannel": "github-releases"
@@ -379,8 +379,8 @@
     },
     {
       "version": "v1.5.2",
-      "status": "public_stable",
-      "channel": "stable",
+      "status": "public_release",
+      "channel": "stable_history",
       "bundle": {
         "shortVersion": "1.5.2",
         "build": "13"
@@ -448,37 +448,79 @@
         "localArtifactSha256": null,
         "buildLogPath": null
       },
-      "summary": "Windows x64 local dictation, double Alt; coordinated GitHub checks and desktop1.6.0 preparation.",
+      "summary": "Development snapshot shipped as desktopv1.6.0 from sourcee80a4a094affb65457c4f3f77e090b84d6aef210; see stable release card for verification and acceptance limits.",
       "sourceConfidence": "in_development"
     },
     {
       "version": "v1.6.0",
-      "status": "local_only",
-      "channel": "candidate",
+      "status": "public_stable",
+      "channel": "stable",
       "bundle": {
         "shortVersion": "1.6.0",
         "build": "14"
       },
       "git": {
-        "commit": null,
-        "localTag": null,
-        "remoteTags": [],
-        "tagRequiredLocally": false
+        "commit": "e80a4a094affb65457c4f3f77e090b84d6aef210",
+        "localTag": "v1.6.0",
+        "remoteTags": [
+          "v1.6.0"
+        ],
+        "tagRequiredLocally": true
       },
       "github": {
-        "releaseUrl": null,
-        "assetName": null,
-        "githubAssetSha256": null,
-        "publishedAt": null
+        "releaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.6.0",
+        "assetName": "MacDictate_Final_v1.6.0.dmg",
+        "githubAssetSha256": "d2c582541991b83973362cd8e926c651f85b595252b74825cbb2e05f13c3fe18",
+        "publishedAt": "2026-10-19T13:39:24Z"
       },
       "local": {
         "releaseDir": "releases/versions/v1.6.0",
-        "artifactPath": null,
-        "localArtifactSha256": null,
-        "buildLogPath": null
+        "artifactPath": "releases/versions/v1.6.0/artifacts/MacDictate_Final_v1.6.0.dmg",
+        "localArtifactSha256": "d2c582541991b83973362cd8e926c651f85b595252b74825cbb2e05f13c3fe18",
+        "buildLogPath": "releases/versions/v1.6.0/artifacts/build_log_v1.6.0.txt"
       },
-      "summary": "Windows x64 local dictation, double Alt; coordinated GitHub checks and desktop1.6.0 preparation.",
-      "sourceConfidence": "in_development"
+      "summary": "Free desktop1.6.0: Windows x64 first release plus notarized macOS; all final CI jobs PASS, complete9asset GitHub release published and digests read back.",
+      "sourceConfidence": "verified_ci_and_notarized_macos",
+      "distribution": {
+        "channel": "github-releases",
+        "websiteMirrorRequired": false,
+        "latestAssetName": "MacDictate_Latest.dmg",
+        "latestSha256": "d2c582541991b83973362cd8e926c651f85b595252b74825cbb2e05f13c3fe18",
+        "websiteURL": "https://alexfisenkov.github.io/MacDictate/"
+      },
+      "notarization": {
+        "status": "Accepted",
+        "submissionId": "ca49c4de-e2d6-46ed-9442-26eebae7ae83",
+        "stapled": true
+      },
+      "verification": {
+        "sourceSHA": "e80a4a094affb65457c4f3f77e090b84d6aef210",
+        "ciRunURL": "https://github.com/alexfisenkov/MacDictate/actions/runs/39259656403",
+        "publicReleaseDigestReadback": "9/9 PASS"
+      },
+      "windows": {
+        "platform": "win-x64",
+        "minimumWindowsBuild": 19041,
+        "status": "first_release",
+        "signed": false,
+        "sourceSHA": "e80a4a094affb65457c4f3f77e090b84d6aef210",
+        "ciRunURL": "https://github.com/alexfisenkov/MacDictate/actions/runs/39259656403",
+        "installerAssetName": "MacDictate_Windows_v1.6.0_x64.exe",
+        "installerLatestAssetName": "MacDictate_Windows_Latest_x64.exe",
+        "installerSha256": "7760c34fb04c2d59887b613a8c71ce3001920a91448d60e9048fa207d2f689c2",
+        "portableAssetName": "MacDictate_Windows_v1.6.0_x64.zip",
+        "portableLatestAssetName": "MacDictate_Windows_Latest_x64.zip",
+        "portableSha256": "4bae36e98ab81a10fe929a05c398aa1d3e23d0aad02112eed3ac76966f6644c7",
+        "manifestAssetName": "windows-build-manifest.json",
+        "validation": {
+          "hostedOS": "Windows Server2025",
+          "coreTests": 37,
+          "nativeInput": "PASS",
+          "syntheticASR": "PASS",
+          "installerUninstaller": "PASS",
+          "physicalWindows10_11MicAltEditor": "NOT_RUN"
+        }
+      }
     }
   ],
   "checkpoints": [

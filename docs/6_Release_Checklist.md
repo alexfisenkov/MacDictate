@@ -92,3 +92,13 @@
 - [x] Final installed build13 read-back from public downloaded DMG: SHA/strictsignature/Gatekeeper/process and synthetic WhisperRunner PASS.
 - Live microphone/hotkey/paste: NOT_RUN; native UI automation times out. Installed-bundle WhisperRunner synthetic ASR: PASS.
 - Hosted app CI not run under OWNER_LOCAL_RELEASE_20261015; Pages performed three automatic hosted deployments during branch preparation, all successful; final run39245114809. This deviated from the one-final-run policy; no additional Pages push is needed.
+
+## v1.6.0 release evidence — 2026-10-19
+
+- [x] Final manual CI39259656403 all3jobs PASS; exact sourcee80a4a094affb65457c4f3f77e090b84d6aef210.
+- [x] Windows37checks, native focus/Unicode/menu, actual bundled ASR, installer/uninstaller; full self-contained payload and notices.
+- [x] macOS bundle1.6.0/build14 DeveloperID+AppleAccepted/stapled/Gatekeeper/mounted-install PASS.
+- [x] Versioned/alias DMG, WindowsEXE/ZIP, manifests/checksums uploaded in draft; all9public digest/size readbacks PASS.
+- [x] Annotated tagv1.6.0 at checked build source, published latest complete release.
+- [ ] GitHub Pages final deploy/readback — append actual evidence after execution.
+- Physical Windows10/11 mic/Alt/editor and macOS mic/Option/editor remain NOT_RUN.

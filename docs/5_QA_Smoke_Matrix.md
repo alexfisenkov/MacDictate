@@ -59,3 +59,15 @@
 - `Verified locally` обязан обновляться после реального runtime smoke, а не только после typecheck/build.
 
 Public GitHub update check from 1.5.1 to free1.5.2 uses GitHub directly; no retired-server request in default configuration. App-side release CI is local under OWNER_LOCAL_RELEASE_20261015. Pages actually performed three automatic deployments; final run39245114809 succeeded (process deviation documented in ActionLog).
+
+## v1.6.0 cross-platform evidence — 2026-10-19
+
+| Scenario | Result / evidence |
+|---|---|
+| Complete desktopCI | All3jobs PASS, run39259656403, sourcee80a4a0 |
+| Windows core/native/ASR/install | 37checks, exact Unicode/focus/clipboard readback, actual Whisper on Unicode paths, installed smoke/uninstall PASS |
+| Self-contained Windows payload | CoreCLR/WinForms/UIAutomation/native runtime/complete notices verified, .NET10.0.13 |
+| macOS distribution | Build14DeveloperID, AppleAccepted/stapled, Gatekeeper/mountedinstall PASS |
+| Public GitHub assets | Complete9asset draft then publish, all9digests/sizes match; platform aliases identical |
+| Physical Windows10/11 mic/Alt/editor | NOT_RUN; hostedServer2025 does not substitute |
+| Physical macOS mic/Option/editor | NOT_RUN; preexisting acceptance gap retained |

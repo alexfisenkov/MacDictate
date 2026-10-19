@@ -16,3 +16,7 @@ Not published yet. Require final GitHub checks on exact source SHA, Windows nati
 ## Acceptance limits
 
 Windows10/11 physical microphone/hotkey/paste: NOT_RUN. Hosted Windows runner is Server2025. Windows Authenticode signing is unavailable; binaries are unsigned. Win10 Home/Pro is outside current .NET official OS lifecycle support; technical compatibility target is not physical acceptance.
+
+## Completion note — 2026-10-19
+
+Shipped as publicv1.6.0; full verified evidence is in the stable release card.

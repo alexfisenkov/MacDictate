@@ -2,7 +2,7 @@
 
 Этот changelog фиксирует только пользовательски и релизно значимые изменения.
 
-## [v1.6.0] - preparation 2026-10-19
+## [v1.6.0] - 2026-10-19
 
 ### Added
 - Windows x64 tray application: local Whisper dictation, double Alt to start and stop, configurable alternative hotkeys, language selection, verified model setup and last-text recovery.

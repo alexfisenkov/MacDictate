@@ -1,11 +1,11 @@
 # MacDictate
 
-MacDictate — бесплатная локальная диктовка с Whisper.cpp для macOS и Windows (новая версия готовится). Приложение бесплатно без срока действия, активации и проверки лицензии.
+MacDictate — бесплатная локальная диктовка с Whisper.cpp для macOS и Windows. Приложение бесплатно без срока действия, активации и проверки лицензии.
 
 ## Versioning
 
-- Публичная стабильная база: `v1.5.2` (бесплатно)
-- Следующая рабочая линия: `release/1.6.0`
+- Публичная стабильная база: `v1.6.0` (бесплатно)
+- Текущая рабочая копия: `main`
 - Канон по версиям и артефактам: `docs/7_Release_Governance.md` + `releases/registry.json`
 - Обычный `./build.sh` кладет временный DMG в `build/artifacts/`.
 - Release DMG/build logs должны переноситься в `releases/versions/<version>/artifacts/` или `releases/archive/`, а не оставаться в корне проекта.
@@ -33,7 +33,7 @@ MacDictate — бесплатная локальная диктовка с Whisp
 Версии desktop-продукта ведутся через `releases/`:
 
 - `releases/registry.json` — машинно-читаемый реестр всех известных версий и checkpoint-ов.
-- `releases/versions/v1.5.2/RELEASE.md` — карточка текущей stable.
+- `releases/versions/v1.6.0/RELEASE.md` — карточка текущей stable.
 - `releases/versions/v1.5.1-working/RELEASE.md` — завершенная рабочая линия `1.5.1`.
 - `releases/versions/v1.5.2-working/RELEASE.md` — текущая рабочая линия.
 - `scripts/verify_release_governance.sh` — проверка, что registry, папки версий, checksums, `Info.plist` и обязательные git tags не расходятся.

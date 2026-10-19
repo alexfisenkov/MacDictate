@@ -3,11 +3,11 @@
   "product": "MacDictate desktop",
   "publicPath": "/downloads/MacDictate_Latest.dmg",
   "publicUrl": "https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg",
-  "version": "v1.5.2",
-  "githubReleaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.5.2",
-  "githubAssetName": "MacDictate_Final_v1.5.2.dmg",
-  "sha256": "8cd4c00cb2ddaa7fef2f747cee8b28f4d46b6e3b317a8e39206ac04c3752a261",
-  "publishedAt": "2026-10-19T11:16:38Z",
+  "version": "v1.6.0",
+  "githubReleaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.6.0",
+  "githubAssetName": "MacDictate_Final_v1.6.0.dmg",
+  "sha256": "d2c582541991b83973362cd8e926c651f85b595252b74825cbb2e05f13c3fe18",
+  "publishedAt": "2026-10-19T13:39:24Z",
   "distributionChannel": "github-releases",
   "source": "releases/registry.json current.publicStable"
 }

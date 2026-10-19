@@ -1,6 +1,6 @@
 # MacDictate v1.5.2
 
-- Status: `public_stable`
+- Status: `public_release`
 - Bundle: `1.5.2` / build `13`
 - Distribution: GitHub Releases; static product page uses GitHub Pages (deployment recorded separately).
 - Source commit: `b8158a6a73f33e07cf548fa46658511f95c59811`
@@ -30,3 +30,7 @@ Local owner rollback preserves the earlier FREE build12 independently. v1.5.1 re
 ## Verification limits
 
 Live microphone/hotkey/paste remains NOT_RUN (native UI timeout); installed automatic-backend WhisperRunner synthetic speech passed. Optional Qwen3B model rights are separate from free MacDictate/Whisper, as explicitly stated in RU/EN terms. Pages made three automatic deployments during preparation; final run39245114809 succeeded.
+
+## Superseded stable note — 2026-10-19
+
+Desktopv1.6.0 is now public stable. The original v1.5.2 artifacts and hashes are preserved for rollback.

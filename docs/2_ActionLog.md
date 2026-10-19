@@ -200,3 +200,11 @@
 - Second run39255523418 at5c2449b: governance/macOS PASS; Windows compile, pinned C++ runtime, manifest/import checks, ZIP/EXE and native Unicode/focus/menu smoke PASS. Synthetic ASR failed before its report was printed; add controlled synthetic-only native diagnostics and preserve run artifacts on failure. No release published. Fix Windows build-input pathspec (component-relative src) discovered in runner warning.
 - Third run39256863541 at4c7e4e6 isolated native exit3: model exists/has pinned digest but Whisper fails to open its supplementary-character path. Pinned upstream uses codecvt_utf8<wchar_t> (UCS-2 on Windows); applied deterministic codecvt_utf8_utf16 replacement at both Whisper model loaders, with original/patched source hashes in runtime-lock. Keep the same Cyrillic/emoji model/WAV/TEMP ASR gate; no ASCII fallback or weakened assertion.
 - Fourth run39257917547 at539ea32: all three jobs PASS, Windows37checks, Unicode/focus native smoke, exact synthetic ASR and installer/uninstaller PASS. Local Mac DeveloperID build succeeded but notary submit stopped before upload because legacy build.sh hardcoded v1.5.2 DMG filename/volume despite correct1.6.0 bundle. Make DMG/default install-check paths derive from Info.plist; this real release-packaging defect requires one final source-aligned repair run. No signing failure or Apple rejection occurred.
+
+## 2026-10-19 — Desktop1.6.0 public release
+
+- Final source `e80a4a094affb65457c4f3f77e090b84d6aef210`; fifth/final coordinated CI39259656403 PASS across all3jobs. Earlier attempts and concrete fixes are recorded above; no intermediate push/PR CI was enabled.
+- Windows:37checks, native Unicode/focus/menu/clipboard, full syntheticASR on Unicode paths, installer/uninstaller PASS. Downloaded final archive verified SHA05647a09…412729; both package hashes match build manifest.
+- macOS: dynamic1.6.0filename/volume corrected, DeveloperID build14, AppleAccepted/stapled/Gatekeeper/mountedinstall PASS. No Apple rejection occurred; prior submit stopped locally on obsolete filename.
+- Published complete9asset draft as latestv1.6.0 at2026-10-19T13:39:24Z; public API digest/size readback9/9PASS. No partial latest release exposed.
+- Public Pages/readback and local install evidence appended after completion.

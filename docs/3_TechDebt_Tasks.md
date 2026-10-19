@@ -48,6 +48,9 @@
 
 | Windows/Recovery | Open | P2 | UX | M | Project | Isolate UI Automation provider for restartable recovery; a hung provider currently requires app restart and safely falls back to manual copy. Add explicit corrupted-model backup/repair UI; current different-hash file is preserved and manual move/reselect is explained. |
 
+| Windows/Performance | Open | P2 | Measurement | M | Project | Measure CPU inference latency separately from model download; final hosted ASR step includes both. Benchmark optional CPU runtime variants before changing the portable baseline; no real-time speed guarantee is claimed. |
+| Release/Windows | Open | P2 | Governance | M | Project | Extend the shared macOS-oriented governance checker to validate latest-windows.json automatically. This release Windows manifests/hashes/source were independently verified against finalCI and public9asset readback; next-release process remains documented. |
+
 ## Notes
 
 - Исторические TODO уровня `1.1` не удалены по смыслу: часть из них реализована, часть перенесена в таблицу выше.
