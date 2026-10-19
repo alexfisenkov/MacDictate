@@ -4,12 +4,14 @@ For MacDictate Software and MacDictate website
 This Policy regulates the collection, use, and protection of personal and technical data of Users of the "MacDictate" application and visitors of the MacDictate website.
 
 ## 1. INTRODUCTION AND ARCHITECTURE (IMPORTANT!)
-**1.1. Local speech and text processing:** MacDictate uses Whisper for speech recognition and may use a local Qwen model for optional text correction. Audio and text are processed locally on your Mac. The application does not send dictation audio or text to remote servers for recognition or correction.
+**1.1. Local speech and text processing:** MacDictate uses Whisper for speech recognition and may use a local Qwen model for optional text correction. Audio and text are processed locally on your computer. The application does not send dictation audio or text to remote servers for recognition or correction.
 
 **1.2. Local Diagnostic Logs:** During testing, the user or support may explicitly enable a local debug mode. In this mode, the application stores diagnostic dictation files on the device: a copy of the audio, Whisper output, the prompt and outputs of the local Qwen model, the final inserted text, and service events. These files are stored locally in `~/.macdictate/debug-sessions/`, are not sent to any server, and may contain sensitive information that the user dictated or processed. When debug mode is disabled, these session files are not created.
 
+**1.3. Windows:** optional Qwen correction and debug sessions apply to macOS. Windows stores the last dictation and settings locally in `%LOCALAPPDATA%/MacDictate`; the last text can be copied or deleted from the menu. Temporary audio is deleted after processing or cancellation. The app does not encrypt this text separately from Windows account protection.
+
 ## 2. DATA USED
-**2.1. Free macOS version:** local dictation requires no account, email address, or hardware identifier. The application does not obtain a Machine ID or contact a license verification server. New local diagnostic files contain no Machine ID; previously created files are not rewritten.
+**2.1. Free desktop version:** local dictation requires no account, email address, or hardware identifier. The application does not obtain a Machine ID or contact a license verification server. New local diagnostic files contain no Machine ID; previously created files are not rewritten.
 
 **2.2. Downloads and updates:** to download models and check for updates, the application contacts file and update hosting servers. These requests may disclose the IP address and standard HTTP request information to the recipient; they do not contain dictation audio or text.
 
@@ -27,7 +29,7 @@ This Policy regulates the collection, use, and protection of personal and techni
 
 ## 5. YOUR RIGHTS
 5.1. For questions about processing or deleting provided data, contact a.fisenkov@gmail.com. Requests are handled with regard to applicable retention requirements for previous orders.
-5.2. Deleting previously stored license data does not block the current free macOS version.
+5.2. Deleting previously stored license data does not block the current free desktop version.
 
 ## 6. DATA OPERATOR DETAILS
 **Individual Entrepreneur:** ALEXANDER ANDREEVICH FISENKOV
