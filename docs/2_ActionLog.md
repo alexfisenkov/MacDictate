@@ -16,6 +16,8 @@
 
 - Владелец подтвердил: прежний сервер отключён. Выбран GitHub-only download/update канал (D-022), без принятия незнакомого SSH-ключа и без восстановления billing backend. Для публичной страницы готовится статический GitHub Pages без изменения DNS. Backend free policy остаётся проверенным исходником, не выдается за deployed API.
 
+- Публичный `v1.5.2` build13 выпущен на GitHub: оба DMG имеют SHA256 `8cd4c00cb2ddaa7fef2f747cee8b28f4d46b6e3b317a8e39206ac04c3752a261`, Apple notarization Accepted, staple/Gatekeeper/mounted install PASS; source main SHA `b8158a6a73f33e07cf548fa46658511f95c59811`. Статическая страница GitHub Pages и окончательная установка build13 фиксируются после read-back.
+
 ## 2026-05-12 — optional Whisper large-v3 test mode
 
 - В рабочей линии `release/1.5.2` добавлен тестовый режим максимальной точности ASR без публикации релиза: settings menu получил toggle `Точная модель Whisper large-v3` и action `Скачать точную модель Whisper`.

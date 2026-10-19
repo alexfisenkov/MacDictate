@@ -2,7 +2,7 @@
 
 ## Status
 
-- Status: `public_stable`
+- Status: `public_release`
 - Bundle: `1.5.1` / build `11`
 - Git tag: `v1.5.1`
 - Git commit: `4e160ad908cf73759f0699fe19179a6aec8bf783`
@@ -40,3 +40,7 @@
 - Text improvement remains optional and bounded: input over `6_000` characters falls back instead of chunking.
 - Full desktop dictation history is still future work; `v1.5.1` includes only last-dictation recovery.
 - The first transition from older ad-hoc builds to Developer ID may still require a one-time Accessibility/Microphone re-approval, but subsequent Developer ID updates should preserve trust identity.
+
+## Correction note — 2026-10-19
+
+v1.5.2 is now public stable; this historical release remains available as public_release.

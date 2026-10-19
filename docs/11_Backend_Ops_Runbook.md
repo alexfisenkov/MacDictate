@@ -1,4 +1,10 @@
-# Backend Ops Runbook
+# Current free distribution — 2026-10-19
+
+Owner confirmed the old server is turned off. Current app/download/update use GitHub Releases; product website uses GitHub Pages. Do not reconnect to the historical IP or accept its changed SSH key as part of routine releases. DNS remains untouched.
+
+The free backend policy is tested source code only; it is not a claim of a live API. New apps do not use it. Historical host paths and credentials below are retained as incident history, not current deployment instructions.
+
+# Distribution and legacy backend runbook
 
 Этот документ фиксирует минимальный production-контур для `macdictate.pro`: сайт, обновления и API для старых desktop-версий. Бесплатный desktop по решению D-021 от 2026-10-19 не вызывает `GET /api/license/status`; сохраняем API совместимым для ранее установленных клиентов. Переход публичной дистрибуции и checkout отслеживается отдельно в backlog.
 

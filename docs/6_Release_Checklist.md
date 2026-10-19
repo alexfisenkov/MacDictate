@@ -80,3 +80,15 @@
 - [x] `node --check backend/server.js && node --check backend/db.js`.
 - [x] `plutil -lint assets/Info.plist`.
 - [x] `./build.sh`.
+
+## v1.5.2 free release evidence — 2026-10-19
+
+- [x] Free source/menu, diagnostic logger, model selection, temporary audio cleanup, last dictation, update checker, Whisper timeout, text improvement and runtime locator harnesses.
+- [x] Free backend HTTP harness: no new devices/orders/provider requests, payments410. Source-only compatibility; retired server not restored.
+- [x] Developer ID build13 from exact GitHub main SHA; notarization Accepted, stapled DMG, Gatekeeper and mounted-install checks PASS.
+- [x] Annotated v1.5.2 source tag and public GitHub release with matching versioned/alias digests.
+- [x] Static site RU/EN, prefix routing, legal documents, mobile/wide, CDN fallback QA PASS.
+- [ ] GitHub Pages live deployment/read-back (record after completion).
+- [ ] Final installed build13 read-back (record after completion).
+- Live microphone/hotkey/paste: NOT_RUN; native UI automation times out. Installed-bundle WhisperRunner synthetic ASR: PASS.
+- Hosted app CI not run under OWNER_LOCAL_RELEASE_20261015; Pages performs the one final hosted deployment.

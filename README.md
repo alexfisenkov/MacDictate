@@ -4,7 +4,7 @@ MacDictate — menu bar utility для локальной диктовки на 
 
 ## Versioning
 
-- Публичная стабильная база: `v1.5.1`
+- Публичная стабильная база: `v1.5.2` (бесплатно)
 - Следующая рабочая линия: `release/1.5.2`
 - Канон по версиям и артефактам: `docs/7_Release_Governance.md` + `releases/registry.json`
 - Обычный `./build.sh` кладет временный DMG в `build/artifacts/`.
@@ -32,7 +32,7 @@ MacDictate — menu bar utility для локальной диктовки на 
 Версии desktop-продукта ведутся через `releases/`:
 
 - `releases/registry.json` — машинно-читаемый реестр всех известных версий и checkpoint-ов.
-- `releases/versions/v1.5.1/RELEASE.md` — карточка текущей stable.
+- `releases/versions/v1.5.2/RELEASE.md` — карточка текущей stable.
 - `releases/versions/v1.5.1-working/RELEASE.md` — завершенная рабочая линия `1.5.1`.
 - `releases/versions/v1.5.2-working/RELEASE.md` — текущая рабочая линия.
 - `scripts/verify_release_governance.sh` — проверка, что registry, папки версий, checksums, `Info.plist` и обязательные git tags не расходятся.
@@ -79,3 +79,10 @@ MacDictate — menu bar utility для локальной диктовки на 
 - `scripts/check_install_artifact_flow.sh build/artifacts/MacDictate_Final_v*.dmg` проверяет финальный DMG: mounted app и временная installed-copy должны проходить strict codesign, microphone entitlement и bundled runtime checks.
 - Больше проектных правил и rollback discipline: `docs/0_Project_Operating_Model.md`.
 - Больше правил по версиям, GitHub Releases и локальному складу артефактов: `docs/7_Release_Governance.md`.
+
+## Download and website
+
+- [Free MacDictate installer](https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg)
+- [Product website](https://alexfisenkov.github.io/MacDictate/)
+
+The retired billing server is not required. Updates use GitHub directly.

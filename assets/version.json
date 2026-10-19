@@ -1,5 +1,5 @@
 {
-  "version": "1.5.1",
-  "download_url": "https://macdictate.pro/downloads/MacDictate_Latest.dmg",
-  "release_notes": "Публичная стабильная версия 1.5.1: Developer ID signed/notarized DMG, новые иконки, восстановление последней диктовки и корректный доступ к микрофону."
+  "version": "1.5.2",
+  "download_url": "https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg",
+  "release_notes": "Бесплатная локальная диктовка без активации и серверной проверки лицензии; обновления напрямую через GitHub."
 }

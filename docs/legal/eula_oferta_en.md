@@ -27,7 +27,7 @@ By installing or launching the Software, the User agrees to these terms of use.
 5.2. The Whisper neural network used in the application is distributed under the MIT license and belongs to OpenAI. Optional text improvement may use a local Qwen2.5-Instruct family model (preferred 3B, fallback 1.5B; the applicable model license terms apply). Model weights are downloaded locally either automatically or by a user action in the application.
 
 ## 6. FINAL PROVISIONS
-6.1. The current terms are published at MacDictate.pro/legal.html.
+6.1. The current terms are published at https://alexfisenkov.github.io/MacDictate/legal.html.
 
 ## 7. LICENSOR DETAILS
 **Individual Entrepreneur:** ALEXANDER ANDREEVICH FISENKOV

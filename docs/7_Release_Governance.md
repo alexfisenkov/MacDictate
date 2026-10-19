@@ -12,7 +12,7 @@
 | Артефакты | `releases/versions/<version>/artifacts/` | Локальные DMG/build logs/checksums. Бинарники не являются source of truth для кода. |
 | Runtime | `src/`, `assets/`, `build.sh` | Исходники desktop-приложения. |
 | GitHub | Git tags + GitHub Releases | Публичная история релизов и публичные DMG assets. |
-| Website download alias | `web-landing/downloads/latest-desktop.json` + `/downloads/MacDictate_Latest.dmg` | Сайт должен отдавать тот же DMG, что и текущий `public_stable` release. |
+| Public download channel | `web-landing/downloads/latest-desktop.json` + GitHub stable asset alias (D-022) | GitHub alias должен отдавать тот же DMG, что и `public_stable`; старый website mirror относится только к legacy server channel. |
 
 Если источники расходятся, порядок приоритета такой:
 

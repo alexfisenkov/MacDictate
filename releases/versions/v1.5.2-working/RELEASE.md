@@ -20,3 +20,7 @@
 ## Release Rule
 
 `v1.5.2` нельзя считать выпущенной, пока не будут выполнены version-specific release notes, registry update, build artifact, annotated tag, GitHub Release и smoke evidence.
+
+## Completion note — 2026-10-19
+
+This development snapshot shipped as free v1.5.2/build13. See the v1.5.2 release card and registry for public artifacts and verification.

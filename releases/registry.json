@@ -4,11 +4,12 @@
   "registryUpdatedAt": "2026-10-19",
   "governanceDocument": "docs/7_Release_Governance.md",
   "current": {
-    "publicStable": "v1.5.1",
+    "publicStable": "v1.5.2",
     "workingLine": "v1.5.2-working",
-    "developmentBranch": "release/1.5.2",
+    "developmentBranch": "main",
     "bundleShortVersion": "1.5.2",
-    "bundleVersion": "13"
+    "bundleVersion": "13",
+    "distributionChannel": "github-releases"
   },
   "versions": [
     {
@@ -317,8 +318,8 @@
     },
     {
       "version": "v1.5.1",
-      "status": "public_stable",
-      "channel": "stable",
+      "status": "public_release",
+      "channel": "stable_history",
       "bundle": {
         "shortVersion": "1.5.1",
         "build": "11"
@@ -378,32 +379,46 @@
     },
     {
       "version": "v1.5.2",
-      "status": "local_only",
-      "channel": "candidate",
+      "status": "public_stable",
+      "channel": "stable",
       "bundle": {
         "shortVersion": "1.5.2",
         "build": "13"
       },
       "git": {
-        "commit": null,
-        "localTag": null,
-        "remoteTags": [],
-        "tagRequiredLocally": false
+        "commit": "b8158a6a73f33e07cf548fa46658511f95c59811",
+        "localTag": "v1.5.2",
+        "remoteTags": [
+          "v1.5.2"
+        ],
+        "tagRequiredLocally": true
       },
       "github": {
-        "releaseUrl": null,
-        "assetName": null,
-        "githubAssetSha256": null,
-        "publishedAt": null
+        "releaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.5.2",
+        "assetName": "MacDictate_Final_v1.5.2.dmg",
+        "githubAssetSha256": "8cd4c00cb2ddaa7fef2f747cee8b28f4d46b6e3b317a8e39206ac04c3752a261",
+        "publishedAt": "2026-10-19T11:16:38Z"
       },
       "local": {
         "releaseDir": "releases/versions/v1.5.2",
-        "artifactPath": null,
-        "localArtifactSha256": null,
-        "buildLogPath": null
+        "artifactPath": "releases/versions/v1.5.2/artifacts/MacDictate_Final_v1.5.2.dmg",
+        "localArtifactSha256": "8cd4c00cb2ddaa7fef2f747cee8b28f4d46b6e3b317a8e39206ac04c3752a261",
+        "buildLogPath": "releases/versions/v1.5.2/artifacts/build_log_v1.5.2.txt"
       },
       "summary": "Free desktop: no licensing, no new payments, compatible free access for old apps. Public website rollout pending trusted server access.",
-      "sourceConfidence": "verified_local_candidate"
+      "sourceConfidence": "verified_github_notarized_artifact",
+      "distribution": {
+        "channel": "github-releases",
+        "websiteMirrorRequired": false,
+        "latestAssetName": "MacDictate_Latest.dmg",
+        "latestSha256": "8cd4c00cb2ddaa7fef2f747cee8b28f4d46b6e3b317a8e39206ac04c3752a261",
+        "websiteURL": "https://alexfisenkov.github.io/MacDictate/"
+      },
+      "notarization": {
+        "status": "Accepted",
+        "submissionId": "7eb345bb-f692-49c9-8f5e-23c1e0ad6aea",
+        "stapled": true
+      }
     }
   ],
   "checkpoints": [
