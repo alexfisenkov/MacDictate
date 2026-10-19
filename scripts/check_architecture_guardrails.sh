@@ -43,7 +43,7 @@ while IFS= read -r -d '' file; do
   esac
 done < <(find "$ROOT_DIR/src" -name "*.swift" -print0)
 
-while IFS= read -r path; do
+while IFS= read -r -d '' path; do
   case "$path" in
     .github/*|archive/*|assets/*|backend/*|docs/*|releases/*|scripts/*|src/*|web-landing/*|windows/*)
       ;;
@@ -53,7 +53,7 @@ while IFS= read -r path; do
       fail "Unexpected tracked root-level path: $path. Move active source to a layer or historical artifacts to archive/."
       ;;
   esac
-done < <(git -C "$ROOT_DIR" ls-files)
+done < <(git -C "$ROOT_DIR" ls-files -z)
 
 if (( errors > 0 )); then
   echo "Architecture guardrails failed with $errors issue(s)." >&2

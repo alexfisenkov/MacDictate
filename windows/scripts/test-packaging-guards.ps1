@@ -27,3 +27,5 @@ try {
     if ((Get-Content $package -Raw).Trim() -ne 'preserve release package') { throw 'Existing package bytes changed' }
     Write-Host 'Packaging guards PASS: prior app and versioned artifact preserved without native build.'
 } finally { Remove-Item $fixture -Recurse -Force }
+# Expected failing child builds must not leak exit 1 to GitHub's pwsh wrapper.
+$global:LASTEXITCODE = 0

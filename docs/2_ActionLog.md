@@ -194,3 +194,6 @@
 - Baseline release governance PASS, clean main72cd20d; implementation branch release/1.6.0.
 - Added Windows scope and plan, isolated portable policy/native/UI services, pinned runtime/model distribution and final manual CI design. Public stable remains v1.5.2 until verified release publication.
 - CI/build/runtime/publication evidence will be appended after execution; no production completion is claimed here.
+
+- Final CI attempt39255124492 found a preexisting portability bug in architecture guard: quoted Cyrillic paths under default core.quotePath=true were mistaken for root clutter. Replaced line-based Git output with NUL-delimited ls-files -z. Local quotePath=true reproduction passes; publication remains blocked until a repaired final run succeeds.
+- The same first run passed Windows portable tests and both destructive-operation guard assertions, but GitHub pwsh inherited LASTEXITCODE=1 from the intentionally rejected child build. Reset the expected-failure test exit state after successful assertions. macOS job118068379031 passed all compile/regression steps. These two evidenced CI failures justify the repair run.
