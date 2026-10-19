@@ -37,6 +37,16 @@ if (!(Test-Path $archive) -or (Get-FileHash $archive -Algorithm SHA256).Hash.ToL
 }
 $source = Join-Path $cache ('whisper.cpp-' + $lock.whisper.commit)
 if (!(Test-Path $source)) { Expand-Archive $archive $cache -Force }
+foreach ($patch in $lock.whisper.patches) {
+    $file = Join-Path $source $patch.file
+    $hash = (Get-FileHash $file -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($hash -eq $patch.afterSha256) { continue }
+    if ($hash -ne $patch.beforeSha256) { throw "Unexpected source bytes before patch $($patch.id)" }
+    $text = [IO.File]::ReadAllText($file)
+    if ([regex]::Matches($text, [regex]::Escape($patch.replaceFrom)).Count -ne $patch.expectedOccurrences) { throw 'Native patch does not match the pinned source' }
+    [IO.File]::WriteAllText($file, $text.Replace($patch.replaceFrom, $patch.replaceTo), [Text.UTF8Encoding]::new($false))
+    if ((Get-FileHash $file -Algorithm SHA256).Hash.ToLowerInvariant() -ne $patch.afterSha256) { throw 'Native source patch read-back mismatch' }
+}
 $native = Join-Path $cache ('build-' + $lock.whisper.commit)
 & cmake -S $source -B $native -A x64 `
     -DBUILD_SHARED_LIBS=OFF -DGGML_STATIC=ON -DGGML_BACKEND_DL=OFF -DGGML_NATIVE=OFF `

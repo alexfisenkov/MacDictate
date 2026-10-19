@@ -4,7 +4,20 @@
     "version": "v1.9.5",
     "commit": "d1be6fde11ac6e0407606b4e42fe72d34add8037",
     "sourceUrl": "https://codeload.github.com/ggml-org/whisper.cpp/zip/d1be6fde11ac6e0407606b4e42fe72d34add8037",
-    "sourceSha256": "6be93b881acb415c5a25d0ef85bb6a488099de0296e072e22a66d50f20ec40b9"
+    "sourceSha256": "6be93b881acb415c5a25d0ef85bb6a488099de0296e072e22a66d50f20ec40b9",
+    "patches": [
+      {
+        "id": "windows-utf16-model-paths",
+        "file": "src/whisper.cpp",
+        "beforeSha256": "891168a838301bd2baa5e8b87422a854dafeeb7da914d40a2e4c6bf33ff448ed",
+        "afterSha256": "39799e3a479724e219b885a2615b8d9ee523ef857be50b3147cda0ae6a6e3a1c",
+        "replaceFrom": "std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;",
+        "replaceTo": "std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;",
+        "expectedOccurrences": 2,
+        "reason": "Windows wchar_t is UTF-16; codecvt_utf8 uses UCS-2 and cannot represent supplementary characters in model paths.",
+        "reference": "https://learn.microsoft.com/en-us/cpp/standard-library/codecvt-utf8-utf16-class"
+      }
+    ]
   },
   "model": {
     "fileName": "ggml-small.bin",

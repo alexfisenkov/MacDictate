@@ -3,7 +3,7 @@
 MacDictate Windows is free of charge and runs speech recognition locally.
 The following components retain their own licenses:
 
-- whisper.cpp and ggml: MIT; see the bundled `WHISPER-LICENSE` and pinned
+- whisper.cpp and ggml: MIT; the Windows build applies a UTF-16 model-path compatibility patch recorded with before/after source hashes in `runtime-lock.json`; see the bundled `WHISPER-LICENSE` and pinned
   source identity in `runtime-lock.json`. Source: https://github.com/ggml-org/whisper.cpp
 - Whisper multilingual model: MIT, downloaded separately after user confirmation.
   Source: https://huggingface.co/ggerganov/whisper.cpp
