@@ -95,6 +95,7 @@ Copy-Item (Join-Path $root 'README.md') (Join-Path $app 'README.md')
 Copy-Item (Join-Path $source 'LICENSE') (Join-Path $app 'WHISPER-LICENSE')
 Copy-Item (Join-Path $root 'THIRD-PARTY-NOTICES.md') $app
 Copy-Item (Join-Path $root 'licenses') $app -Recurse
+Copy-Item (Join-Path $root '../docs/legal') (Join-Path $app 'legal') -Recurse
 $version = (Get-Item (Join-Path $app 'MacDictate.exe')).VersionInfo.ProductVersion.Split('+')[0]
 if ($version -ne '1.6.0') { throw "Unexpected app version $version" }
 $zip = Join-Path $out "MacDictate_Windows_v$version`_x64.zip"
