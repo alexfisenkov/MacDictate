@@ -60,7 +60,7 @@
 - Не менять статус версии, bundle version, Git tag, GitHub asset или artifact path вне `macos/releases/registry.json`.
 - Не оставлять DMG/build logs в корне `macos/`.
 - Не считать локальную сборку релизом без записи `macos/releases/versions/<version>/RELEASE.md`, registry entry, checksum и проверки.
-- Не считать публичный release завершенным, пока сайт не отдает тот же DMG через `/downloads/MacDictate_Latest.dmg` и `macos/web-landing/downloads/latest-desktop.json` не совпадает с `registry.current.publicStable`.
+- Public release проверяется по distribution channel из registry и D-022: GitHub asset/alias и manifest обязаны совпадать с `current.publicStable`; legacy website mirror обязателен только для прежнего серверного канала.
 - Не начинать feature/release work, если `macos/scripts/verify_release_governance.sh` падает.
 - Не добавлять новую версию по другой схеме: все следующие версии обязаны жить в `macos/releases/versions/<version>/` и иметь запись с тем же именем в registry.
 - Если есть противоречие между docs, registry, GitHub и DMG, остановиться и сначала восстановить release ledger.

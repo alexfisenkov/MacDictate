@@ -72,7 +72,7 @@
   - `LaunchAtLoginService.swift` — `SMAppService` + legacy login-item compatibility wrapper.
 
 - `src/Updates/*`
-  - `UpdateChecker.swift` — GitHub latest release fetch, JSON parsing и numeric version compare.
+  - `UpdateChecker.swift` — GitHub latest release fetch directly (D-022; retired website is not queried), JSON parsing и numeric version compare.
 
 - `archive/legacy-licensing/`
   - Исторические `LicenseState`, `LicenseSnapshot`, `LicenseCache`, `LicenseService` находятся в `archive/legacy-licensing/src/License/`, а три `test_license_*` harness — в `archive/legacy-licensing/scripts/`. Сборка и текущие desktop-тесты не включают этот код.

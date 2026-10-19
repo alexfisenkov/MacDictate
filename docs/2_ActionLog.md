@@ -14,6 +14,8 @@
 - Для публикации выделен clean release worktree: прежние незакоммиченные desktop/model/runtime изменения сохранены отдельным checkpoint, исходная рабочая копия не откатывалась. Кандидат `v1.5.2` build13 ведётся в release ledger.
 - Production `macdictate.pro` на прежнем DNS IP предъявляет изменённые SSH-ключи и HTTPS TLS internal error; то же подтверждено из независимого доверенного сервера. Неизвестный ключ не принимался, production не изменялся. Notarization возможна через существующий ASC API key без восстановления отсутствующего Keychain profile.
 
+- Владелец подтвердил: прежний сервер отключён. Выбран GitHub-only download/update канал (D-022), без принятия незнакомого SSH-ключа и без восстановления billing backend. Для публичной страницы готовится статический GitHub Pages без изменения DNS. Backend free policy остаётся проверенным исходником, не выдается за deployed API.
+
 ## 2026-05-12 — optional Whisper large-v3 test mode
 
 - В рабочей линии `release/1.5.2` добавлен тестовый режим максимальной точности ASR без публикации релиза: settings menu получил toggle `Точная модель Whisper large-v3` и action `Скачать точную модель Whisper`.

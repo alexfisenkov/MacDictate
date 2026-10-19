@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MacDictate — Юридические документы</title>
-    <link rel="icon" href="/assets/mic_logo.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/assets/mic_logo.png">
+    <link rel="icon" href="./assets/mic_logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./assets/mic_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
@@ -32,8 +32,8 @@
 <body class="bg-brandDark text-white selection:bg-brand selection:text-white pb-20">
     <nav class="w-full z-50 glass border-b border-white/10 mb-10">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="/" class="flex items-center gap-2 font-bold text-xl hover:text-gray-300 transition" id="navHome">
-                <img src="/assets/mic_logo.svg" width="32" height="32" alt="" class="h-8 w-8 rounded-lg">
+            <a href="./" class="flex items-center gap-2 font-bold text-xl hover:text-gray-300 transition" id="navHome">
+                <img src="./assets/mic_logo.svg" width="32" height="32" alt="" class="h-8 w-8 rounded-lg">
                 <span id="navHomeText">На главную (MacDictate)</span>
             </a>
             <button id="langToggle" class="text-sm bg-white/10 hover:bg-white/20 px-3 py-2.5 min-h-[44px] min-w-[44px] rounded-full transition">EN</button>
@@ -59,7 +59,7 @@
 
         function updateUITexts() {
             document.documentElement.lang = currentLang;
-            document.getElementById('navHome').href = '/?lang=' + currentLang;
+            document.getElementById('navHome').href = './?lang=' + currentLang;
             const url = new URL(window.location.href);
             url.searchParams.set('lang', currentLang);
             window.history.replaceState(null, '', url.pathname + url.search + url.hash);
@@ -100,11 +100,11 @@
             contentDiv.innerHTML = currentLang === 'en' ? "Loading..." : "Загрузка...";
             try {
                 let filename = basename + (currentLang === 'en' ? '_en.md' : '.md');
-                const res = await fetch(`/docs/${filename}`);
+                const res = await fetch(`./docs/${filename}`);
                 if (!res.ok) {
                     if (currentLang === 'en') {
                         // Fallback to RU if EN doc doesn't exist
-                        const fallbackRes = await fetch(`/docs/${basename}.md`);
+                        const fallbackRes = await fetch(`./docs/${basename}.md`);
                         if (!fallbackRes.ok) throw new Error("Document not found");
                         const text = await fallbackRes.text();
                         renderDocument(contentDiv, text);

@@ -146,3 +146,11 @@
 - **Почему:** диктовка на устройстве должна запускаться без лицензии и доступности license server. Постоянный бесплатный режим задается составом приложения, а не поддельной оплаченной лицензией или увеличенным сроком grace.
 - **История и данные:** прежние четыре Swift-файла сохранены в `archive/legacy-licensing/src/License/`, три `test_license_*` harness — в `archive/legacy-licensing/scripts/`; архив не компилируется в app. Новые debug metadata не содержат machine ID. Старые debug-сессии и legacy UserDefaults остаются нетронутыми.
 - **Публичный переход:** владелец подтвердил выпуск для всех в той же задаче. Старый `GET /api/license/status` сохраняет типы полей и возвращает free active access без изменения данных оплаты; `/api/plans` возвращает пустой массив, `/api/payment/create` — HTTP410. Исторический каталог и webhook сохранены для сверки прежних заказов. Landing/legal/download и signed/notarized release обновляются согласованно; до production read-back rollout не завершён.
+
+## D-022 — Free distribution without the retired server
+
+- **Дата:** 2026-10-19
+- **Контекст владельца:** «сервак отключен».
+- **Решение:** public release assets и stable download alias размещаются на GitHub Releases; app проверяет updates непосредственно через GitHub API. Отключённый website/API не является зависимостью бесплатного app. D-019 website mirror применяется только к прежнему серверному каналу; для GitHub-канала проверяется publicUrl из version manifest и asset digest.
+- **Страница продукта:** подготовлен статический сайт без checkout; публикация возможна на GitHub Pages без изменения DNS и восстановления backend. Старые приложения получают бесплатный runtime только после установки новой версии; их прежний badge/offline cache серверным ответом удалить нельзя.
+- **Данные:** прежний сервер не включается и неизвестный новый SSH-ключ не принимается. Старые платежные записи/секреты не переносятся; backend free policy хранится в исходниках для возможного последующего восстановления совместимости.

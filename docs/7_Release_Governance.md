@@ -80,7 +80,7 @@ releases/versions/<version>/
 
 Если проверка падает, дальнейшая feature/release работа запрещена до восстановления release ledger.
 
-На GitHub этот же запрет закреплен workflow `.github/workflows/release-governance.yml`: push и pull request в основные рабочие ветки должны пройти `scripts/verify_release_governance.sh`.
+На GitHub проверка доступна вручную через `.github/workflows/release-governance.yml`; промежуточные push/PR не запускают Actions. При активном OWNER_LOCAL_RELEASE_20261015 выпуск подтверждается локальными проверками и сборкой точного SHA main.
 
 Локальные DMG/build logs в `artifacts/` не коммитятся. Поэтому обычная проверка допускает их отсутствие в clean checkout и проверяет checksum только когда файл физически есть. Для локального аудита полного склада артефактов используется строгий режим:
 
@@ -199,3 +199,13 @@ git -C macos worktree add ../MacDictate-macos-v1.4.2 v1.4.2
 - `v1.2` и `v1.3` существуют как GitHub Releases и remote tags, но в локальном git их tag refs сейчас не присутствуют. Remote tags указывают на тот же commit, что `v1.4`; фактическое отличие подтверждается локальными DMG bundle versions и GitHub release notes.
 - `v1.4.1` есть как локальный DMG/build `8`, но публичного GitHub Release/tag не найдено.
 - Локальный `MacDictate_Final_v1.4.2.dmg` отличается по SHA256 от опубликованного GitHub asset. Публичным source of truth для скачивания остается GitHub Release `v1.4.2`.
+
+## GitHub-only free distribution (D-022, 2026-10-19)
+
+Владелец подтвердил, что прежний сервер выключен. Для новых бесплатных версий
+канон скачивания — GitHub Release с versioned DMG и byte-identical
+`MacDictate_Latest.dmg` asset. `latest-desktop.json.publicUrl` указывает на
+этот GitHub alias; `publicPath` остаётся legacy logical path. Website mirror
+на выключенном сервере больше не release gate. App updater использует GitHub
+API напрямую. Статический сайт не должен зависеть от backend или оплаты.
+Проверяются публичный asset, checksum, notarization, install flow и publicUrl.

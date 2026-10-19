@@ -23,8 +23,8 @@ final class UpdateChecker {
     private let session: URLSession
 
     init(
-        latestReleaseURL: URL = URL(string: "https://macdictate.pro/downloads/latest-desktop.json")!,
-        fallbackReleaseURL: URL? = URL(string: "https://api.github.com/repos/alexfisenkov/MacDictate/releases/latest")!,
+        latestReleaseURL: URL = URL(string: "https://api.github.com/repos/alexfisenkov/MacDictate/releases/latest")!,
+        fallbackReleaseURL: URL? = nil,
         session: URLSession = .shared
     ) {
         self.latestReleaseURL = latestReleaseURL

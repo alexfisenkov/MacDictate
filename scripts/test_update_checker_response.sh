@@ -25,6 +25,7 @@ final class MockURLProtocol: URLProtocol {
     }
 
     static var responses: [URL: Response] = [:]
+    static var requestedURLs: [URL] = []
 
     override class func canInit(with request: URLRequest) -> Bool {
         true
@@ -35,6 +36,7 @@ final class MockURLProtocol: URLProtocol {
     }
 
     override func startLoading() {
+        if let url = request.url { Self.requestedURLs.append(url) }
         guard let url = request.url,
               let response = Self.responses[url] else {
             client?.urlProtocol(self, didFailWithError: URLError(.badURL))
@@ -164,6 +166,20 @@ func testGitHubFallbackStillWorks() {
         exit(1)
     }
 }
+
+
+func testDefaultUpdateCheckDoesNotUseRetiredServer() {
+    MockURLProtocol.requestedURLs = []
+    MockURLProtocol.responses = [githubURL: .init(statusCode: 200, body: "{\"tag_name\":\"v1.5.2\",\"html_url\":\"https://github.com/alexfisenkov/MacDictate/releases/tag/v1.5.2\"}")]
+    let checker = UpdateChecker(session: makeSession())
+    switch waitForResult(checker, currentVersion: "1.5.1") {
+    case .newer(let info, _): expect(info.version == "1.5.2", "new free update")
+    default: expect(false, "expected free GitHub update")
+    }
+    expect(MockURLProtocol.requestedURLs == [githubURL], "default updater must use GitHub directly without the retired server")
+}
+
+testDefaultUpdateCheckDoesNotUseRetiredServer()
 
 testWebsiteManifestDrivesDownloadURL()
 testUpToDateFromWebsiteManifest()

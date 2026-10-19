@@ -22,4 +22,4 @@
 
 Риски проверки: старый expired cache; outage license API; прямой старый payment URL; дубликат bundle ID у iOS-wrapper; смешение runtime libs. Они покрываются source guard, HTTP harness, exact-path/hash install read-back и artifact checks.
 
-Открыто: сервер сайта предъявляет изменившийся SSH-ключ и TLS internal error с двух независимых сетей; требуется установить доверенную идентичность хоста до deployment. Live mic/hotkey/paste не проверены из-за timeout native UI runtime.
+Владелец подтвердил отключение прежнего сервера: выбран GitHub-only download/update + GitHub Pages (D-022), без восстановления backend или смены DNS. Live mic/hotkey/paste не проверены из-за timeout native UI runtime.
