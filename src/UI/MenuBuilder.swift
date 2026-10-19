@@ -3,7 +3,6 @@ import Cocoa
 struct AppMenuComponents {
     let menu: NSMenu
     let statusItem: NSMenuItem
-    let licenseItem: NSMenuItem
     let diagnosticsItem: NSMenuItem
     let improveTextItem: NSMenuItem
     let copyLastDictationItem: NSMenuItem
@@ -23,10 +22,6 @@ enum MenuBuilder {
         let statusItem = NSMenuItem(title: "Status: Initializing...", action: nil, keyEquivalent: "")
         menu.addItem(statusItem)
         menu.addItem(NSMenuItem.separator())
-
-        let licenseItem = NSMenuItem(title: "⏳ Лицензия: проверка...", action: #selector(AppController.openLicensePage), keyEquivalent: "")
-        licenseItem.target = controller
-        menu.addItem(licenseItem)
 
         let diagnosticsItem = NSMenuItem(title: "Диагностика: Инициализация...", action: nil, keyEquivalent: "")
         menu.addItem(diagnosticsItem)
@@ -121,7 +116,6 @@ enum MenuBuilder {
         return AppMenuComponents(
             menu: menu,
             statusItem: statusItem,
-            licenseItem: licenseItem,
             diagnosticsItem: diagnosticsItem,
             improveTextItem: improveTextItem,
             copyLastDictationItem: copyLastDictationItem,

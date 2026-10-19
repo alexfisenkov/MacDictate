@@ -28,7 +28,7 @@
 - [ ] Настроен и проверен `MACDICTATE_NOTARY_PROFILE`, если это публичный release.
 - [ ] `swiftc`/typecheck проходит по всем `.swift` файлам.
 - [ ] `scripts/test_whisper_runner_timeout.sh` проходит.
-- [ ] `scripts/test_license_machine_id_timeout.sh` проходит.
+- [ ] `scripts/test_free_desktop.sh` проходит: текущий app не содержит license gate, machine ID, paywall и license timer.
 - [ ] `scripts/test_recording_temp_cleanup.sh` проходит.
 - [ ] `scripts/test_text_improvement_runner.sh` проходит.
 - [ ] `scripts/check_bundled_whisper_runtime.sh build/MacDictate.app` проходит.
@@ -51,7 +51,8 @@
 - [ ] `scripts/verify_release_governance.sh` проходит локально.
 - [ ] `scripts/verify_release_governance.sh --strict-local-artifacts` проходит перед публикацией, если registry ссылается на локальные DMG/build logs.
 - [ ] Проверен update check.
-- [ ] Проверен license flow: active / grace / expired / server unavailable.
+- [ ] Проверен бесплатный desktop: старт и диктовка не зависят от legacy license cache или доступности license API; проверки модели, runtime и разрешений сохранены.
+- [ ] Для первого публичного бесплатного выпуска обновлены landing/download/checkout и RU/EN legal-тексты; backend совместим со старыми клиентами.
 - [ ] Проверен paste path и transcription failure path.
 
 ## Release recording
@@ -62,6 +63,8 @@
 - [ ] После публикации сайт скачивает именно текущий stable DMG, а не старый alias.
 
 ## v1.5.0 Release Evidence
+
+Исторические license harness ниже перенесены в `archive/legacy-licensing/scripts/`; они не являются требованиями для бесплатного desktop.
 
 - [x] Bundle поднят до `1.5.0` / build `10`.
 - [x] Release DMG собран как `MacDictate_Final_v1.5.0.dmg`.

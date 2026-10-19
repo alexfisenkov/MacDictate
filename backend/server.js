@@ -1,22 +1,15 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
-import crypto from 'crypto';
 import {
     initDb,
-    getOrCreateDevice,
-    createOrder,
     getOrder,
     updateOrderStatus,
     updateDeviceLicense
 } from './db.js';
-import {
-    initPayment,
-    generateToken,
-    assertPaymentConfig,
-    PaymentConfigurationError
-} from './tinkoff.js';
-import { getPublicPlans, resolvePlanSelection, getPlanByAmountRub } from './plans.js';
+import { generateToken } from './tinkoff.js';
+import { getPlanByAmountRub } from './plans.js';
+import { legacyFreeAccess } from './access-policy.js';
 
 dotenv.config();
 
@@ -29,7 +22,6 @@ const DEFAULT_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000'
 ];
 const DEVICE_ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{3,63}$/;
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const rateLimitBuckets = new Map();
 
 function parsePositiveInt(rawValue, fallback) {
@@ -61,12 +53,6 @@ function createCorsOptions() {
     };
 }
 
-function apiError(code, message, status = 400) {
-    const error = new Error(message);
-    error.code = code;
-    error.status = status;
-    return error;
-}
 
 function sendError(res, status, code, message) {
     res.status(status).json({ error: message, code });
@@ -76,17 +62,11 @@ function normalizeDeviceId(value) {
     return typeof value === 'string' ? value.trim() : '';
 }
 
-function normalizeEmail(value) {
-    return typeof value === 'string' ? value.trim().toLowerCase() : '';
-}
 
 function validateDeviceId(deviceId) {
     return DEVICE_ID_RE.test(deviceId);
 }
 
-function validateEmail(email) {
-    return email.length <= 254 && EMAIL_RE.test(email);
-}
 
 const slowRequestLogMs = parsePositiveInt(process.env.SLOW_REQUEST_LOG_MS, 1000);
 
@@ -119,34 +99,6 @@ function createRateLimiter({ windowMs, maxRequests }) {
     };
 }
 
-function readPaymentSelection(body) {
-    const deviceId = normalizeDeviceId(body.deviceId);
-    const email = normalizeEmail(body.email);
-
-    if (!validateDeviceId(deviceId)) {
-        throw apiError('INVALID_DEVICE_ID', 'deviceId is invalid', 400);
-    }
-
-    if (!validateEmail(email)) {
-        throw apiError('INVALID_EMAIL', 'email is invalid', 400);
-    }
-
-    const plan = resolvePlanSelection({
-        planId: body.planId,
-        planMonths: body.planMonths,
-        amount: body.amount
-    });
-
-    if (!plan) {
-        throw apiError(
-            'INVALID_PLAN',
-            'planId is invalid or legacy amount/months do not match the server catalog',
-            400
-        );
-    }
-
-    return { deviceId, email, plan };
-}
 
 app.disable('x-powered-by');
 app.use(cors(createCorsOptions()));
@@ -184,7 +136,7 @@ app.get(['/healthz', '/api/health'], (_req, res) => {
     });
 });
 
-// 1. App calling to check license status
+// Compatibility for older desktop apps; new apps never call this endpoint.
 app.get('/api/license/status', licenseStatusLimiter, async (req, res) => {
     const deviceId = normalizeDeviceId(req.query.deviceId);
     if (!deviceId) {
@@ -197,111 +149,17 @@ app.get('/api/license/status', licenseStatusLimiter, async (req, res) => {
         return;
     }
 
-    try {
-        const device = await getOrCreateDevice(deviceId);
-        const expires = new Date(device.expires_at);
-        const now = new Date();
-        const isActive = Boolean(device.is_paid) || expires > now;
-        
-        res.json({
-            deviceId: device.device_id,
-            isPaid: !!device.is_paid,
-            isActive: isActive,
-            expiresAt: device.expires_at,
-            daysLeft: Math.max(0, Math.ceil((expires - now) / (1000 * 60 * 60 * 24)))
-        });
-    } catch (e) {
-        sendError(res, 500, 'LICENSE_STATUS_ERROR', e.message);
-    }
+    res.json(legacyFreeAccess(deviceId));
 });
 
 app.get('/api/plans', plansLimiter, (_req, res) => {
-    res.json({ plans: getPublicPlans() });
+    res.json({ plans: [], accessMode: 'free' });
 });
 
-// 2. Generate Payment Link
-app.post('/api/payment/create', paymentCreateLimiter, async (req, res) => {
-    let selection;
-
-    try {
-        selection = readPaymentSelection(req.body);
-    } catch (error) {
-        sendError(res, error.status || 400, error.code || 'BAD_REQUEST', error.message);
-        return;
-    }
-
-    try {
-        assertPaymentConfig();
-    } catch (error) {
-        if (error instanceof PaymentConfigurationError) {
-            sendError(res, 503, error.code, error.message);
-            return;
-        }
-
-        sendError(res, 500, 'PAYMENT_CONFIG_ERROR', error.message);
-        return;
-    }
-
-    const amountKopecks = selection.plan.amountRub * 100;
-    const orderId = `MD-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
-
-    try {
-        await createOrder({
-            orderId,
-            deviceId: selection.deviceId,
-            email: selection.email,
-            planId: selection.plan.planId,
-            planMonths: selection.plan.months,
-            amount: amountKopecks,
-            status: 'NEW'
-        });
-        
-        const tinkoffRes = await initPayment({
-            orderId,
-            amountKopecks,
-            deviceId: selection.deviceId,
-            email: selection.email,
-            plan: selection.plan
-        });
-        
-        if (tinkoffRes.Success && tinkoffRes.PaymentURL) {
-            await updateOrderStatus(orderId, 'INITIATED', {
-                providerPaymentId: tinkoffRes.PaymentId ? String(tinkoffRes.PaymentId) : null,
-                providerOrderId: tinkoffRes.OrderId ? String(tinkoffRes.OrderId) : orderId
-            });
-
-            res.json({
-                paymentUrl: tinkoffRes.PaymentURL,
-                orderId,
-                planId: selection.plan.planId
-            });
-        } else {
-            await updateOrderStatus(orderId, 'INIT_FAILED', {
-                providerPaymentId: tinkoffRes.PaymentId ? String(tinkoffRes.PaymentId) : null,
-                providerOrderId: tinkoffRes.OrderId ? String(tinkoffRes.OrderId) : orderId
-            });
-
-            sendError(
-                res,
-                400,
-                'PAYMENT_INIT_FAILED',
-                tinkoffRes.Details || tinkoffRes.Message || 'Payment initialization failed'
-            );
-        }
-    } catch (e) {
-        if (e instanceof PaymentConfigurationError) {
-            sendError(res, 503, e.code, e.message);
-            return;
-        }
-
-        const providerMessage = e.response?.data?.Details || e.response?.data?.Message;
-        if (providerMessage) {
-            sendError(res, 502, 'PAYMENT_PROVIDER_ERROR', providerMessage);
-            return;
-        }
-
-        sendError(res, 500, 'PAYMENT_CREATE_ERROR', e.message);
-    }
+// No new orders or provider requests after the free desktop transition.
+// Existing order callbacks below remain supported for payment reconciliation.
+app.post('/api/payment/create', paymentCreateLimiter, (_req, res) => {
+    sendError(res, 410, 'PAYMENTS_DISABLED', 'MacDictate is free. Download it at https://macdictate.pro/');
 });
 
 // 3. Tinkoff Webhook Callback

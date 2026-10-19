@@ -2,6 +2,18 @@
 
 Этот журнал фиксирует инженерные шаги и checkpoints, а не маркетинговое описание релиза.
 
+## 2026-10-19 — бесплатный macOS desktop без проверки лицензии
+
+- Зафиксировано прямое решение владельца D-021: desktop бесплатен без срока действия. Из `AppController`, dictation gate, menu/status/diagnostics и новых debug metadata убраны license-зависимости, machine ID и переход к оплате. Проверки модели, runtime, микрофона и Accessibility сохраняются.
+- Исторические четыре licensing Swift-файла и три `test_license_*` harness сохранены в `archive/legacy-licensing/`; `build.sh` рекурсивно компилирует только активный `src/`, архив в app не входит. Существующие UserDefaults и локальные debug-сессии не переписываются.
+- Добавлен `scripts/test_free_desktop.sh`: source guard против licensing-зависимостей, компиляция всех активных app sources, реальные `NSMenu`/presentation assertions без лицензии, сохранение microphone/runtime diagnostics.
+- Подтверждены локальные проверки: `scripts/test_free_desktop.sh`, `scripts/test_debug_session_logger.sh` (включая отсутствие machine ID), `scripts/test_update_checker_response.sh`, `scripts/check_architecture_guardrails.sh` и исходный release governance.
+- Первая сборка выявила drift локального runtime cache после миграции Mac: cached Mach-O содержит старый absolute `LC_RPATH`, bundler fallback подтянул Homebrew dependencies с `minos=26`, guard корректно остановил artifact. Для следующей сборки выбран runtime из прежнего установленного bundle, прошедший обе runtime-проверки; воспроизводимая пересборка source-cache вынесена в backlog.
+- Signed build12, mounted DMG install-flow и strict подпись установленного `/Applications/MacDictate.app` прошли; SHA исполняемого файла совпадает со сборкой, запущен именно desktop-процесс. Установленный Whisper распознал synthetic русскую фразу. Native UI дважды вернул timeout: live microphone/hotkey/paste не проверены.
+- Владелец отдельно подтвердил бесплатный выпуск для всех. Подготовлены free landing/callback pages, RU/EN legal, backend free-access policy без записи devices/orders и HTTP410 для новых оплат. `scripts/test_free_access_backend.py` проходит на изолированной БД; исторические заказы и webhook не изменяются.
+- Для публикации выделен clean release worktree: прежние незакоммиченные desktop/model/runtime изменения сохранены отдельным checkpoint, исходная рабочая копия не откатывалась. Кандидат `v1.5.2` build13 ведётся в release ledger.
+- Production `macdictate.pro` на прежнем DNS IP предъявляет изменённые SSH-ключи и HTTPS TLS internal error; то же подтверждено из независимого доверенного сервера. Неизвестный ключ не принимался, production не изменялся. Notarization возможна через существующий ASC API key без восстановления отсутствующего Keychain profile.
+
 ## 2026-05-12 — optional Whisper large-v3 test mode
 
 - В рабочей линии `release/1.5.2` добавлен тестовый режим максимальной точности ASR без публикации релиза: settings menu получил toggle `Точная модель Whisper large-v3` и action `Скачать точную модель Whisper`.

@@ -2,8 +2,8 @@ import Cocoa
 
 extension AppController {
     func handleStartHotkey() {
-        if let reason = blockedRecordingReason() {
-            handleBlockedRecording(reason)
+        if let issue = diagnostics.currentIssue() {
+            handleBlockedRecording(issue)
             return
         }
 
@@ -101,85 +101,34 @@ extension AppController {
         refreshPresentation()
     }
 
-    private func blockedRecordingReason() -> BlockedRecordingReason? {
-        licenseService.normalizeStateIfNeeded()
+    private func handleBlockedRecording(_ issue: EnvironmentIssue) {
+        let primaryButton: String?
+        let primaryAction: (() -> Void)?
 
-        if let environmentIssue = diagnostics.currentIssue() {
-            return .environment(environmentIssue)
+        switch issue {
+        case .accessibilityMissing:
+            primaryButton = "Открыть настройки"
+            primaryAction = { [weak self] in self?.openAccessibilitySettings() }
+        case .microphonePending:
+            primaryButton = "Разрешить микрофон"
+            primaryAction = { [weak self] in self?.requestMicrophonePermission() }
+        case .microphoneDenied:
+            primaryButton = "Открыть микрофон"
+            primaryAction = { [weak self] in self?.openMicrophoneSettings() }
+        case .modelMissing, .whisperMissing:
+            primaryButton = nil
+            primaryAction = nil
         }
 
-        switch licenseService.state {
-        case .checking:
-            return .checking
-        case .expired:
-            return .expired
-        case .serverUnavailable:
-            return .serverUnavailable
-        case .active, .grace:
-            return nil
-        }
-    }
-
-    private func handleBlockedRecording(_ reason: BlockedRecordingReason) {
-        switch reason {
-        case .checking:
-            maybePresentBlockedAlert(
-                key: "license.checking",
-                title: "Проверка лицензии",
-                message: "MacDictate ещё завершает стартовую проверку лицензии. Попробуйте снова через пару секунд."
-            )
-            setStatus("Checking license...", icon: "⏳")
-
-        case .expired:
-            maybePresentBlockedAlert(
-                key: "license.expired",
-                title: "Лицензия истекла",
-                message: "Пробный период или подписка завершены. Чтобы продолжить использование (Ваш ID: \(licenseService.machineID)), откройте страницу оплаты.",
-                primaryButton: "Оплатить подписку",
-                secondaryButton: "Позже",
-                primaryAction: { [weak self] in
-                    self?.openLicensePage()
-                }
-            )
-            setStatus("License Expired", icon: "🛑")
-
-        case .serverUnavailable:
-            maybePresentBlockedAlert(
-                key: "license.serverUnavailable",
-                title: "Сервер лицензий недоступен",
-                message: "MacDictate не смог подтвердить лицензию и локальный grace уже недоступен. Проверьте интернет и попробуйте позже."
-            )
-            setStatus("License Server Unavailable", icon: "⚠️")
-
-        case .environment(let issue):
-            let primaryButton: String?
-            let primaryAction: (() -> Void)?
-
-            switch issue {
-            case .accessibilityMissing:
-                primaryButton = "Открыть настройки"
-                primaryAction = { [weak self] in self?.openAccessibilitySettings() }
-            case .microphonePending:
-                primaryButton = "Разрешить микрофон"
-                primaryAction = { [weak self] in self?.requestMicrophonePermission() }
-            case .microphoneDenied:
-                primaryButton = "Открыть микрофон"
-                primaryAction = { [weak self] in self?.openMicrophoneSettings() }
-            case .modelMissing, .whisperMissing:
-                primaryButton = nil
-                primaryAction = nil
-            }
-
-            maybePresentBlockedAlert(
-                key: "env.\(issue.statusText)",
-                title: issue.alertTitle,
-                message: issue.alertText,
-                primaryButton: primaryButton,
-                secondaryButton: "ОК",
-                primaryAction: primaryAction
-            )
-            setStatus(issue.statusText, icon: "⚠️")
-        }
+        maybePresentBlockedAlert(
+            key: "env.\(issue.statusText)",
+            title: issue.alertTitle,
+            message: issue.alertText,
+            primaryButton: primaryButton,
+            secondaryButton: "ОК",
+            primaryAction: primaryAction
+        )
+        setStatus(issue.statusText, icon: "⚠️")
     }
 
     private func maybePresentBlockedAlert(
@@ -223,8 +172,7 @@ extension AppController {
             activeDebugSession = debugSessionLogger.startSession(context: DebugSessionContext(
                 appVersion: appVersionString(),
                 textImprovementEnabled: TextImprovementSettings.isEnabled(),
-                whisperModelMode: WhisperModelSettings.currentMode().rawValue,
-                machineID: licenseService.machineID
+                whisperModelMode: WhisperModelSettings.currentMode().rawValue
             ))
             activeDebugSession?.record("recording_started")
             recordDiagnostic(nil)

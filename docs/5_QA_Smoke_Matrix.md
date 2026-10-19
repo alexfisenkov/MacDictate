@@ -9,14 +9,11 @@
 | No microphone permission | статус/alerts ведут в privacy settings, запись не стартует | Not runtime-verified |
 | No accessibility permission | hotkey blocked, показан accessibility guidance | Not runtime-verified |
 | Stale temp audio/text at startup | `RecordingService` удаляет старые `/tmp/mac_dictate_dist.wav` и `.txt` | Verified by `scripts/test_recording_temp_cleanup.sh` |
-| License `checking` | double Option не стартует запись, false paywall не показывается | Compile-level only |
-| Machine ID command hangs | startup machine ID resolution быстро уходит в generated cached `MD-*` fallback | Verified by `scripts/test_license_machine_id_timeout.sh` |
-| License `active` | запись разрешена при нормальной среде | Not runtime-verified |
-| License `grace` | запись разрешена до bounded deadline | Compile-level only |
-| License `expired` | запись блокируется, доступна ссылка на оплату | Compile-level only |
-| License server unavailable | при валидном snapshot включается grace, без snapshot запись блокируется | Compile-level only |
-| License status boolean compatibility | live/legacy backend values `true/false`, `1/0` и boolean-like strings декодируются без false `serverUnavailable` | Verified by `scripts/test_license_status_response.sh` and live endpoint curl |
-| License transient failure with cached active snapshot | при сетевом сбое и валидном snapshot app остается в grace без runtime-warning `Сервер лицензий временно недоступен`; без cache warning сохраняется | Verified by `scripts/test_license_grace_diagnostic.sh` |
+| Free desktop source and menu | активный `src/` не зависит от licensing/client/cache/machine ID; реальное `NSMenu` не содержит license/trial/payment; при нормальной среде `Ready` без лицензии | Verified 2026-10-19 by `scripts/test_free_desktop.sh`: all active app sources compile and menu/presentation assertions pass |
+| Free desktop diagnostics | microphone denial и runtime failure остаются видимыми без license gate | Verified 2026-10-19 by `scripts/test_free_desktop.sh`; actual recording/permission prompts not covered by harness |
+| Legacy license cache / license API outage | старые paid/expired cache и недоступность license API не влияют на доступ к записи | Source guard verified by `scripts/test_free_desktop.sh`; live dictation not yet verified |
+| Free desktop debug metadata | новые `metadata.json` не содержат machine ID, сохраняют ASR mode и остальные diagnostic artifacts | Verified 2026-10-19 by `scripts/test_debug_session_logger.sh`; old sessions are not rewritten |
+| Free desktop local install | на Mac установлена новая signed сборка; menu без лицензирования, базовая диктовка работает | Build12 signed DMG/install-flow/installed strict signature/executable SHA and exact desktop process: PASS; installed Whisper synthetic ASR: PASS; live microphone/hotkey/paste: NOT_RUN (native UI timeout) |
 | Hung / stderr-heavy `whisper-cli` subprocess | зависший процесс завершается timeout diagnostic, temp audio чистится; большой `stderr` не блокирует успешный subprocess | Verified by `scripts/test_whisper_runner_timeout.sh` |
 | Whisper bundled runtime artifact | собранный `.app` содержит arm64 `whisper-cli`, `libwhisper`, ggml dylibs/backend plugins в isolated `lib/whisper` + `libexec/ggml-whisper`; `otool` не содержит `/opt/homebrew` / `/usr/local` ссылок; Mach-O `minos` не выше `LSMinimumSystemVersion`; runtime запускается с bundled `GGML_BACKEND_PATH` без `dyld` error | Verified by `scripts/build_clean_runtimes.sh`, `scripts/check_bundled_whisper_runtime.sh`, `./build.sh`, direct `otool`/`vtool` audit, and `scripts/check_install_artifact_flow.sh` |
 | Whisper model selection | balanced mode выбирает `large-v3-turbo`, maximumAccuracy mode выбирает `large-v3`; установленная heavy-модель не подменяет дефолт, fallback между валидными `.bin` сохраняется | Verified by `scripts/test_whisper_model_selection.sh` |
@@ -53,9 +50,10 @@
 | Last dictation safety copy | финальный non-empty текст сохраняется до paste и может быть скопирован из menu bar через `Скопировать последнюю диктовку` | Store behavior verified by `scripts/test_last_dictation_store.sh`; menu action compile-level verified |
 | Transcription fail | user видит различимую диагностическую ошибку | Compile-level only |
 | Paste fail | отображается локально различимая ошибка вставки | Compile-level only |
-| Payment initiated via site/app path | `uid` / pricing path совпадают с current product contract | Backend/web smoke verified in Sprint 1 |
+| Legacy site/backend payment path | прежний `uid` / pricing contract остается совместимым для старых клиентов; бесплатный app не имеет payment action | Current local free HTTP harness PASS: active/no expiry, empty plans, payments410, no device/order writes; free landing/legal responsive QA PASS; production rollout BLOCKED pending trusted host access |
 
 ## Notes
 
-- Этот документ описывает минимум smoke coverage, а не полный regression plan.
+- Этот документ описывает минимум smoke coverage, а не полный regression plan. Записи без даты 2026-10-19 описывают прежние проверки и не подтверждают новую installed-copy.
+- Licensing smoke старых версий сохранен в исторических harness `archive/legacy-licensing/scripts/`; это не критерий готовности бесплатного desktop.
 - `Verified locally` обязан обновляться после реального runtime smoke, а не только после typecheck/build.

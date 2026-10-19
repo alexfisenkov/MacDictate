@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+APP_ROOT_DIR="$(cd "$ROOT_DIR/../.." && pwd)"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
@@ -104,7 +105,7 @@ print("LicenseService machine ID timeout test passed.")
 SWIFT
 
 swiftc \
-    "$ROOT_DIR/src/Diagnostics/DiagnosticStatus.swift" \
+    "$APP_ROOT_DIR/src/Diagnostics/DiagnosticStatus.swift" \
     "$ROOT_DIR/src/License/LicenseCache.swift" \
     "$ROOT_DIR/src/License/LicenseService.swift" \
     "$ROOT_DIR/src/License/LicenseSnapshot.swift" \

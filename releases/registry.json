@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "product": "MacDictate macOS desktop",
-  "registryUpdatedAt": "2026-05-10",
+  "registryUpdatedAt": "2026-10-19",
   "governanceDocument": "docs/7_Release_Governance.md",
   "current": {
     "publicStable": "v1.5.1",
     "workingLine": "v1.5.2-working",
     "developmentBranch": "release/1.5.2",
     "bundleShortVersion": "1.5.2",
-    "bundleVersion": "12"
+    "bundleVersion": "13"
   },
   "versions": [
     {
@@ -352,7 +352,7 @@
       "channel": "development",
       "bundle": {
         "shortVersion": "1.5.2",
-        "build": "12"
+        "build": "13"
       },
       "git": {
         "commit": null,
@@ -375,6 +375,35 @@
       },
       "summary": "Active 1.5.2 development line after public v1.5.1 release.",
       "sourceConfidence": "confirmed_working_line"
+    },
+    {
+      "version": "v1.5.2",
+      "status": "local_only",
+      "channel": "candidate",
+      "bundle": {
+        "shortVersion": "1.5.2",
+        "build": "13"
+      },
+      "git": {
+        "commit": null,
+        "localTag": null,
+        "remoteTags": [],
+        "tagRequiredLocally": false
+      },
+      "github": {
+        "releaseUrl": null,
+        "assetName": null,
+        "githubAssetSha256": null,
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.5.2",
+        "artifactPath": null,
+        "localArtifactSha256": null,
+        "buildLogPath": null
+      },
+      "summary": "Free desktop: no licensing, no new payments, compatible free access for old apps. Public website rollout pending trusted server access.",
+      "sourceConfidence": "verified_local_candidate"
     }
   ],
   "checkpoints": [

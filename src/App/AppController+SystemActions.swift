@@ -74,9 +74,4 @@ extension AppController {
         UserDefaults.standard.set(versionKey, forKey: "LastLaunchedVersion")
     }
 
-    @objc func openLicensePage() {
-        if let url = licenseService.purchaseURL() {
-            NSWorkspace.shared.open(url)
-        }
-    }
 }

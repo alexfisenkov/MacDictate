@@ -1,13 +1,6 @@
 name: Release Governance
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
-      - "release/**"
-      - "hotfix/**"
-      - "codex/**"
   workflow_dispatch:
 
 permissions:

@@ -4,7 +4,6 @@ struct DebugSessionContext: Codable {
     let appVersion: String
     let textImprovementEnabled: Bool
     let whisperModelMode: String
-    let machineID: String
 }
 
 struct DebugSessionEvent: Codable {
@@ -56,8 +55,7 @@ final class DebugSessionLogger {
                 createdAt: Date(),
                 appVersion: context.appVersion,
                 textImprovementEnabled: context.textImprovementEnabled,
-                whisperModelMode: context.whisperModelMode,
-                machineID: context.machineID
+                whisperModelMode: context.whisperModelMode
             ))
             session.record("session_started", details: [
                 "textImprovementEnabled": String(context.textImprovementEnabled),
@@ -84,7 +82,6 @@ struct DebugSessionMetadata: Codable {
     let appVersion: String
     let textImprovementEnabled: Bool
     let whisperModelMode: String
-    let machineID: String
 }
 
 final class DebugSession {

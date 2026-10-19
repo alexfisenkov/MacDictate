@@ -26,7 +26,8 @@
 - `releases/registry.json` — машинно-читаемый реестр всех desktop-версий и checkpoint-ов.
 - `releases/versions/<version>/RELEASE.md` — человекочитаемый паспорт конкретной версии.
 - `backend/plans.js` — единственный источник истины по plan catalog.
-- `GET /api/license/status` сохраняется совместимым с текущим macOS app, пока отдельным решением не согласован breaking change.
+- macOS desktop бесплатен без срока действия и не зависит от licensing/payment API (решение D-021 от 2026-10-19).
+- `GET /api/license/status` сохраняется совместимым со старыми установленными версиями; backend, checkout и публичная дистрибуция переходят отдельно, без отключения старых клиентов.
 
 ## Secret Handling Policy
 

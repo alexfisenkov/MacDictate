@@ -1,32 +1,9 @@
 import Foundation
 
 enum StatusPresentation {
-    static func licenseMenuTitle(state: LicenseState, machineID: String) -> String {
-        switch state {
-        case .checking:
-            return "⏳ Лицензия: проверка... [\(machineID)]"
-        case .active(let snapshot):
-            if snapshot.isPaid {
-                return "💎 Лицензия: активна [\(machineID)]"
-            }
-            return "🎁 Триал: \(snapshot.daysLeft) дн. [\(machineID)]"
-        case .grace(let snapshot, let deadline):
-            let until = shortDateTime(deadline)
-            if snapshot.isPaid {
-                return "🟡 Grace: лицензия до \(until) [\(machineID)]"
-            }
-            return "🟡 Grace: триал до \(until) [\(machineID)]"
-        case .expired:
-            return "🛑 Лицензия: истекла [\(machineID)]"
-        case .serverUnavailable:
-            return "⚠️ Лицензия: сервер недоступен [\(machineID)]"
-        }
-    }
-
     static func diagnosticsSummary(
         environmentIssue: EnvironmentIssue?,
-        runtimeDiagnostic: RuntimeDiagnostic?,
-        licenseState: LicenseState
+        runtimeDiagnostic: RuntimeDiagnostic?
     ) -> String {
         if let environmentIssue {
             return "Диагностика: \(environmentIssue.diagnosticText)"
@@ -36,24 +13,12 @@ enum StatusPresentation {
             return "Диагностика: \(runtimeDiagnostic.severity.prefix) \(runtimeDiagnostic.message)"
         }
 
-        switch licenseState {
-        case .grace(_, let deadline):
-            return "Диагностика: offline grace активен до \(shortDateTime(deadline))."
-        case .checking:
-            return "Диагностика: выполняется проверка лицензии."
-        case .serverUnavailable:
-            return "Диагностика: сервер лицензий недоступен."
-        case .expired:
-            return "Диагностика: лицензия истекла."
-        case .active:
-            return "Диагностика: OK"
-        }
+        return "Диагностика: OK"
     }
 
     static func idleStatus(
         environmentIssue: EnvironmentIssue?,
-        runtimeDiagnostic: RuntimeDiagnostic?,
-        licenseState: LicenseState
+        runtimeDiagnostic: RuntimeDiagnostic?
     ) -> (text: String, icon: String) {
         if let environmentIssue {
             return (environmentIssue.statusText, "⚠️")
@@ -72,18 +37,7 @@ enum StatusPresentation {
             return (runtimeDiagnostic.message, icon)
         }
 
-        switch licenseState {
-        case .checking:
-            return ("Checking license...", "⏳")
-        case .active:
-            return ("Ready", "")
-        case .grace:
-            return ("Offline Grace", "🟡")
-        case .expired:
-            return ("License Expired", "🛑")
-        case .serverUnavailable:
-            return ("License Server Unavailable", "⚠️")
-        }
+        return ("Ready", "")
     }
 
     static func accessibilityMenuTitle(isTrusted: Bool) -> String {

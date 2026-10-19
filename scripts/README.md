@@ -54,13 +54,15 @@ scripts/test_whisper_runner_timeout.sh
 scripts/test_whisper_model_selection.sh
 ```
 
-## `test_license_machine_id_timeout.sh`
+## `test_free_desktop.sh`
 
-Компилирует `LicenseService` с fake `ioreg` и проверяет parsing/cache machine ID, а также быстрый generated fallback при зависшем command.
+Проверяет отсутствие licensing-зависимостей в активном source, компилирует все app sources и создает реальное `NSMenu`: в нем нет license/trial/payment, при нормальной среде статус `Ready`, а microphone denial и runtime errors остаются видимыми. Live запись и системные permission prompts проверяются отдельно.
 
 ```bash
-scripts/test_license_machine_id_timeout.sh
+scripts/test_free_desktop.sh
 ```
+
+Исторические `test_license_machine_id_timeout.sh`, `test_license_status_response.sh` и `test_license_grace_diagnostic.sh` сохранены в `archive/legacy-licensing/scripts/` вместе с прежним licensing-кодом. Они не входят в проверки текущего desktop.
 
 ## `test_recording_temp_cleanup.sh`
 
@@ -134,7 +136,7 @@ scripts/check_install_artifact_flow.sh build/artifacts/MacDictate_Final_v1.5.2.d
 
 ## `test_debug_session_logger.sh`
 
-Компилирует `DebugSessionLogger` и проверяет opt-in debug session folder, `metadata.json`, `events.jsonl`, `audio.wav`, staged text artifacts и disabled-mode no-op.
+Компилирует `DebugSessionLogger` и проверяет opt-in debug session folder, `metadata.json` без machine ID, `events.jsonl`, `audio.wav`, staged text artifacts и disabled-mode no-op.
 
 ```bash
 scripts/test_debug_session_logger.sh
@@ -147,3 +149,7 @@ scripts/test_debug_session_logger.sh
 ```bash
 scripts/test_last_dictation_store.sh
 ```
+
+## `test_free_access_backend.py`
+
+Проверяет реальные free HTTP routes на временной SQLite БД: активный бессрочный legacy доступ, пустые тарифы, HTTP410 для новых оплат и отсутствие device/order writes.

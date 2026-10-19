@@ -1,6 +1,6 @@
 # Backend Ops Runbook
 
-Этот документ фиксирует минимальный production-контур для `macdictate.pro`, потому что desktop app зависит от `GET /api/license/status`.
+Этот документ фиксирует минимальный production-контур для `macdictate.pro`: сайт, обновления и API для старых desktop-версий. Бесплатный desktop по решению D-021 от 2026-10-19 не вызывает `GET /api/license/status`; сохраняем API совместимым для ранее установленных клиентов. Переход публичной дистрибуции и checkout отслеживается отдельно в backlog.
 
 ## Health checks
 
@@ -80,3 +80,14 @@ Every public desktop release must update both public channels:
 2. Website alias `/downloads/MacDictate_Latest.dmg`.
 
 `scripts/verify_release_governance.sh --online` checks both the GitHub Release and the website alias availability.
+
+## Free rollout 2026-10-19 — deployment gate
+
+Current source returns perpetual free legacy access without DB writes, empty plans,
+and HTTP410 for new payment creation. Existing callbacks/history remain supported.
+`python3 scripts/test_free_access_backend.py` verifies this against a disposable DB.
+
+Production access is currently unverified: the historical IP presents changed SSH
+keys and TLS internal error from two independent networks. Do not accept the key
+without independent owner/provider verification. Paths above are historical until
+a trusted server read-back. No credentials or database may be committed.

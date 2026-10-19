@@ -1,7 +1,6 @@
 import Cocoa
 
 final class AppController: NSObject {
-    let licenseService = LicenseService()
     let whisperRunner = WhisperRunner()
     let textImprovementRunner = TextImprovementRunner()
     lazy var diagnostics = EnvironmentDiagnostics(whisperRunner: whisperRunner)
@@ -15,7 +14,6 @@ final class AppController: NSObject {
     var menuComponents: AppMenuComponents!
     var hotkeyMonitor: HotkeyMonitor?
     var permissionTimer: Timer?
-    var wakeObserver: NSObjectProtocol?
     var whisperModelWindowController: NSWindowController?
     var activeWhisperModelDownloader: ModelDownloader?
     var textImprovementWindowController: NSWindowController?
@@ -32,32 +30,21 @@ final class AppController: NSObject {
     deinit {
         permissionTimer?.invalidate()
         hotkeyMonitor?.stop()
-        licenseService.stop()
-        if let wakeObserver {
-            NSWorkspace.shared.notificationCenter.removeObserver(wakeObserver)
-        }
     }
 
     func start() {
         handleVersionUpgrade()
         buildMenu()
-        bindServices()
 
-        licenseService.restoreCachedState()
         refreshPresentation()
 
-        observeWake()
         checkPermissions()
         setupHotkeys()
-        licenseService.startRefreshLoop()
 
         performUpdateCheck(isManual: false)
-        licenseService.checkStatus(promoteCheckingState: !licenseService.state.allowsDictation)
     }
 
     func refreshPresentation() {
-        licenseService.normalizeStateIfNeeded()
-        refreshLicenseMenuItem()
         refreshPermissionMenuItems()
         refreshWhisperModelMenuItems()
         refreshTextImprovementMenuItems()
@@ -129,8 +116,7 @@ final class AppController: NSObject {
 
         let idleStatus = StatusPresentation.idleStatus(
             environmentIssue: diagnostics.currentIssue(),
-            runtimeDiagnostic: activeRuntimeDiagnostic,
-            licenseState: licenseService.state
+            runtimeDiagnostic: runtimeDiagnostic
         )
         setStatus(idleStatus.text, icon: idleStatus.icon)
     }
@@ -170,38 +156,10 @@ final class AppController: NSObject {
         }
     }
 
-    private func bindServices() {
-        licenseService.onChange = { [weak self] in
-            self?.refreshPresentation()
-        }
-    }
-
-    private func observeWake() {
-        wakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
-            forName: NSWorkspace.didWakeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.licenseService.handleWake()
-        }
-    }
-
-    private var activeRuntimeDiagnostic: RuntimeDiagnostic? {
-        runtimeDiagnostic ?? licenseService.runtimeDiagnostic
-    }
-
-    private func refreshLicenseMenuItem() {
-        menuComponents.licenseItem.title = StatusPresentation.licenseMenuTitle(
-            state: licenseService.state,
-            machineID: licenseService.machineID
-        )
-    }
-
     private func refreshDiagnosticsMenuItem() {
         let summary = StatusPresentation.diagnosticsSummary(
             environmentIssue: diagnostics.currentIssue(),
-            runtimeDiagnostic: activeRuntimeDiagnostic,
-            licenseState: licenseService.state
+            runtimeDiagnostic: runtimeDiagnostic
         )
         menuComponents.diagnosticsItem.title = summary
         statusItem.button?.toolTip = summary

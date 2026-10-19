@@ -37,8 +37,11 @@ backend/.env.*
 !backend/.env.example
 
 # Backend runtime data
-backend/node_modules/
+backend/node_modules
 backend/data/
 *.sqlite
 *.sqlite-*
 npm-debug.log*
+
+# Bundled public end-user license (not a generated transcript)
+!assets/license.txt

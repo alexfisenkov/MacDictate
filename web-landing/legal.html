@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-        tailwind.config = {
+        if (window.tailwind) window.tailwind.config = {
             theme: {
                 extend: {
                     colors: { brand: '#007AFF', brandDark: '#0A0A0A' }
@@ -18,8 +18,9 @@
         }
     </script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background: #0a0a0a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .prose { overflow-wrap: anywhere; }
         .prose h1 { font-size: 2rem; font-weight: bold; margin-bottom: 1.5rem; color: white;}
         .prose h2 { font-size: 1.5rem; font-weight: bold; margin-top: 2rem; margin-bottom: 1rem; color: white;}
         .prose p { margin-bottom: 1rem; color: #9ca3af; line-height: 1.6; }
@@ -32,18 +33,18 @@
     <nav class="w-full z-50 glass border-b border-white/10 mb-10">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
             <a href="/" class="flex items-center gap-2 font-bold text-xl hover:text-gray-300 transition" id="navHome">
-                <img src="/assets/mic_logo.svg" alt="" class="h-8 w-8 rounded-lg">
+                <img src="/assets/mic_logo.svg" width="32" height="32" alt="" class="h-8 w-8 rounded-lg">
                 <span id="navHomeText">На главную (MacDictate)</span>
             </a>
-            <button id="langToggle" class="text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition">EN</button>
+            <button id="langToggle" class="text-sm bg-white/10 hover:bg-white/20 px-3 py-2.5 min-h-[44px] min-w-[44px] rounded-full transition">EN</button>
         </div>
     </nav>
     
     <div class="max-w-4xl mx-auto px-4">
-        <div class="flex gap-4 mb-8 border-b border-white/10 pb-4">
-            <button onclick="loadDoc('privacy_policy')" class="px-4 py-2 bg-white/10 hover:bg-brand rounded transition" id="btnPrivacy">Политика Конфиденциальности</button>
-            <button onclick="loadDoc('eula_oferta')" class="px-4 py-2 bg-white/10 hover:bg-brand rounded transition" id="btnEula">Договор Оферта</button>
-            <button onclick="loadDoc('data_consent')" class="px-4 py-2 bg-white/10 hover:bg-brand rounded transition" id="btnConsent">Согласие ПД</button>
+        <div class="flex flex-wrap gap-3 mb-8 border-b border-white/10 pb-4">
+            <button onclick="loadDoc('privacy_policy')" class="min-h-[44px] px-4 py-2 bg-white/10 hover:bg-brand rounded transition" id="btnPrivacy">Политика Конфиденциальности</button>
+            <button onclick="loadDoc('eula_oferta')" class="min-h-[44px] px-4 py-2 bg-white/10 hover:bg-brand rounded transition" id="btnEula">Условия использования</button>
+            <button onclick="loadDoc('data_consent')" class="min-h-[44px] px-4 py-2 bg-white/10 hover:bg-brand rounded transition" id="btnConsent">Обработка данных</button>
         </div>
         
         <div id="content" class="prose max-w-none glass p-8 rounded-2xl">
@@ -52,29 +53,44 @@
     </div>
 
     <script>
-        let currentLang = 'ru';
+        const requestedLang = new URLSearchParams(window.location.search).get('lang');
+        let currentLang = ['ru', 'en'].includes(requestedLang) ? requestedLang : ((navigator.language || '').toLowerCase().includes('ru') ? 'ru' : 'en');
         let currentDoc = 'privacy_policy';
 
-        const userLang = navigator.language || navigator.userLanguage; 
-        if (!userLang.toLowerCase().includes('ru')) {
-            currentLang = 'en';
-        }
-
         function updateUITexts() {
+            document.documentElement.lang = currentLang;
+            document.getElementById('navHome').href = '/?lang=' + currentLang;
+            const url = new URL(window.location.href);
+            url.searchParams.set('lang', currentLang);
+            window.history.replaceState(null, '', url.pathname + url.search + url.hash);
             if (currentLang === 'en') {
                 document.getElementById('langToggle').textContent = 'RU';
                 document.getElementById('navHomeText').textContent = 'Back to Home (MacDictate)';
                 document.getElementById('btnPrivacy').textContent = 'Privacy Policy';
-                document.getElementById('btnEula').textContent = 'EULA / Terms';
-                document.getElementById('btnConsent').textContent = 'Data Consent';
+                document.getElementById('btnEula').textContent = 'Terms of Use';
+                document.getElementById('btnConsent').textContent = 'Data Processing';
                 document.title = 'MacDictate — Legal Documents';
             } else {
                 document.getElementById('langToggle').textContent = 'EN';
                 document.getElementById('navHomeText').textContent = 'На главную (MacDictate)';
                 document.getElementById('btnPrivacy').textContent = 'Политика Конфиденциальности';
-                document.getElementById('btnEula').textContent = 'Договор Оферта';
-                document.getElementById('btnConsent').textContent = 'Согласие ПД';
+                document.getElementById('btnEula').textContent = 'Условия использования';
+                document.getElementById('btnConsent').textContent = 'Обработка данных';
                 document.title = 'MacDictate — Юридические документы';
+            }
+        }
+
+        function renderDocument(contentDiv, text) {
+            if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
+                contentDiv.innerHTML = marked.parse(text);
+            } else {
+                const fallback = document.createElement('pre');
+                fallback.className = 'whitespace-pre-wrap break-words font-sans';
+                fallback.style.whiteSpace = 'pre-wrap';
+                fallback.style.overflowWrap = 'anywhere';
+                fallback.style.fontFamily = 'inherit';
+                fallback.textContent = text;
+                contentDiv.replaceChildren(fallback);
             }
         }
 
@@ -91,15 +107,15 @@
                         const fallbackRes = await fetch(`/docs/${basename}.md`);
                         if (!fallbackRes.ok) throw new Error("Document not found");
                         const text = await fallbackRes.text();
-                        contentDiv.innerHTML = marked.parse(text);
+                        renderDocument(contentDiv, text);
                     } else {
                         throw new Error("Document not found");
                     }
                 } else {
                     const text = await res.text();
-                    contentDiv.innerHTML = marked.parse(text);
+                    renderDocument(contentDiv, text);
                 }
-                window.location.hash = basename.split('_')[0]; // updates anchor #privacy etc
+                window.location.hash = { privacy_policy: 'privacy', eula_oferta: 'eula', data_consent: 'consent' }[basename];
             } catch (e) {
                 contentDiv.innerHTML = `<p class='text-red-400'>${currentLang === 'en' ? 'Failed to load document.' : 'Ошибка загрузки документа.'}</p>`;
             }

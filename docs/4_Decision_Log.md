@@ -138,3 +138,11 @@
 - **Почему:** clean-install flow не должен требовать от обычного пользователя устанавливать Homebrew, `whisper.cpp`, `llama.cpp`, OpenSSL/libomp или понимать dynamic library paths. Whisper model скачивается на первом запуске, Qwen model может скачиваться лениво после включения `Улучшить текст`, но runtime, который запускает обе модели, обязан быть частью приложения.
 - **Проверка:** `build.sh` по умолчанию требует bundled runtimes; `scripts/check_bundled_whisper_runtime.sh` и `scripts/check_bundled_llama_runtime.sh` проверяют arm64/Mach-O, signatures, запуск без `dyld` errors и отсутствие `/opt/homebrew` / `/usr/local` ссылок; `scripts/check_distribution_signing.sh` и `scripts/check_install_artifact_flow.sh` включают эти проверки для distribution readiness.
 - **Ограничение:** notarization для рабочих тестовых 1.5.2-сборок может быть отключена, но публичный release path должен проходить обычный Developer ID + notarization контур.
+
+## D-021 — Бесплатный macOS desktop без лицензирования
+
+- **Дата:** 2026-10-19
+- **Решение:** по прямому указанию владельца macOS MacDictate становится бесплатным без срока действия. Из desktop runtime удаляются license state/cache/client, license-запросы и refresh timer, machine ID, trial/grace, paywall и переход к оплате. Доступ к записи зависит только от локальной модели/runtime и системных разрешений.
+- **Почему:** диктовка на устройстве должна запускаться без лицензии и доступности license server. Постоянный бесплатный режим задается составом приложения, а не поддельной оплаченной лицензией или увеличенным сроком grace.
+- **История и данные:** прежние четыре Swift-файла сохранены в `archive/legacy-licensing/src/License/`, три `test_license_*` harness — в `archive/legacy-licensing/scripts/`; архив не компилируется в app. Новые debug metadata не содержат machine ID. Старые debug-сессии и legacy UserDefaults остаются нетронутыми.
+- **Публичный переход:** владелец подтвердил выпуск для всех в той же задаче. Старый `GET /api/license/status` сохраняет типы полей и возвращает free active access без изменения данных оплаты; `/api/plans` возвращает пустой массив, `/api/payment/create` — HTTP410. Исторический каталог и webhook сохранены для сверки прежних заказов. Landing/legal/download и signed/notarized release обновляются согласованно; до production read-back rollout не завершён.

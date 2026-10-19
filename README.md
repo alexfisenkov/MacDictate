@@ -1,6 +1,6 @@
 # MacDictate
 
-MacDictate — menu bar utility для локальной диктовки на macOS с Whisper.cpp, licensing layer и checkout surface.
+MacDictate — menu bar utility для локальной диктовки на macOS с Whisper.cpp. Приложение бесплатно без срока действия, активации и проверки лицензии.
 
 ## Versioning
 
@@ -13,16 +13,16 @@ MacDictate — menu bar utility для локальной диктовки на 
 ## Product Surfaces
 
 - `src/`, `assets/`, `build.sh` — основной macOS product.
-- `backend/` — licensing/payment API и SQLite storage.
-- `web-landing/` — публичный лендинг и checkout surface.
+- `backend/` — API совместимости старых клиентов и история прежних платежей. Новые оплаты отключены.
+- `web-landing/` — публичный лендинг и бесплатное скачивание.
 - `docs/legal/` — legal-тексты, используемые сайтом.
 - `docs/` — инженерный канон, журнал решений, smoke matrix и release discipline.
 
 ## Source of truth
 
-- Канон по desktop runtime: `src/AppDelegate.swift`, `src/AppController.swift` и app-side модули в `src/App`, `src/License`, `src/Diagnostics`, `src/Hotkeys`, `src/Transcription`, `src/TextImprovement`, `src/Paste`, `src/UI`, `src/System`, `src/Updates`.
+- Канон по desktop runtime: `src/AppDelegate.swift`, `src/AppController.swift` и app-side модули в `src/App`, `src/Diagnostics`, `src/Hotkeys`, `src/Transcription`, `src/TextImprovement`, `src/Paste`, `src/UI`, `src/System`, `src/Updates`.
 - Канон по росту app-side архитектуры: `docs/10_App_Architecture_Guardrails.md` + `scripts/check_architecture_guardrails.sh`.
-- Канон по тарифам и оплате: `backend/plans.js`.
+- Политика бесплатного доступа: `backend/access-policy.js`; `backend/plans.js` хранит исторический каталог для сверки старых заказов.
 - Главный operating model проекта: `docs/0_Project_Operating_Model.md`.
 - Канон по версиям, rollback и release assets: `docs/7_Release_Governance.md`, `releases/registry.json`, `releases/versions/<version>/RELEASE.md`.
 - Контракт `GET /api/license/status` должен оставаться совместимым с текущим macOS app.

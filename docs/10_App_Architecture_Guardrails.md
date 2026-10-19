@@ -51,8 +51,9 @@
 - Вся вторая AI-модель: settings, prompt profile, formatter, cleaner, validator, llama runtime, trace и runner.
 - Prompt/rules/validators не встраивать в `AppController`.
 
-`src/License/`, `src/Diagnostics/`, `src/Paste/`, `src/Hotkeys/`
+`src/Diagnostics/`, `src/Paste/`, `src/Hotkeys/`
 - Сохраняют текущие границы ответственности.
+- Desktop остается бесплатным: не возвращать license gate, machine ID, paywall или периодические license-запросы. Исторический licensing-код находится в `archive/legacy-licensing/` и не входит в сборку (D-021).
 
 ## Запрещённые Смешения
 

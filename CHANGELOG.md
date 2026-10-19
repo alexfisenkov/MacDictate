@@ -9,6 +9,8 @@
 - Воспроизводимый helper `scripts/build_clean_runtimes.sh` для сборки `whisper-cli` и `llama-completion` под minimum macOS target приложения без Homebrew-linked runtime dependencies.
 
 ### Changed
+- macOS-приложение стало бесплатным без срока действия: проверка лицензии, machine ID, trial/grace, периодическое обновление лицензии и переход к оплате удалены из desktop runtime. Для записи нужны только рабочая локальная модель, runtime и системные разрешения.
+- Новые debug-сессии больше не сохраняют machine ID; ранее созданные файлы не переписываются.
 - Выбор Whisper-модели стал явным: обычный режим продолжает использовать `large-v3-turbo`, а установленная heavy-модель больше не подменяет дефолт просто потому, что она крупнее.
 - Bundled runtime layout разделен для двух нейросетей: Whisper использует `lib/whisper` + `libexec/ggml-whisper`, Qwen/llama.cpp использует `lib/llama` + `libexec/ggml-llama`, чтобы разные версии `libggml` не конфликтовали внутри app bundle.
 

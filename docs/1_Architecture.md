@@ -31,12 +31,6 @@
 
 ## App Modules
 
-- `src/License/*`
-  - `LicenseState.swift` — state model (`checking`, `active`, `grace`, `expired`, `serverUnavailable`).
-  - `LicenseSnapshot.swift` — кэшируемый snapshot и network response model.
-  - `LicenseCache.swift` — bounded offline grace cache.
-  - `LicenseService.swift` — machine ID с bounded `ioreg` timeout, `/api/license/status`, refresh loop, state transitions.
-
 - `src/Diagnostics/*`
   - `DiagnosticStatus.swift` — типы diagnostic/event state.
   - `EnvironmentDiagnostics.swift` — проверки accessibility, microphone, model и `whisper-cli`.
@@ -80,6 +74,9 @@
 - `src/Updates/*`
   - `UpdateChecker.swift` — GitHub latest release fetch, JSON parsing и numeric version compare.
 
+- `archive/legacy-licensing/`
+  - Исторические `LicenseState`, `LicenseSnapshot`, `LicenseCache`, `LicenseService` находятся в `archive/legacy-licensing/src/License/`, а три `test_license_*` harness — в `archive/legacy-licensing/scripts/`. Сборка и текущие desktop-тесты не включают этот код.
+
 - `archive/legacy-root-scratch/*`
   - Старые icon experiments и одноразовые helper/test files, удаленные из активного root layout без потери истории.
 
@@ -87,9 +84,9 @@
 
 - Меню остается `menu bar utility`, без отдельного большого окна настроек.
 - Горячая клавиша не меняется: double `Option` старт, `Option` во время записи стоп.
-- Backend contract не меняется: app продолжает читать `GET /api/license/status`.
-- Offline grace ограничен и больше не является бесконечным fail-open.
-- Machine ID resolution не должен блокировать startup бесконечно: `/usr/sbin/ioreg` ограничен коротким timeout, fallback генерирует и кеширует `MD-*`.
+- macOS desktop бесплатен без срока действия: в app нет license state, проверки `/api/license/status`, license refresh timer, machine ID и paywall. Доступ к записи определяется только локальной средой и разрешениями (D-021).
+- Backend `GET /api/license/status` остается совместимым для старых установленных версий; новый desktop его не вызывает.
+- Новые debug metadata не содержат machine ID; существующие локальные debug-сессии и legacy UserDefaults не переписываются.
 - Transcription subprocess не должен блокировать app бесконечно: зависший `whisper-cli` завершается после timeout и возвращает runtime diagnostic.
 - `stderr` subprocess читается во время выполнения, чтобы verbose/error-heavy `whisper-cli` не мог заблокироваться на заполненном pipe.
 - Text improvement является optional enhancement, а не блокером базовой диктовки. Если Qwen model отсутствует, menu action открывает downloader; если bundled `llama.cpp` runtime отсутствует или падает при включенном toggle, app вставляет cleaned Whisper-текст и показывает warning diagnostic.
@@ -123,7 +120,7 @@
 
 - `scripts/test_whisper_runner_timeout.sh` компилирует `WhisperRunner` с fake `whisper-cli` и проверяет timeout recovery, cleanup temp audio и large-stderr subprocess path.
 - `scripts/test_whisper_model_selection.sh` проверяет persisted ASR mode, приоритет `large-v3-turbo` в balanced mode, приоритет `large-v3` в maximumAccuracy mode и fallback между моделями.
-- `scripts/test_license_machine_id_timeout.sh` проверяет parsing/cache machine ID и fallback при зависшем fake `ioreg`.
+- `scripts/test_free_desktop.sh` проверяет отсутствие licensing-зависимостей в текущем desktop source и presentation-поведение без лицензии.
 - `scripts/test_recording_temp_cleanup.sh` проверяет cleanup stale temp WAV/TXT.
 - `scripts/test_llama_runtime_locator.sh` проверяет приоритет bundled `llama-completion`/`llama-cli` над developer fallback paths.
 - `scripts/check_bundled_llama_runtime.sh` проверяет собранный `.app`: bundled `llama` runtime должен быть arm64, подписан, запускаться без `dyld` errors и не ссылаться на Homebrew/local install paths.

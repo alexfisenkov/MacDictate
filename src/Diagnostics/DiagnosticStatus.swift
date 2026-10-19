@@ -93,10 +93,3 @@ enum EnvironmentIssue {
         }
     }
 }
-
-enum BlockedRecordingReason {
-    case checking
-    case expired
-    case serverUnavailable
-    case environment(EnvironmentIssue)
-}
