@@ -5,5 +5,6 @@
   "websiteSourceCommit": "79900f2983963b39a126f048c2bd88ad27c9b3cf",
   "appSourceCommit": "b8158a6a73f33e07cf548fa46658511f95c59811",
   "dmgSHA256": "8cd4c00cb2ddaa7fef2f747cee8b28f4d46b6e3b317a8e39206ac04c3752a261",
-  "downloadURL": "https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg"
+  "downloadURL": "https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg",
+  "staticTransform": "trim trailing whitespace"
 }
