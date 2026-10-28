@@ -115,7 +115,10 @@
 - [x] Missing populated installed PNG warning retained; actual UIA/clipboard and separate real-ASR result PNG are distinguished. Synthetic125/150% layout stress at actual DPI96 is explicit.
 - [x] Root published annotated v1.6.1 on checked source with `make_latest=false`; actual API release ID427078400/timestamp2026-10-28T19:07:43Z and4asset size/digest read-back PASS; global latest remains Mac1.6.0.
 - [x] Promoted Windows registry → public manifest → all3exact pinned HTML fallback URLs after actual publication evidence.
-- [ ] Root final staged Pages push + browser/HTTPS/file/download hash read-back.
+- [x] Root Pages commit1d4873e628956a8bde3d76bcd07de9cfd66de62a published; actual HTTPS receipt16/16 exact files PASS. Run40752369737 completed success on exact Pages head, confirmed by root API read-back.
+- [x] Complete unauthenticated public EXE download:54351051 bytes/SHA256 match; no complete public ZIP download claimed.
+- [x] Final Pages workflow conclusion confirmed success, exact head1d4873e628956a8bde3d76bcd07de9cfd66de62a.
+- [ ] Complete live browser acceptance.
 - [ ] Physical Windows10/11 microphone/Alt/editor, native125/150%, GUI model HTTP-success and interactive installer/SmartScreen acceptance. Until then retain NOT_RUN and unsigned/manual-model-recovery limitations.
 
-GitHub publication and API asset metadata checks do not establish Pages delivery, complete public download hashes or physical client-OS acceptance.
+HTTPS file and complete EXE download receipts establish delivered bytes; final Pages workflow success was independently confirmed by root API read-back. Browser acceptance, complete ZIP download and physical client-OS acceptance are not established by these receipts.

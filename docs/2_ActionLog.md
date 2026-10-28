@@ -237,3 +237,12 @@
 - Read `.aispa-work/2026-10-29-windows-first-run--wip/public-release-readback.json`: all4assets are public/uploaded and exact sizes/digests match retained bytes. Assets are the two versioned packages, windows-build-manifest.json and WINDOWS-SHA256SUMS. Generic local SHA256SUMS/aliases/evidence were not uploaded; release notes are the body, not a fifth asset.
 - Promoted only current.windows.publicStable to v1.6.1, its release row to public_release, actual tag/release/publication metadata, latest-windows manifest and all3Windows EXE/ZIP HTML fallback links. Mac current pointers, 1.6.0/build14 plist and latest-desktop bytes remain unchanged.
 - Source is ready for root's final static Pages publication. No commit/push/CI/deploy was performed by this finalization. Pages/browser/HTTPS/full public download hash read-back remains pending. Physical Windows10/11 mic/Alt/editor, native DPI, GUI HTTP-success and interactive installer/SmartScreen remain NOT_RUN; unsigned/manual-model-recovery and missing installed populated PNG limitations remain recorded.
+
+
+## 2026-10-29 — Windows 1.6.1 live delivery receipts
+
+- Root merged/pushed source main `e46b25fb8e1c2203609c2ee750176028a61fdca7` and published Pages commit `1d4873e628956a8bde3d76bcd07de9cfd66de62a`, run40752369737. Actual `website-public-receipt.json` confirms16/16 HTTPS files exact PASS, including both platform manifests and DEPLOYMENT.json. Workflow was still in progress at handoff; final run success is not claimed.
+- Actual `public-installer-receipt.json` confirms complete unauthenticated EXE download:54351051 bytes and SHA-256 `fe85fd784649f057d16a115392b3c09cb7ceaf42e8f59beefc05d8149b3307e9`. This supplements prior4/4 API asset size/digest read-back; a complete public ZIP download and live browser acceptance are not established by these receipts.
+- Root confirmed global latest remainsv1.6.0. This append changed only new Windows release verification metadata/card/checklist/action/index; no runtime, scripts, manifests, HTML, Git/publish/CI action or Mac1.6.0/build14 metadata changed. Physical Windows10/11/native-DPI and retained unsigned/model-recovery/PNG limitations remain unchanged.
+
+- Subsequent root API read-back confirmed Pages run40752369737 completed SUCCESS with exact head1d4873e628956a8bde3d76bcd07de9cfd66de62a; global latest remainedv1.6.0. The earlier in-progress observation above is historical, not the final conclusion.

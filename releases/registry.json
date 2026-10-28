@@ -630,15 +630,33 @@
           "guiModelHttpSuccess": "NOT_RUN",
           "installedPopulatedPng": "MISSING; actual UIA/clipboard PASS; separate real-ASR result PNG retained",
           "publicReleaseAssetMetadata": "4/4 actual public API size/digest PASS",
-          "publicPagesReadback": "NOT_RUN (site publication pending)"
+          "publicPagesReadback": "16/16 HTTPS files exact PASS; Pages workflow40752369737 completed success on exact pages head",
+          "publicInstallerDownload": "Complete unauthenticated EXE download size/SHA256 PASS"
         },
         "manifestSha256": "3c9938a22345c81383a995ede87f73a17a522e838b174a76ca7b2ecd93b7eb39",
         "manifestBytes": 1917,
         "checksumsSha256": "813fdf85e12a33f5bccf1503916514511566f366710b0a914ec3c08802cf7774",
-        "checksumsBytes": 202
+        "checksumsBytes": 202,
+        "distribution": {
+          "websiteURL": "https://alexfisenkov.github.io/MacDictate/",
+          "sourceMainCommit": "e46b25fb8e1c2203609c2ee750176028a61fdca7",
+          "pagesCommit": "1d4873e628956a8bde3d76bcd07de9cfd66de62a",
+          "pagesDeploymentRun": "https://github.com/alexfisenkov/MacDictate/actions/runs/40752369737",
+          "pagesWorkflowConclusion": "success (root API read-back; exact pages head verified)",
+          "websiteHTTPSReadback": "16/16 exact files PASS",
+          "installerPublicDownload": {
+            "url": "https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.1/MacDictate_Windows_v1.6.1_x64.exe",
+            "bytes": 54351051,
+            "sha256": "fe85fd784649f057d16a115392b3c09cb7ceaf42e8f59beefc05d8149b3307e9",
+            "authentication": "none",
+            "status": "PASS"
+          },
+          "portablePublicDownload": "NOT_RUN (public API size/digest already verified)",
+          "pagesWorkflowStatus": "completed"
+        }
       },
-      "summary": "Windows-only 1.6.1 first-run release published with make_latest=false at 2026-10-28T19:07:43Z; exact checked source/tag and four public asset sizes/digests read back. Independent Windows stable promoted; Pages publication/read-back and physical client acceptance remain pending. Mac/global latest remains v1.6.0.",
-      "sourceConfidence": "verified_ci_hosted_ui_and_public_asset_metadata"
+      "summary": "Windows-only 1.6.1 published with make_latest=false at2026-10-28T19:07:43Z; exact checked source/tag and four public asset sizes/digests verified. Windows channel promoted; Pages commit1d4873e628956a8bde3d76bcd07de9cfd66de62a serves16/16 exact HTTPS files and complete unauthenticated EXE download matches expected size/SHA256. Pages workflow40752369737 completed success on exact pages head; browser/physical client acceptance remains unconfirmed. Mac/global latest remainsv1.6.0.",
+      "sourceConfidence": "verified_ci_hosted_ui_public_assets_https_and_installer_download"
     }
   ],
   "checkpoints": [
