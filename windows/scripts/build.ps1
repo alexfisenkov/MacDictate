@@ -4,6 +4,8 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot 'release-info.ps1')
+$release = Get-WindowsReleaseInfo
 $root = Split-Path $PSScriptRoot -Parent
 if (!$OutputDirectory) { $OutputDirectory = Join-Path $root 'dist' }
 $out = [IO.Path]::GetFullPath($OutputDirectory)
@@ -19,11 +21,11 @@ Assert-Exit 'Git source identity'
 $dirty = & git -C $root status --porcelain --untracked-files=no
 Assert-Exit 'Check source tree'
 if ($dirty) { throw 'Commit source changes before building a release artifact' }
-$untracked = & git -C $root ls-files --others --exclude-standard src runtime-lock.json global.json
+$untracked = & git -C $root ls-files --others --exclude-standard src scripts runtime-lock.json global.json README.md THIRD-PARTY-NOTICES.md licenses ':(top)docs/legal'
 Assert-Exit 'Check untracked build inputs'
 if ($untracked) { throw 'Untracked application inputs would break source SHA identity; commit them before release build' }
 if (Test-Path (Join-Path $out 'MacDictate')) { throw 'Output app folder already exists; choose a fresh OutputDirectory. Existing files were preserved.' }
-if (@(Get-ChildItem $out -File | Where-Object { $_.Name -match '^MacDictate_Windows_v1\.6\.0_x64\.(zip|exe)$' }).Count -gt 0) {
+if (@(Get-ChildItem $out -File | Where-Object { $_.Name -in @($release.Installer, $release.Portable) }).Count -gt 0) {
     throw 'Versioned package already exists; choose a fresh OutputDirectory. Existing artifacts were preserved.'
 }
 $archive = Join-Path $cache 'whisper-source.zip'
@@ -97,20 +99,20 @@ Copy-Item (Join-Path $root 'THIRD-PARTY-NOTICES.md') $app
 Copy-Item (Join-Path $root 'licenses') $app -Recurse
 Copy-Item (Join-Path $root '../docs/legal') (Join-Path $app 'legal') -Recurse
 $version = (Get-Item (Join-Path $app 'MacDictate.exe')).VersionInfo.ProductVersion.Split('+')[0]
-if ($version -ne '1.6.0') { throw "Unexpected app version $version" }
-$zip = Join-Path $out "MacDictate_Windows_v$version`_x64.zip"
+if ($version -ne $release.Version) { throw "Unexpected app version $version" }
+$zip = Join-Path $out $release.Portable
 if (Test-Path $zip) { throw 'Refusing to overwrite an existing versioned ZIP' }
 Compress-Archive -Path $app -DestinationPath $zip -CompressionLevel Optimal
 if (!$SkipInstaller) {
     $iscc = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6/ISCC.exe'
     if (!(Test-Path $iscc)) { throw 'Inno Setup 6 is required to build the installer' }
-    & $iscc "/DAppSource=$app" "/DOutputDir=$out" (Join-Path $PSScriptRoot 'installer.iss')
+    & $iscc "/DAppSource=$app" "/DOutputDir=$out" "/DAppVersion=$($release.Version)" "/DPackageBaseName=$($release.BaseName)" (Join-Path $PSScriptRoot 'installer.iss')
     Assert-Exit 'Inno Setup'
 }
-$packages = @(Get-ChildItem $out -File | Where-Object { $_.Name -match '^MacDictate_Windows_v1\.6\.0_x64\.(zip|exe)$' })
+$packages = @(Get-ChildItem $out -File | Where-Object { $_.Name -in @($release.Installer, $release.Portable) })
 if ($packages.Count -ne $(if ($SkipInstaller) { 1 } else { 2 })) { throw 'Windows package list is incomplete' }
 $manifest = [ordered]@{
-    schemaVersion = 1; version = '1.6.0'; platform = 'windows-x64'; sourceSHA = $sourceSHA
+    schemaVersion = 1; version = $release.Version; platform = 'windows-x64'; sourceSHA = $sourceSHA
     runtime = $lock.whisper; model = $lock.model; signed = $false
     artifacts = @($packages | ForEach-Object { [ordered]@{
         name = $_.Name; bytes = $_.Length; sha256 = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()

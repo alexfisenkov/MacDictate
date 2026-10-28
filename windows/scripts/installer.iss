@@ -4,10 +4,16 @@
 #ifndef OutputDir
   #error OutputDir is required
 #endif
+#ifndef AppVersion
+  #error AppVersion is required from canonical Windows csproj
+#endif
+#ifndef PackageBaseName
+  #error PackageBaseName is required
+#endif
 [Setup]
 AppId={{71FE70EC-FB68-4D29-B05B-9D18671D3B89}
 AppName=MacDictate
-AppVersion=1.6.0
+AppVersion={#AppVersion}
 AppPublisher=Alexander Fisenkov
 AppPublisherURL=https://alexfisenkov.github.io/MacDictate/
 DefaultDirName={localappdata}\Programs\MacDictate
@@ -17,7 +23,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0.19041
 OutputDir={#OutputDir}
-OutputBaseFilename=MacDictate_Windows_v1.6.0_x64
+OutputBaseFilename={#PackageBaseName}
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern

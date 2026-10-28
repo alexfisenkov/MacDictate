@@ -60,11 +60,11 @@
                 Распознавайте речь на своём компьютере и вставляйте текст в активное окно. После загрузки модели диктовка работает без интернета.
             </p>
             <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-4">
-                <a href="https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition shadow-[0_0_20px_rgba(0,122,255,0.4)] hover:shadow-[0_0_30px_rgba(0,122,255,0.6)] transform hover:-translate-y-1">
+                <a href="#download" data-windows-asset="installer" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition" data-i18n="btn_windows">Скачать установщик EXE · Windows 10/11 x64</a>
+                <a href="https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg" class="inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-2xl text-white bg-white/10 hover:bg-white/20 transition">
                     <span class="mr-2" data-i18n="btn_download">Скачать для macOS</span>
                     <span class="text-sm font-normal opacity-80">( Silicon)</span>
                 </a>
-                <a href="https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Windows_Latest_x64.exe" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition" data-i18n="btn_windows">Скачать для Windows x64</a>
                 <a href="#download" class="inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-2xl text-white bg-white/10 hover:bg-white/20 transition">
                     <span data-i18n="btn_install">Как установить</span>
                 </a>
@@ -104,16 +104,30 @@
     <section id="download" class="py-24">
         <div class="max-w-3xl mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-4xl font-bold mb-6" data-i18n="download_title">Скачайте и начните диктовать</h2>
-            <p class="text-lg text-gray-400 leading-relaxed mb-8" data-i18n="download_steps">Установите MacDictate на Mac с Apple Silicon. При первом запуске загрузите модель Whisper и разрешите доступ к микрофону и «Универсальному доступу». Дважды нажмите Option для начала записи и один раз — для завершения.</p>
-            <a href="https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition" data-i18n="btn_download">Скачать для macOS</a>
+            <article class="glass p-5 sm:p-8 rounded-3xl text-left" aria-labelledby="windows-download-title">
+                <h3 id="windows-download-title" class="text-2xl font-bold mb-4" data-i18n="windows_title">Windows 10 / 11 x64</h3>
+                <p class="text-lg text-gray-300 leading-relaxed mb-6" data-i18n="windows_recommended">Рекомендуем установщик EXE. Он добавит MacDictate в меню «Пуск» и откроет окно первой настройки.</p>
+                <a href="https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.0/MacDictate_Windows_v1.6.0_x64.exe" data-windows-asset="installer" class="inline-flex w-full items-center justify-center px-5 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition text-center" data-i18n="btn_windows">Скачать установщик EXE · Windows 10/11 x64</a>
+                <div class="space-y-4 mt-7 text-base text-gray-300 leading-relaxed">
+                    <p data-i18n="windows_step1">1. Скачайте EXE, запустите его и завершите установку. Оставьте включённым «Запустить MacDictate»: откроется основное окно. Позже откройте программу из меню «Пуск».</p>
+                    <p data-i18n="windows_step2">2. Нажмите «Начать настройку: скачать модель» (~488 МБ). Дождитесь проверки и автоматического сохранения. Затем распознавание работает без сети.</p>
+                    <p data-i18n="windows_step3">3. Выберите микрофон и нажмите «Проверить микрофон». Говорите 3 секунды и следите за уровнем. Если сигнала нет, откройте «Доступ к микрофону в Windows», разрешите доступ классическим приложениям и повторите тест. Отдельного запроса Windows обычно нет.</p>
+                    <p data-i18n="windows_step4">4. Нажмите «Начать запись», произнесите фразу и нажмите «Остановить и распознать». Дождитесь текста в окне и нажмите «Копировать текст». Кнопка работает независимо от Alt.</p>
+                    <p data-i18n="windows_step5">5. Для диктовки в другое приложение проверьте клавишу, затем поставьте курсор в текстовое поле. Два быстрых нажатия левого Alt начинают запись; ещё два останавливают. Правый Alt/AltGr не подходит. Максимум — 2 минуты; если автопечать не сработала, скопируйте текст в окне MacDictate.</p>
+                </div>
+                <p class="mt-5 text-gray-300 leading-relaxed" data-i18n="windows_reopen">Закрытие окна оставляет MacDictate в трее. Двойной щелчок по его значку или повторный запуск из «Пуска» снова покажет окно.</p>
+                <details class="mt-7 border-t border-white/10 pt-5">
+                    <summary class="cursor-pointer py-2 text-gray-300" data-i18n="btn_portable">Portable ZIP · без установки</summary>
+                    <p class="my-4 text-gray-300 leading-relaxed" data-i18n="windows_portable">ZIP — дополнительный вариант для запуска без установки: распакуйте всю папку и откройте MacDictate.exe. Не запускайте EXE прямо из архива и сохраняйте папку runtime рядом с ним.</p>
+                    <a href="https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.0/MacDictate_Windows_v1.6.0_x64.zip" data-windows-asset="portable" class="inline-flex min-h-[44px] items-center rounded-xl px-5 py-3 bg-white/10 hover:bg-white/20" data-i18n="btn_portable">Portable ZIP · без установки</a>
+                </details>
+                <p class="mt-6 text-sm text-gray-400 leading-relaxed" data-i18n="windows_limits">Windows-пакет без цифровой подписи: Windows может предупредить или заблокировать запуск. Проверьте источник — официальный GitHub Release; при необходимости сверьте SHA-256 из WINDOWS-SHA256SUMS. Если доступно, выберите «Подробнее» → «Выполнить в любом случае» только после проверки. Если политика компьютера запрещает запуск, обратитесь к администратору. Не отключайте защиту Windows. Проверки на Windows Server 2025 и синтетическое аудио не подтверждают работу физического микрофона и Alt на Windows 10/11. Windows 10 Home/Pro вне официального срока поддержки .NET 10. Дополнительной модели улучшения текста в Windows пока нет.</p>
+                <p class="mt-5 text-base text-gray-300 leading-relaxed" data-i18n="windows_support">При ошибке нажмите в окне «Копировать диагностику без личных данных» и отправьте этот текст в поддержку. Аудио, диктовку, пароли и снимки чужой переписки отправлять не нужно.</p>
+            </article>
             <hr class="my-8 border-white/10">
-            <h3 class="text-2xl font-bold mb-4">Windows x64</h3>
-            <p class="text-lg text-gray-400 leading-relaxed mb-6" data-i18n="windows_steps">Установите EXE или распакуйте ZIP. При первом запуске скачайте модель Whisper small (около 488 МБ). Разрешите приложениям доступ к микрофону в настройках Windows. Дважды нажмите левый Alt для записи, повторите двойное нажатие для завершения. Горячую клавишу можно изменить в настройках.</p>
-            <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-4">
-                <a href="https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Windows_Latest_x64.exe" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition" data-i18n="btn_windows">Скачать для Windows x64</a>
-                <a href="https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Windows_Latest_x64.zip" class="inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-2xl text-white bg-white/10 hover:bg-white/20 transition" data-i18n="btn_portable">ZIP без установки</a>
-            </div>
-            <p class="mt-6 text-base text-gray-400" data-i18n="windows_limits">Первый выпуск для Windows содержит диктовку без дополнительной модели улучшения текста. Установщик пока без цифровой подписи: Windows может показать предупреждение или заблокировать запуск. Совместимость рассчитана на Windows 10 (2004+) / 11 x64; проверка сборки выполнена на Windows Server 2025. Живой микрофон и Alt на Windows 10/11 отдельно ещё не проверены. Windows 10 Home/Pro находится вне официального срока поддержки .NET 10.</p>
+            <h3 class="text-2xl font-bold mb-4">macOS · Apple Silicon</h3>
+            <p class="text-lg text-gray-400 leading-relaxed mb-8" data-i18n="download_steps">Установите MacDictate на Mac с Apple Silicon. При первом запуске загрузите модель Whisper и разрешите доступ к микрофону и «Универсальному доступу». Дважды нажмите Option для начала записи и один раз — для завершения.</p>
+            <a href="https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg" class="inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-2xl text-white bg-white/10 hover:bg-white/20 transition" data-i18n="btn_download">Скачать для macOS</a>
             <p class="mt-6 text-sm text-gray-400"><span data-i18n="download_help">Нужна помощь?</span> <a href="mailto:a.fisenkov@gmail.com" class="inline-flex items-center min-h-[44px] text-base text-blue-400 hover:text-blue-300 underline">a.fisenkov@gmail.com</a></p>
         </div>
     </section>
@@ -148,9 +162,19 @@
                 feat_3_title: "Текст в активном окне", feat_3_desc: "Пишите в редакторе, мессенджере или таблице. MacDictate вставляет распознанный текст туда, где установлен курсор.",
                 download_title: "Скачайте и начните диктовать",
                 download_steps: "Установите MacDictate на Mac с Apple Silicon. При первом запуске загрузите модель Whisper и разрешите доступ к микрофону и «Универсальному доступу». Дважды нажмите Option для начала записи и один раз — для завершения.",
-                btn_windows: "Скачать для Windows x64", btn_portable: "ZIP без установки",
-                windows_steps: "Установите EXE или распакуйте ZIP. При первом запуске скачайте модель Whisper small (около 488 МБ). Разрешите приложениям доступ к микрофону в настройках Windows. Дважды нажмите левый Alt для записи, повторите двойное нажатие для завершения. Горячую клавишу можно изменить в настройках.",
-                windows_limits: "Первый выпуск для Windows содержит диктовку без дополнительной модели улучшения текста. Установщик пока без цифровой подписи: Windows может показать предупреждение или заблокировать запуск. Совместимость рассчитана на Windows 10 (2004+) / 11 x64; проверка сборки выполнена на Windows Server 2025. Живой микрофон и Alt на Windows 10/11 отдельно ещё не проверены. Windows 10 Home/Pro находится вне официального срока поддержки .NET 10.",
+                btn_windows: "Скачать установщик EXE · Windows 10/11 x64",
+                btn_portable: "Portable ZIP · без установки",
+                windows_title: "Windows 10 / 11 x64",
+                windows_recommended: "Рекомендуем установщик EXE. Он добавит MacDictate в меню «Пуск» и откроет окно первой настройки.",
+                windows_step1: "1. Скачайте EXE, запустите его и завершите установку. Оставьте включённым «Запустить MacDictate»: откроется основное окно. Позже откройте программу из меню «Пуск».",
+                windows_step2: "2. Нажмите «Начать настройку: скачать модель» (~488 МБ). Дождитесь проверки и автоматического сохранения. Затем распознавание работает без сети.",
+                windows_step3: "3. Выберите микрофон и нажмите «Проверить микрофон». Говорите 3 секунды и следите за уровнем. Если сигнала нет, откройте «Доступ к микрофону в Windows», разрешите доступ классическим приложениям и повторите тест. Отдельного запроса Windows обычно нет.",
+                windows_step4: "4. Нажмите «Начать запись», произнесите фразу и нажмите «Остановить и распознать». Дождитесь текста в окне и нажмите «Копировать текст». Кнопка работает независимо от Alt.",
+                windows_step5: "5. Для диктовки в другое приложение проверьте клавишу, затем поставьте курсор в текстовое поле. Два быстрых нажатия левого Alt начинают запись; ещё два останавливают. Правый Alt/AltGr не подходит. Максимум — 2 минуты; если автопечать не сработала, скопируйте текст в окне MacDictate.",
+                windows_portable: "ZIP — дополнительный вариант для запуска без установки: распакуйте всю папку и откройте MacDictate.exe. Не запускайте EXE прямо из архива и сохраняйте папку runtime рядом с ним.",
+                windows_reopen: "Закрытие окна оставляет MacDictate в трее. Двойной щелчок по его значку или повторный запуск из «Пуска» снова покажет окно.",
+                windows_limits: "Windows-пакет без цифровой подписи: Windows может предупредить или заблокировать запуск. Проверьте источник — официальный GitHub Release; при необходимости сверьте SHA-256 из WINDOWS-SHA256SUMS. Если доступно, выберите «Подробнее» → «Выполнить в любом случае» только после проверки. Если политика компьютера запрещает запуск, обратитесь к администратору. Не отключайте защиту Windows. Проверки на Windows Server 2025 и синтетическое аудио не подтверждают работу физического микрофона и Alt на Windows 10/11. Windows 10 Home/Pro вне официального срока поддержки .NET 10. Дополнительной модели улучшения текста в Windows пока нет.",
+                windows_support: "При ошибке нажмите в окне «Копировать диагностику без личных данных» и отправьте этот текст в поддержку. Аудио, диктовку, пароли и снимки чужой переписки отправлять не нужно.",
                 download_help: "Нужна помощь?",
                 foot_privacy: "Политика конфиденциальности", foot_terms: "Условия использования", foot_consent: "Обработка данных", foot_contact: "Контакты"
             },
@@ -165,9 +189,19 @@
                 feat_3_title: "Text in the active window", feat_3_desc: "Write in an editor, messenger, or spreadsheet. MacDictate inserts recognized text where your cursor is.",
                 download_title: "Download and start dictating",
                 download_steps: "Install MacDictate on a Mac with Apple Silicon. On first launch, download the Whisper model and allow Microphone and Accessibility access. Press Option twice to start recording and once to finish.",
-                btn_windows: "Download for Windows x64", btn_portable: "Portable ZIP",
-                windows_steps: "Install the EXE or extract the ZIP. On first launch download the Whisper small model (about 488 MB). Allow desktop microphone access in Windows Settings. Press left Alt twice to record and twice again to finish. You can change the hotkey in Settings.",
-                windows_limits: "The first Windows release includes dictation without the optional text correction model. The installer has no digital signature yet: Windows may warn or block it. Compatibility targets Windows 10 (2004+) / 11 x64; build verification uses Windows Server 2025. Physical microphone and Alt on Windows 10/11 have not yet been tested separately. Windows 10 Home/Pro is outside the official .NET 10 OS support lifecycle.",
+                btn_windows: "Download EXE installer · Windows 10/11 x64",
+                btn_portable: "Portable ZIP · no installer",
+                windows_title: "Windows 10 / 11 x64",
+                windows_recommended: "Recommended: the EXE installer. It adds MacDictate to Start and opens the first setup window.",
+                windows_step1: "1. Download the EXE, run it, and finish installation. Keep “Launch MacDictate” selected to open the main window. Later, open it from Start.",
+                windows_step2: "2. Select “Start setup: download model” (~488 MB). Wait for verification and automatic saving. Recognition then works offline.",
+                windows_step3: "3. Choose your microphone and select “Test microphone”. Speak for 3 seconds and watch the level. If there is no signal, open “Windows microphone privacy”, allow desktop apps, and retry. Windows usually shows no separate permission prompt.",
+                windows_step4: "4. Select “Start recording”, say a phrase, then select “Stop and recognize”. Wait for text in the window and select “Copy text”. This button works independently of Alt.",
+                windows_step5: "5. For dictation in another app, test the hotkey and place the cursor in an input field. Tap left Alt twice quickly to start; tap twice again to stop. Right Alt/AltGr does not work. Maximum: 2 minutes. If automatic typing fails, copy the result from MacDictate.",
+                windows_portable: "ZIP is an alternative for use without installation: extract the whole folder and open MacDictate.exe. Do not run the EXE inside the archive; keep the runtime folder beside it.",
+                windows_reopen: "Closing the window leaves MacDictate in the tray. Double-click its icon or launch it from Start again to reopen the window.",
+                windows_limits: "The Windows package has no digital signature: Windows may warn or block it. Verify the official GitHub Release source and, if needed, the SHA-256 in WINDOWS-SHA256SUMS. If available, use “More info” → “Run anyway” only after verification. If computer policy blocks it, contact your administrator. Do not disable Windows protection. Windows Server 2025 checks and synthetic audio do not confirm physical microphone or Alt behavior on Windows 10/11. Windows 10 Home/Pro is outside the official .NET 10 OS support lifecycle. The optional text improvement model is not available on Windows yet.",
+                windows_support: "For an error, select “Copy private-safe diagnostics” in the app and send that text to support. You do not need to send audio, dictation, passwords, or screenshots of private conversations.",
                 download_help: "Need help?",
                 foot_privacy: "Privacy Policy", foot_terms: "Terms of Use", foot_consent: "Data Processing", foot_contact: "Contact"
             }
@@ -191,6 +225,18 @@
             document.getElementById('langToggle').textContent = lang === 'ru' ? 'EN' : 'RU';
             document.title = lang === 'ru' ? 'MacDictate — Бесплатная диктовка для macOS и Windows' : 'MacDictate — Free dictation for macOS and Windows';
         }
+
+        // Download identity comes from the independent published Windows channel.
+        // Version-pinned HTML links remain usable if this request fails.
+        fetch('./downloads/latest-windows.json', { cache: 'no-cache' })
+            .then(response => { if (!response.ok) throw new Error('manifest'); return response.json(); })
+            .then(manifest => {
+                if (manifest.schemaVersion !== 1 || manifest.platform !== 'win-x64') return;
+                document.querySelectorAll('[data-windows-asset]').forEach(link => {
+                    const url = manifest[link.dataset.windowsAsset + 'Url'];
+                    if (typeof url === 'string' && /^https:\/\/github\.com\/alexfisenkov\/MacDictate\/releases\/download\/v[0-9.]+\/MacDictate_Windows_v[0-9.]+_x64\.(exe|zip)$/.test(url)) link.href = url;
+                });
+            }).catch(() => {});
 
         setLanguage(currentLang);
         document.getElementById('langToggle').addEventListener('click', () => {

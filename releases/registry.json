@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "product": "MacDictate desktop (macOS and Windows)",
-  "registryUpdatedAt": "2026-10-19",
+  "registryUpdatedAt": "2026-10-29",
   "governanceDocument": "docs/7_Release_Governance.md",
   "current": {
     "publicStable": "v1.6.0",
@@ -9,7 +9,13 @@
     "developmentBranch": "main",
     "bundleShortVersion": "1.6.0",
     "bundleVersion": "14",
-    "distributionChannel": "github-releases"
+    "distributionChannel": "github-releases",
+    "windows": {
+      "publicStable": "v1.6.0",
+      "workingLine": "v1.6.1-working",
+      "releaseTag": "v1.6.1",
+      "makeLatest": false
+    }
   },
   "versions": [
     {
@@ -527,6 +533,44 @@
           "physicalWindows10_11MicAltEditor": "NOT_RUN"
         }
       }
+    },
+    {
+      "version": "v1.6.1-working",
+      "status": "working_line",
+      "platform": "win-x64",
+      "channel": "windows-only-candidate",
+      "git": {
+        "commit": null,
+        "localTag": null,
+        "remoteTags": [],
+        "tagRequiredLocally": false
+      },
+      "github": {
+        "releaseUrl": null,
+        "assetName": null,
+        "githubAssetSha256": null,
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.6.1-working",
+        "artifactPath": null,
+        "localArtifactSha256": null,
+        "buildLogPath": null
+      },
+      "windows": {
+        "version": "1.6.1",
+        "signed": false,
+        "sourceSHA": null,
+        "validation": {
+          "hostedOS": "Windows Server2025 (planned)",
+          "onboardingRealASR": "NOT_RUN",
+          "installerNormalProfile": "NOT_RUN",
+          "syntheticLayout125_150": "NOT_RUN",
+          "physicalWindows10_11MicAltEditor": "NOT_RUN"
+        }
+      },
+      "summary": "Windows-only first-run UI and delivery candidate; no compiled/public artifact or hosted acceptance claimed. macOS remains1.6.0/build14 and GitHub latest must remain v1.6.0.",
+      "sourceConfidence": "source_candidate_only"
     }
   ],
   "checkpoints": [

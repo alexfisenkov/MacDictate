@@ -42,14 +42,14 @@
 
 | App/Models | Open | P1 | Recovery | S | Project | Existing ModelDownloader removes a prior model before moving its replacement. Preserve/stage the new file before atomic replacement to avoid a re-download if move fails. This predates free rollout; no user models were replaced in this task. |
 
-| Windows/QA | Open | P1 | Acceptance | M | Project | Physical Windows10/11 mic → double/single Alt → active-editor paste and denied-mic test. Hosted Windows Server2025 native/synthetic checks cannot substitute for client OS acceptance. |
+| Windows/QA | Open | P1 | Acceptance | M | Project | Physical Windows10/11 mic → double/double left Alt → active-editor paste and denied-mic test. Hosted Windows Server2025 native/synthetic checks cannot substitute for client OS acceptance. |
 | Windows/Distribution | Open | P1 | Trust | M | Project | Obtain Authenticode publisher certificate and establish signed Windows release path. Current unsigned EXE/ZIP must disclose SmartScreen/Smart App Control limitations; never instruct blanket protection disablement. |
 | Windows/Compatibility | Open | P2 | OS lifecycle | M | Project | Measure Windows10 target compatibility on a maintained LTSC/Enterprise installation. Ordinary Home/Pro is outside the current .NET10 support matrix. ARM-native Windows and optional LLM correction are not part of first x64 dictation release. |
 
 | Windows/Recovery | Open | P2 | UX | M | Project | Isolate UI Automation provider for restartable recovery; a hung provider currently requires app restart and safely falls back to manual copy. Add explicit corrupted-model backup/repair UI; current different-hash file is preserved and manual move/reselect is explained. |
 
 | Windows/Performance | Open | P2 | Measurement | M | Project | Measure CPU inference latency separately from model download; final hosted ASR step includes both. Benchmark optional CPU runtime variants before changing the portable baseline; no real-time speed guarantee is claimed. |
-| Release/Windows | Open | P2 | Governance | M | Project | Extend the shared macOS-oriented governance checker to validate latest-windows.json automatically. This release Windows manifests/hashes/source were independently verified against finalCI and public9asset readback; next-release process remains documented. |
+| Release/Windows | Done | P2 | Governance | M | Project | Root-invoked windows/scripts/check-delivery.py validates independent Windows stable/working pointers, latest-windows schema/tag/source/hashes and optional actual build package bytes/sourceSHA/runtime pins in the existing final manual workflow. Native execution remains a separate gate. |
 
 ## Notes
 
@@ -59,3 +59,7 @@
 - Text improvement добавлен как optional enhancement: отсутствие Qwen model или runtime failure не блокирует диктовку, длинный input > 6 000 символов fallback-ится к Whisper-тексту, preferred-моделью стала Qwen2.5-3B с fallback на 1.5B, а редакторское поведение управляется `TextImprovementProfile`. Runtime distribution для `llama.cpp` закрыт clean bundled path в `release/1.5.2`; long-text chunking, latency/RAM evidence и corpus-based quality tuning остаются отдельными debt items.
 - Debug session logging добавлен как локальный opt-in инструмент диагностики качества. Он сохраняет чувствительные аудио/текстовые artifacts только на устройстве; user-facing управление retention/cleanup остается отдельным debt item.
 - Каждый крупный спринт должен оставлять след здесь, если появились новые незавершенные риски или остаточные компромиссы.
+
+| Windows/QA | Open | P1 | First-run1.6.1 | M | Project | Run the prepared final workflow and inspect UI/error/result/install JSON/PNG before publishing. Synthetic PCM/key seams and layout scale125/150% are explicit; physical Windows10/11 capture/Alt/editor and native125/150% remain external acceptance. |
+
+| Windows/UX | Open | P1 | First-result viewport | S | Project | Source review found the long setup flow can leave the result/Copy below viewport. Final onboarding acceptance records resultVisibleBeforeTestScroll and fails if false; extra scrolled PNG is diagnostic only. F1 must make production reveal result and Copy together before final CI. Operation/error/microphone status visibility needs the same whole-branch review. |

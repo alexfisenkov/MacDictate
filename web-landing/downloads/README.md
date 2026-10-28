@@ -11,3 +11,6 @@ The retired server and its old website alias are not a dependency of this channe
 ## Windows desktop
 
 `latest-windows.json` is a separate schema1Windows metadata document: version, min build19041, sourceSHA/finalCI, installer/portable aliases and exact SHA256, unsigned status and physical acceptance limit. Never replace the legacy macOS schema1manifest with a cross-platform incompatible shape. Both platform aliases must exist on the same complete GitHub release before making it latest.
+
+
+Windows download identity is independent: `latest-windows.json` follows `registry.current.windows.publicStable` and pins exact `/releases/download/<tag>/<versioned-asset>` URLs. The landing reads it; static EXE/ZIP links provide a pinned fallback. Keep this manifest on the last actually published version until source/hash/public-release read-back; staged1.6.1 instructions must not be pushed to Pages prematurely. Windows-only GitHub releases use `make_latest=false`, preserving the Mac latest alias and `latest-desktop.json`.

@@ -170,3 +170,13 @@
 - **Ограничение:** A failed check blocks publication. A targeted rerun requires a recorded concrete failure/fix. Pages branch push is a separate automatic deployment and occurs only after complete staging QA.
 
 - D-023 implementation refinement: the native CLI embeds UTF-8 process-codepage manifest, verified by mt.exe read-back. Minimum installer Windows10 build19041 (2004+) to support Unicode profile/model/WAV/temp paths; ASR CI explicitly exercises Cyrillic, spaces and emoji for all inputs and temporary output.
+
+
+## D-025 — Independent Windows hotfix and first-run evidence
+
+- **Дата:** 2026-10-29.
+- **Решение:** Windows1.6.1 is an independent hotfix. `current.windows.publicStable`/`workingLine` are additive platform pointers. Legacy `current.publicStable`, `latest-desktop.json`, macOS bundle1.6.0/build14 and global GitHub latest remain unchanged. The Windows release must set `make_latest=false`; its public download URLs use `/releases/download/<tag>/<versioned-asset>`, never global `/latest/`.
+- **Версия/имена:** candidate version lives once in the Windows csproj. `release-info.ps1` derives version/tag/EXE/ZIP names for build/installer/tests; CI upload uses version-neutral globs only in its fresh dist. `latest-windows.json` is the published Windows download identity; landing reads it and retains pinned HTML fallback links.
+- **Приёмка:** one final manual desktop workflow after local checks/review. One actual bundled Whisper invocation is driven by the visible UI using runner-generated synthetic speech; capture/key seams are explicit and isolated. Two additional synthetic layout125/150% runs scale geometry/fonts, verify bounds and retain PNG; actual desktop DPI is reported separately. Normal installed launch runs without test CLI in an empty real runner profile. Every installed file and generated package hash/sourceSHA is checked.
+- **Ограничение:** this evidence is Windows Server2025 + synthetic inputs, not physical Windows10/11 microphone/Alt/editor or native monitor125/150%. Raw audio/model are not uploaded. Safe diagnostics contain only version/status metadata. No Authenticode signature is claimed.
+- **Публикация:** candidate registry entry and site source may be prepared locally, but published manifest remains1.6.0 until actual release digest/source read-back. New UI instructions are staged for1.6.1 and must not be pushed to Pages before that promotion.

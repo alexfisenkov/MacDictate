@@ -209,3 +209,14 @@
 - Published complete9asset draft as latestv1.6.0 at2026-10-19T13:39:24Z; public API digest/size readback9/9PASS. No partial latest release exposed.
 - Public Pages/readback and local install evidence appended after completion.
 - Final post-publication evidence: all3platformaliases fully downloaded WITHOUTauthentication and matched expectedSHA/size. Pagesonepushb48db9f, automaticrun39263614091success;16HTTPSfiles exactbytePASS including both manifests. InstalledpublicMac1.6.0/build14 after idlecheck; strictsignature/Gatekeeper, unchangedDR, exactmountedbinary/currentPID PASS; priorfree13 preserved privately. No models/preferences/iOSwrapper change. Physicalmic/hotkey/editor remainsNOT_RUN.
+
+
+## 2026-10-29 — Windows1.6.1 first-run delivery preparation
+
+- T01 app source was handed off with46portable checks and cross-build0warnings (root-confirmed); independent app repairs/review are tracked in the AISpa run. Delivery does not claim native/runtime success from this local evidence.
+- Prepared a Windows-only1.6.1 working ledger, centralized packaging version/names, independent Windows stable pointer and pinned published1.6.0 links. macOS bundle1.6.0/build14 and latest-desktop.json untouched; no tag/release/Pages operation performed.
+- Prepared EXE-primary/ZIP-secondary RU/EN instructions, automatic model saving, explicit desktop microphone access and record/stop/copy fallback, tray reopening and safe diagnostics. Site content is staged for1.6.1; keep it unpublished until actual Windows promotion.
+- Added root-invoked Windows manifest/source/hash guard (initial RED: missing current.windows), isolated UI + one real ASR synthetic-fixture test, layout125/150% synthetic geometry/font/bounds/PNG checks, normal installed fresh-profile UI/reopen and all-file payload plus reinstall/uninstall preservation checks.
+- Final CI/installer/Win32/UIASR/PNG and physical Windows10/11/native monitor DPI evidence are pending. Raw WAV/model/user content are excluded from CI upload. Final local results and hosted evidence must be appended after execution by the orchestrator.
+
+- T02 local read-back:54portable checks PASS and Windows cross-build0warnings/errors after concurrent T01 repair; PowerShell parser/canonical-name/no-overwrite tests PASS; Windows channel + existing release governance PASS; landing JS syntax and36RU/EN keys PASS. Negative fixtures rejected Windows global-latest URL, wrong sourceSHA and same-size package tampering. Win32/installed/DPI/realASR are still NOT_RUN on this Mac.

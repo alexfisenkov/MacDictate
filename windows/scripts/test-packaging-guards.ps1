@@ -1,8 +1,14 @@
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'release-info.ps1')
+$release = Get-WindowsReleaseInfo
 $fixture = Join-Path ([IO.Path]::GetTempPath()) ('macdictate-package-guards-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path (Join-Path $fixture 'scripts') | Out-Null
 try {
     Copy-Item (Join-Path $PSScriptRoot 'build.ps1') (Join-Path $fixture 'scripts')
+    Copy-Item (Join-Path $PSScriptRoot 'release-info.ps1') (Join-Path $fixture 'scripts')
+    $projectDirectory = Join-Path $fixture 'src/MacDictate.Windows'
+    New-Item -ItemType Directory -Force $projectDirectory | Out-Null
+    Copy-Item (Join-Path (Split-Path $PSScriptRoot -Parent) 'src/MacDictate.Windows/MacDictate.Windows.csproj') $projectDirectory
     Copy-Item (Join-Path (Split-Path $PSScriptRoot -Parent) 'runtime-lock.json') $fixture
     Set-Content (Join-Path $fixture '.gitignore') "dist/`n.runtime-build/"
     & git -C $fixture init --quiet
@@ -20,7 +26,7 @@ try {
     if ($LASTEXITCODE -eq 0 -or $message -notmatch 'Output app folder already exists') { throw "Existing app guard did not stop before build: $message" }
     if ((Get-Content $sentinel -Raw).Trim() -ne 'preserve original app') { throw 'Existing app data was changed' }
     Remove-Item $app -Recurse # Only this test's synthetic fixture.
-    $package = Join-Path $output 'MacDictate_Windows_v1.6.0_x64.zip'
+    $package = Join-Path $output $release.Portable
     Set-Content $package 'preserve release package'
     $message = & $shell -NoProfile -File (Join-Path $fixture 'scripts/build.ps1') 2>&1 | Out-String
     if ($LASTEXITCODE -eq 0 -or $message -notmatch 'Versioned package already exists') { throw "Existing package guard did not stop: $message" }

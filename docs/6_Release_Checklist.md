@@ -102,3 +102,18 @@
 - [x] Annotated tagv1.6.0 at checked build source, published latest complete release.
 - [x] GitHub Pages b48db9f/run39263614091 success,16HTTPfiles exactbytePASS; all3public platformalias download hashes PASS; installedMac1.6.0build14 signature/Gatekeeper/process/binary/DR PASS.
 - Physical Windows10/11 mic/Alt/editor and macOS mic/Option/editor remain NOT_RUN.
+
+
+## Windows1.6.1 first-run candidate — 2026-10-29
+
+- [ ] `windows/scripts/check-local.sh` and `python3 windows/scripts/check-delivery.py`; existing release/architecture checks and PowerShell syntax/package guards.
+- [ ] Independent review; all accepted fixes tested; clean exact source committed before packaging.
+- [ ] One manual `desktop-release.yml`: native keyboard/paste, one real bundled Whisper through fresh-profile UI on exact synthetic TTS, sourceSHA/package bytes and all installed payload files.
+- [ ] Smoke JSON/PNG read-back: RU/EN, error/silent/no-device, processing/result, synthetic layout125/150% bounds/fonts; actual desktop DPI separately recorded.
+- [ ] Installed normal production launch (not isolated test mode), fresh real runner profile, visible model setup, close-to-tray/relaunch, no implicit download, reinstall/uninstall preserve synthetic settings/model/last-text.
+- [ ] Final artifacts retained and locally rehashed; no raw WAV/model/user content uploaded.
+- [ ] Windows-only tagged1.6.1 published with `make_latest=false`; published source/digests read back; global latest still Mac1.6.0, bundle/build14 and Mac manifest unchanged.
+- [ ] Windows registry → published manifest → pinned HTML fallbacks promoted only from actual evidence; one final staged Pages push + HTTPS/asset read-back.
+- [ ] Physical Windows10/11 microphone/Alt/editor and native125/150% manual acceptance, or explicit NOT_RUN limitation retained.
+
+All boxes begin pending. Source changes, a cross-build or synthetic scale are not a release/runtime/physical PASS.
