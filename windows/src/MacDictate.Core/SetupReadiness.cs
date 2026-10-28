@@ -11,3 +11,19 @@ public sealed record SetupReadiness(SetupStep Next, bool CanRecord)
             runtime && model && microphone is MicrophoneReadiness.Signal or MicrophoneReadiness.Untested);
     }
 }
+
+public sealed record MicrophoneSelection(uint DeviceId, MicrophoneReadiness Readiness)
+{
+    public static MicrophoneSelection Reconcile(uint storedId, IReadOnlyCollection<uint> availableIds, MicrophoneReadiness readiness)
+    {
+        if (availableIds.Count == 0) return new(uint.MaxValue, MicrophoneReadiness.NoDevice);
+        if (storedId == uint.MaxValue || availableIds.Contains(storedId)) return new(storedId, readiness == MicrophoneReadiness.NoDevice ? MicrophoneReadiness.Untested : readiness);
+        return new(availableIds.First(), MicrophoneReadiness.Untested);
+    }
+}
+
+public enum ModelDownloadFailure { Integrity, TransferOrStorage }
+public static class ModelDownloadRecovery
+{
+    public static ModelDownloadFailure Classify(Exception failure) => failure is InvalidDataException ? ModelDownloadFailure.Integrity : ModelDownloadFailure.TransferOrStorage;
+}

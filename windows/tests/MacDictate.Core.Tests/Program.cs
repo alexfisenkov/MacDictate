@@ -48,6 +48,15 @@ try
     Check(!SetupReadiness.Evaluate(true, true, MicrophoneReadiness.Silent, true).CanRecord, "Silence must block trial readiness");
     Check(SetupReadiness.Evaluate(true, true, MicrophoneReadiness.Signal, false).CanRecord && SetupReadiness.Evaluate(true, true, MicrophoneReadiness.Signal, false).Next == SetupStep.Hotkey, "Record button remains usable when hotkey registration fails");
     Check(SetupReadiness.Evaluate(false, true, MicrophoneReadiness.Signal, true).Next == SetupStep.Runtime && !SetupReadiness.Evaluate(true, false, MicrophoneReadiness.Signal, true).CanRecord, "Missing runtime or model must block recording");
+    var disconnected = MicrophoneSelection.Reconcile(7, new uint[] { 0, 2 }, MicrophoneReadiness.Signal);
+    Check(disconnected.DeviceId == 0 && disconnected.Readiness == MicrophoneReadiness.Untested, "Disconnected saved input must choose an available input and invalidate its prior signal");
+    store.SaveSettings(store.LoadSettings() with { MicrophoneDeviceId = disconnected.DeviceId });
+    Check(store.LoadSettings().MicrophoneDeviceId == 0, "Replacement input selection must survive settings read-back");
+    Check(MicrophoneSelection.Reconcile(0, new uint[] { 0, 2 }, MicrophoneReadiness.Signal).Readiness == MicrophoneReadiness.Signal, "Unchanged available input retains session signal");
+    Check(MicrophoneSelection.Reconcile(uint.MaxValue, new uint[] { 0 }, MicrophoneReadiness.Signal).DeviceId == uint.MaxValue, "Available system-default input selection must remain stable");
+    var noDevices = MicrophoneSelection.Reconcile(7, Array.Empty<uint>(), MicrophoneReadiness.Signal);
+    Check(noDevices.DeviceId == uint.MaxValue && noDevices.Readiness == MicrophoneReadiness.NoDevice, "No devices clears stale ID and never keeps green readiness");
+    Check(MicrophoneSelection.Reconcile(noDevices.DeviceId, new uint[] { 0 }, noDevices.Readiness).Readiness == MicrophoneReadiness.Untested, "Reconnected input becomes testable without inheriting prior signal");
     var meter = new PcmSignalMeter(); meter.Append(new byte[16000]); Check(!meter.HasSignal && meter.Level == 0, "Silent PCM never verifies a microphone");
     byte[] speechPcm = new byte[16000]; for (int i = 0; i < speechPcm.Length; i += 2) { speechPcm[i] = 0; speechPcm[i + 1] = 16; }
     meter.Append(speechPcm); Check(meter.HasSignal && meter.Level > .1, "Sustained nonzero PCM establishes actual signal");
@@ -70,6 +79,9 @@ try
     await Throws<InvalidDataException>(() => modelStore.DownloadAsync(pin with { Sha256 = new string('0', 64) }, destination, null, CancellationToken.None));
     Check(File.ReadAllBytes(destination).SequenceEqual(content), "Hash failure preserves valid model");
     await Throws<InvalidDataException>(() => modelStore.DownloadAsync(pin with { Sha256 = new string('0', 64) }, Path.Combine(directory, "bad-hash.bin"), null, CancellationToken.None));
+    try { await modelStore.DownloadAsync(pin with { Sha256 = new string('0', 64) }, Path.Combine(directory, "recovery-bad-hash.bin"), null, CancellationToken.None); throw new Exception("Invalid hash unexpectedly accepted"); }
+    catch (InvalidDataException failure) { Check(ModelDownloadRecovery.Classify(failure) == ModelDownloadFailure.Integrity, "Actual SHA verification failure must select integrity recovery instead of network advice"); }
+    Check(ModelDownloadRecovery.Classify(new IOException("disk unavailable")) == ModelDownloadFailure.TransferOrStorage, "Storage failure remains distinct from integrity failure");
     await Throws<InvalidDataException>(() => modelStore.DownloadAsync(pin with { Size = 2 }, destination, null, CancellationToken.None));
     using var cancelled = new CancellationTokenSource(); cancelled.Cancel();
     await Throws<OperationCanceledException>(() => modelStore.DownloadAsync(pin, destination, null, cancelled.Token));
@@ -85,7 +97,7 @@ try
     {
         string audio = Path.Combine(directory, "sample audio.wav"), model = Path.Combine(directory, "model file.bin"), script = Path.Combine(directory, "fake whisper");
         File.WriteAllBytes(audio, [0]); File.WriteAllBytes(model, [0]);
-        async Task Script(string body) { await File.WriteAllTextAsync(script, "#!/bin/sh\n" + body); File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute); }
+        async Task Script(string body) { if (OperatingSystem.IsWindows()) throw new PlatformNotSupportedException(); await File.WriteAllTextAsync(script, "#!/bin/sh\n" + body); File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute); }
         await Script("while [ \"$1\" != \"\" ]; do if [ \"$1\" = \"-of\" ]; then shift; output=$1; fi; shift; done\nprintf 'Привет\\nfixture' > \"$output.txt\"\n");
         Check(await new WhisperRunner(script).TranscribeAsync(audio, model, "ru", CancellationToken.None) == "Привет fixture", "Process argument paths with spaces/Unicode");
         await Script("exit 7\n"); await Throws<InvalidOperationException>(() => new WhisperRunner(script).TranscribeAsync(audio, model, "auto", CancellationToken.None));

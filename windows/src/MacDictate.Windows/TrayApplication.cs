@@ -52,7 +52,7 @@ internal sealed class TrayApplication : ApplicationContext
         menu.Items.Add(T("Выход", "Quit"), null, (_, _) => ExitThread());
         tray.ContextMenuStrip = menu; tray.DoubleClick += (_, _) => ShowMain();
         clock.Tick += async (_, _) => { if (view.Activity != AppActivity.Recording) return; view = view with { ElapsedSeconds = (int)(DateTime.UtcNow - started).TotalSeconds }; Render(); if (view.ElapsedSeconds >= 120) await StopAsync(); };
-        ConfigureKeyboard(); Render(); home.Show();
+        ConfigureKeyboard(); ReconcileMicrophone(); home.RefreshMicrophones(); Render(); home.Show();
     }
     private string T(string ru, string en) => home.T(ru, en);
     private void Dispatch(Action callback)
@@ -70,6 +70,24 @@ internal sealed class TrayApplication : ApplicationContext
     }
     internal void ShowMain() { if (!shuttingDown) { RefreshFiles(); home.ShowMain(); Render(); } }
     private void RefreshFiles() => view = view with { RuntimeReady = File.Exists(services.RuntimePath), ModelReady = ModelFile.IsUsable(view.Settings.ModelPath) };
+    private bool ReconcileMicrophone()
+    {
+        try
+        {
+            var selection = MicrophoneSelection.Reconcile(view.Settings.MicrophoneDeviceId, services.Microphones().Select(x => x.Id).ToArray(), view.Microphone);
+            bool changed = selection.DeviceId != view.Settings.MicrophoneDeviceId;
+            var settings = view.Settings with { MicrophoneDeviceId = selection.DeviceId };
+            if (changed) store.SaveSettings(settings);
+            view = view with { Settings = settings, Microphone = selection.Readiness };
+            if (changed) view = view with { Message = T("Выбранный вход отключён. Доступный вход выбран и сохранён; проверьте микрофон заново.", "The selected input disconnected. An available input was selected and saved; test the microphone again.") };
+            return selection.Readiness != MicrophoneReadiness.NoDevice;
+        }
+        catch
+        {
+            view = view with { Microphone = MicrophoneReadiness.Error, Message = T("Не удалось обновить или сохранить вход. Обновите список; проверьте права на локальные настройки и повторите.", "Cannot refresh or save the input. Refresh inputs, check local settings permissions, and retry.") };
+            return false;
+        }
+    }
     private void ConfigureKeyboard()
     {
         try { keyboard.Configure(view.Settings.Hotkey); view = view with { HotkeyReady = true, HotkeyVerified = false }; }
@@ -100,12 +118,17 @@ internal sealed class TrayApplication : ApplicationContext
             store.SaveSettings(settings); view = view with { Settings = settings, Message = T("Модель проверена и сохранена автоматически. Следующий шаг — микрофон.", "Verified model saved automatically. Next, test the microphone.") }; RefreshFiles();
         }
         catch (OperationCanceledException) { SetMessage(T("Загрузка отменена. Существующая модель сохранена. Можно повторить.", "Download cancelled. Existing model preserved. You can retry.")); }
+        catch (Exception error) when (ModelDownloadRecovery.Classify(error) == ModelDownloadFailure.Integrity)
+        {
+            SetMessage(T("Проверка целостности модели не пройдена: SHA-256 или размер не совпадают, либо по пути уже есть другая модель. Существующие файлы сохранены. Повторите скачивание или нажмите «Выбрать .bin» и укажите существующую модель Whisper.", "Model integrity verification failed: SHA-256 or size does not match, or a different model already exists at the destination. Existing files were preserved. Retry the download or select Choose .bin to use an existing Whisper model."));
+        }
         catch { SetMessage(T("Загрузка или сохранение не завершены. Проверьте сеть, место и права; повторите или выберите существующую .bin. Файл другой модели не заменяется.", "Download or save did not complete. Check network, space and permissions; retry or choose an existing .bin. A different existing model is never overwritten.")); }
         finally { operation = null; view = view with { Activity = AppActivity.Idle }; Render(); FinishExit(); }
     }
     internal async Task TestMicrophoneAsync()
     {
         if (view.Activity != AppActivity.Idle) return;
+        if (!ReconcileMicrophone()) { home.RefreshMicrophones(); Render(); return; }
         using var cancellation = new CancellationTokenSource(); operation = cancellation;
         view = view with { Microphone = MicrophoneReadiness.Untested, Activity = AppActivity.TestingMicrophone, Message = T("Говорите сейчас — 3 секунды. Тестовая запись будет удалена.", "Speak now for 3 seconds. The test recording will be deleted.") }; Render();
         try
@@ -123,6 +146,7 @@ internal sealed class TrayApplication : ApplicationContext
         if (view.Activity == AppActivity.Recording) { await StopAsync(); return; }
         if (view.Activity != AppActivity.Idle) return;
         RefreshFiles();
+        if (!ReconcileMicrophone()) { ShowMain(); return; }
         if (!view.Readiness.CanRecord) { SetMessage(T("Сначала выполните выделенный шаг настройки.", "Complete the indicated setup step first.")); ShowMain(); return; }
         string path = Path.Combine(Path.GetTempPath(), "macdictate-audio-" + Guid.NewGuid().ToString("N") + ".wav");
         view = view with { Activity = AppActivity.Starting, Message = "" }; Render();

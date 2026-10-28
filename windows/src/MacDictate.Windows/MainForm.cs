@@ -81,18 +81,23 @@ internal sealed class MainForm : Form
     private void Save(AppSettings settings) { if (!updating && settings != view.Settings) SettingsChanged?.Invoke(settings); }
     public void RefreshMicrophones()
     {
+        AppSettings? replacement = null;
         bool before = updating; updating = true;
         try
         {
             var devices = enumerate(); microphone.Items.Clear();
+            var selection = MicrophoneSelection.Reconcile(view.Settings.MicrophoneDeviceId, devices.Select(x => x.Id).ToArray(), view.Microphone);
             if (devices.Count > 0) microphone.Items.Add(new MicrophoneDevice(uint.MaxValue, T("Системный вход по умолчанию", "System default input")));
             foreach (var device in devices) microphone.Items.Add(device);
-            microphone.SelectedItem = microphone.Items.Cast<MicrophoneDevice>().FirstOrDefault(x => x.Id == view.Settings.MicrophoneDeviceId);
-            if (microphone.SelectedIndex < 0 && microphone.Items.Count > 0) microphone.SelectedIndex = 0;
+            microphone.SelectedItem = microphone.Items.Cast<MicrophoneDevice>().FirstOrDefault(x => x.Id == selection.DeviceId);
+            if (selection.DeviceId != view.Settings.MicrophoneDeviceId) replacement = view.Settings with { MicrophoneDeviceId = selection.DeviceId };
             if (devices.Count == 0) micStatus.Text = T("Входных устройств нет. Подключите микрофон и обновите список.", "No input device. Connect a microphone and refresh the list.");
         }
         catch { micStatus.Text = T("Не удалось получить список входов. Откройте настройки звука и повторите.", "Cannot list inputs. Open Sound settings and retry."); }
         finally { updating = before; }
+        // Publish after restoring the guard: automatic fallback must persist just
+        // like an explicit selection, and the controller invalidates its signal.
+        if (replacement != null) Save(replacement);
     }
     public void Render(ViewState state)
     {
