@@ -57,3 +57,4 @@ windows/dist/
 windows/.runtime-build/
 windows/**/TestResults/
 *.user
+.aispa-work/serve.*
