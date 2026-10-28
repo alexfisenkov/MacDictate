@@ -2,7 +2,7 @@
   "product": "MacDictate",
   "version": "1.6.0",
   "build": "14",
-  "websiteSourceCommit": "4c387eb",
+  "websiteSourceCommit": "e46b25fb8e1c2203609c2ee750176028a61fdca7",
   "appSourceCommit": "e80a4a094affb65457c4f3f77e090b84d6aef210",
   "dmgSHA256": "d2c582541991b83973362cd8e926c651f85b595252b74825cbb2e05f13c3fe18",
   "downloadURL": "https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg",
@@ -10,10 +10,12 @@
   "schemaVersion": 1,
   "ciRunURL": "https://github.com/alexfisenkov/MacDictate/actions/runs/39259656403",
   "windows": {
-    "installerSHA256": "7760c34fb04c2d59887b613a8c71ce3001920a91448d60e9048fa207d2f689c2",
-    "portableSHA256": "4bae36e98ab81a10fe929a05c398aa1d3e23d0aad02112eed3ac76966f6644c7",
-    "minimumWindowsBuild": 19041,
+    "version": "1.6.1",
+    "sourceSHA": "56b45301bc0e98c12f4823e5039152a3c3dd5229",
+    "ciRunURL": "https://github.com/alexfisenkov/MacDictate/actions/runs/40747430459",
+    "installerSHA256": "fe85fd784649f057d16a115392b3c09cb7ceaf42e8f59beefc05d8149b3307e9",
+    "portableSHA256": "55eedeed0bda8e91dc807cab00fefc9041e5c3d1151984508107e1e287c6365d",
     "signed": false
   },
-  "generatedAt": "2026-10-19T13:49:07.365256+00:00"
+  "generatedAt": "2026-10-28T19:13:31.131356+00:00"
 }
