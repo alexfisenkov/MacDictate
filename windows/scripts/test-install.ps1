@@ -3,6 +3,7 @@ Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'release-info.ps1')
 $release = Get-WindowsReleaseInfo
 $root = Split-Path $PSScriptRoot -Parent
+& (Join-Path $root 'tests/test-installed-ui-contract.ps1')
 $installer = Join-Path $root ('dist/' + $release.Installer)
 $target = Join-Path $env:RUNNER_TEMP ('MacDictate install test ' + [Guid]::NewGuid().ToString('N'))
 $appProfile = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'MacDictate'
@@ -44,7 +45,7 @@ try {
     $before = @{}; foreach ($path in $owned) { $before[$path] = (Get-FileHash -LiteralPath $path).Hash }
     Install-Package
     foreach ($path in $owned) { if ((Get-FileHash -LiteralPath $path).Hash -ne $before[$path]) { throw 'Upgrade altered existing settings/model/last text' } }
-    $installReport = [ordered]@{ success = $true; scenario = 'installer-payload-upgrade-uninstall'; payloadFilesVerified = $files.Count; version = $release.Version; installedMainWindow = 'verified by installed-first-launch-smoke.json in normal production mode'; settingsModelsLastText = 'synthetic sentinels preserved byte-for-byte across reinstall'; uninstallPreservation = 'pending' }
+    $installReport = [ordered]@{ success = $true; scenario = 'installer-payload-upgrade-uninstall'; payloadFilesVerified = $files.Count; version = $release.Version; installedMainWindow = 'fresh blank-state and populated-result UIA/Copy read-back verified by installed-first-launch-smoke.json in normal production mode'; settingsModelsLastText = 'synthetic sentinels preserved byte-for-byte across reinstall'; uninstallPreservation = 'pending' }
 } finally {
     $uninstall = Join-Path $target 'unins000.exe'
     if (Test-Path $uninstall) {
