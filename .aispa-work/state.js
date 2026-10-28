@@ -2,7 +2,7 @@ window.STATE =
 {
   "version": 2,
   "slug": "windows-first-run",
-  "dir": "2026-10-29-windows-first-run--wip",
+  "dir": "2026-10-29-windows-first-run",
   "title": "Windows: от скачивания до первой диктовки",
   "mode": "auto",
   "depth": "normal",
@@ -15,8 +15,8 @@ window.STATE =
   "skillVersion": "1.0.2",
   "baseCommit": "9531dcc",
   "startedAt": "2026-10-29T00:59:49+08:00",
-  "updatedAt": "2026-10-29T02:57:36+08:00",
-  "finishedAt": null,
+  "updatedAt": "2026-10-29T03:19:49+08:00",
+  "finishedAt": "2026-10-29T03:19:49+08:00",
   "stages": [
     {
       "id": "preflight",
@@ -63,8 +63,9 @@ window.STATE =
     },
     {
       "id": "final",
-      "status": "active",
-      "startedAt": "2026-10-29T02:18:18+08:00"
+      "status": "done",
+      "startedAt": "2026-10-29T02:18:18+08:00",
+      "finishedAt": "2026-10-29T03:19:49+08:00"
     }
   ],
   "requirements": {
@@ -226,10 +227,9 @@ window.STATE =
   ],
   "blind": {
     "checked": 8,
-    "matched": 4,
+    "matched": 5,
     "mismatches": [
-      "Physical microphone/Alt/editor on friend Windows10/11 nottested; automaticServer2025 accepted only",
-      "New public website/download notyetdeployed; localbrowserchecked, candidateaccepted"
+      "Physical friendWindows10/11mic/Alt/editor untested; automatic WindowsServer2025 accepted only"
     ]
   },
   "beats": [
@@ -266,9 +266,11 @@ window.STATE =
     "2026-10-29T02:25:58+08:00",
     "2026-10-29T02:33:09+08:00",
     "2026-10-29T02:40:35+08:00",
-    "2026-10-29T02:57:36+08:00"
+    "2026-10-29T02:57:36+08:00",
+    "2026-10-29T03:18:18+08:00",
+    "2026-10-29T03:19:49+08:00"
   ],
-  "rev": 59,
+  "rev": 63,
   "waiting": null,
   "waits": [],
   "log": [
@@ -698,6 +700,31 @@ window.STATE =
       "k": "add",
       "key": "report",
       "n": 1
+    },
+    {
+      "t": "2026-10-29T03:18:18+08:00",
+      "k": "add",
+      "key": "report",
+      "n": 1
+    },
+    {
+      "t": "2026-10-29T03:18:18+08:00",
+      "k": "gate",
+      "g": "G4",
+      "ok": false,
+      "checked": 8,
+      "matched": 5
+    },
+    {
+      "t": "2026-10-29T03:18:18+08:00",
+      "k": "tests",
+      "passed": 60,
+      "failed": 0
+    },
+    {
+      "t": "2026-10-29T03:19:49+08:00",
+      "k": "finish",
+      "result": "Windows1.6.1 опубликован: видимый первый запуск, проверенный UI/ASR/установщик; физическая Windows друга остаётся отдельной проверкой"
     }
   ],
   "reqList": [
@@ -773,12 +800,12 @@ window.STATE =
     },
     "G4": {
       "ok": false,
-      "at": "2026-10-29T02:57:36+08:00",
+      "at": "2026-10-29T03:18:18+08:00",
       "checked": 8,
-      "matched": 4
+      "matched": 5
     }
   },
-  "result": null,
+  "result": "Windows1.6.1 опубликован: видимый первый запуск, проверенный UI/ASR/установщик; физическая Windows друга остаётся отдельной проверкой",
   "report": [
     "Подтверждены два UX-барьера: модальные настройки блокируют Alt, скачанная модель не активируется до Save; причина конкретного ПК пока неизвестна",
     "Windows WinMM не гарантирует отдельный OS consent prompt; проверяем реальную запись и общий desktop microphone toggle",
@@ -791,6 +818,7 @@ window.STATE =
     "CI40744090057 RED on check-delivery charmap decode7147; packagesbuilt, WindowsUI/ASR/installnotrun. OnlyconcreteUTF8repairjustifiesnextmanualrun",
     "RepairCI40745192074 realWhisperUIonboarding/nativePASS; installednormalfreshUI failed LastDictationText missing. Mustdiagnoseactualvisibility vswrongassertion, no passclaim.",
     "CI40745192074 actualUI+realWhisperPASS, normalfreshgatehadincorrectalways-result assumption. Fixedstate-aware34contractcases; native rerunneeded. Appcodeunchanged.",
-    "G4actual finalJSON/PNG PASSautomatic: installed normal UI/Copy/reopen/492payload/reinstall/uninstall, realbundledWhisperresultvisible. Retention1populatedPNGmissing; UIA/clipboard+realASRPNGverified."
+    "G4actual finalJSON/PNG PASSautomatic: installed normal UI/Copy/reopen/492payload/reinstall/uninstall, realbundledWhisperresultvisible. Retention1populatedPNGmissing; UIA/clipboard+realASRPNGverified.",
+    "Public Windows1.6.1 and completeEXEdownload verified; site16HTTPexactPASS, Pages40752369737SUCCESS; Maclatest1.6.0 unchanged"
   ]
 }

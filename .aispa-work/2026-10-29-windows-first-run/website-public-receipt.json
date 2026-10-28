@@ -1,0 +1,70 @@
+{
+  "pagesSource": "1d4873e628956a8bde3d76bcd07de9cfd66de62a",
+  "run": "https://github.com/alexfisenkov/MacDictate/actions/runs/40752369737",
+  "results": [
+    {
+      "file": "assets/mic_logo.png",
+      "status": "PASS"
+    },
+    {
+      "file": "assets/mic_logo.svg",
+      "status": "PASS"
+    },
+    {
+      "file": "assets/mic_menubar.svg",
+      "status": "PASS"
+    },
+    {
+      "file": "downloads/latest-desktop.json",
+      "status": "PASS"
+    },
+    {
+      "file": "downloads/latest-windows.json",
+      "status": "PASS"
+    },
+    {
+      "file": "fail.html",
+      "status": "PASS"
+    },
+    {
+      "file": "index.html",
+      "status": "PASS"
+    },
+    {
+      "file": "legal.html",
+      "status": "PASS"
+    },
+    {
+      "file": "success.html",
+      "status": "PASS"
+    },
+    {
+      "file": "docs/privacy_policy.md",
+      "status": "PASS"
+    },
+    {
+      "file": "docs/eula_oferta_en.md",
+      "status": "PASS"
+    },
+    {
+      "file": "docs/data_consent.md",
+      "status": "PASS"
+    },
+    {
+      "file": "docs/privacy_policy_en.md",
+      "status": "PASS"
+    },
+    {
+      "file": "docs/data_consent_en.md",
+      "status": "PASS"
+    },
+    {
+      "file": "docs/eula_oferta.md",
+      "status": "PASS"
+    },
+    {
+      "file": "DEPLOYMENT.json",
+      "status": "PASS"
+    }
+  ]
+}
