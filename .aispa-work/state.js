@@ -15,7 +15,7 @@ window.STATE =
   "skillVersion": "1.0.2",
   "baseCommit": "9531dcc",
   "startedAt": "2026-10-29T00:59:49+08:00",
-  "updatedAt": "2026-10-29T02:18:18+08:00",
+  "updatedAt": "2026-10-29T02:25:58+08:00",
   "finishedAt": null,
   "stages": [
     {
@@ -143,16 +143,17 @@ window.STATE =
       "model": "сильная",
       "status": "done",
       "startedAt": "2026-10-29T01:28:21+08:00",
-      "finishedAt": "2026-10-29T01:59:30+08:00",
+      "finishedAt": "2026-10-29T02:25:58+08:00",
       "retries": 0,
-      "repairs": 1,
+      "repairs": 2,
       "tests": {
-        "passed": 54,
+        "passed": 60,
         "failed": 0
       },
-      "commit": "7a4907d",
+      "commit": "f014eff",
       "repairFindings": [
-        "Existing docs-layout check red: five stale line counts in docs/00-индекс.md"
+        "Existing docs-layout check red: five stale line counts in docs/00-индекс.md",
+        "Final Windows CI check-delivery charmap decode failure before native UI; explicit UTF-8 needed"
       ]
     },
     {
@@ -251,9 +252,13 @@ window.STATE =
     "2026-10-29T01:59:30+08:00",
     "2026-10-29T02:10:32+08:00",
     "2026-10-29T02:14:44+08:00",
-    "2026-10-29T02:18:18+08:00"
+    "2026-10-29T02:18:18+08:00",
+    "2026-10-29T02:19:50+08:00",
+    "2026-10-29T02:24:32+08:00",
+    "2026-10-29T02:24:33+08:00",
+    "2026-10-29T02:25:58+08:00"
   ],
-  "rev": 49,
+  "rev": 53,
   "waiting": null,
   "waits": [],
   "log": [
@@ -604,6 +609,39 @@ window.STATE =
       "k": "tests",
       "passed": 60,
       "failed": 0
+    },
+    {
+      "t": "2026-10-29T02:19:50+08:00",
+      "k": "add",
+      "key": "report",
+      "n": 1
+    },
+    {
+      "t": "2026-10-29T02:24:32+08:00",
+      "k": "ticket",
+      "ids": [
+        "02"
+      ],
+      "act": "repair",
+      "note": "Final Windows CI check-delivery charmap decode failure before native UI; explicit UTF-8 needed"
+    },
+    {
+      "t": "2026-10-29T02:24:33+08:00",
+      "k": "add",
+      "key": "report",
+      "n": 1
+    },
+    {
+      "t": "2026-10-29T02:25:58+08:00",
+      "k": "ticket",
+      "ids": [
+        "02"
+      ],
+      "act": "done",
+      "tests": {
+        "passed": 60,
+        "failed": 0
+      }
     }
   ],
   "reqList": [
@@ -686,6 +724,8 @@ window.STATE =
     "Локальная реализация приложения прошла cross-build без warnings и46portable checks по отчёту исполнителя; native UI/ASR приёмка ещё впереди",
     "Уже существующий по адресу загрузки файл с другимSHA сохраняется; повтор без смены/переноса файла не ремонтирует его. Ручное восстановление остаётся отдельным ограничением",
     "Browser runtime QA: RU/EN390px и1440px безoverflow; EXEявныйprimary,ZIPотдельнораскрывается; текущиепубличныеURLещёv1.6.0доverifiedpublication1.6.1",
-    "Ограниченное отступление от лимита F1: scoped review оставил невидимые local errors ms-settings/clipboard. По явному уведомлению пользователя закрываем тем же writer коротким ремонтом и локальной проверкой, без третьего полного ревью"
+    "Ограниченное отступление от лимита F1: scoped review оставил невидимые local errors ms-settings/clipboard. По явному уведомлению пользователя закрываем тем же writer коротким ремонтом и локальной проверкой, без третьего полного ревью",
+    "Набор33b3687 передан независимой G4-проверке: чистый GitHubклон + единственный manualWindowsCI. Orchestrator не запускаетдубликат; ждём фактическиеUI/ASR/installer/PNG",
+    "CI40744090057 RED on check-delivery charmap decode7147; packagesbuilt, WindowsUI/ASR/installnotrun. OnlyconcreteUTF8repairjustifiesnextmanualrun"
   ]
 }
