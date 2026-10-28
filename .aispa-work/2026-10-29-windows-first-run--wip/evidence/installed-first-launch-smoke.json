@@ -1,0 +1,1429 @@
+﻿{
+    "success":  true,
+    "scenario":  "installed-normal-fresh-profile",
+    "testMode":  false,
+    "checks":  [
+                   "normal production launch shows real first-run window without CLI test mode",
+                   "actual UIA hierarchy: visible model setup/status/primary controls; empty result and Copy hidden",
+                   "close-to-tray and normal second launch reopen the same process",
+                   "normal startup does not automatically download a model",
+                   "installed ordinary relaunch exposes exact persisted synthetic text and enabled visible Copy without scrolling",
+                   "actual installed Copy invoked through UIA and exact synthetic clipboard text read back"
+               ],
+    "failure":  null,
+    "screenshots":  [
+                        "installed-first-launch-smoke.png",
+                        "installed-first-launch-smoke.-populated.png"
+                    ],
+    "uiStates":  [
+                     {
+                         "state":  "fresh-empty",
+                         "window":  {
+                                        "id":  "MacDictateMainWindow",
+                                        "name":  "MacDictate",
+                                        "type":  "ControlType.Window",
+                                        "enabled":  true,
+                                        "offscreen":  false,
+                                        "bounds":  {
+                                                       "x":  179,
+                                                       "y":  12,
+                                                       "width":  666,
+                                                       "height":  696
+                                                   },
+                                        "value":  null,
+                                        "readOnly":  null,
+                                        "invokable":  false
+                                    },
+                         "controls":  [
+                                          {
+                                              "id":  "",
+                                              "name":  "",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  187,
+                                                             "y":  103,
+                                                             "width":  650,
+                                                             "height":  523
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Your voice → text on this computer",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  128,
+                                                             "width":  310,
+                                                             "height":  25
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "1. Download the model (~488 MB). It is verified and saved automatically. Recognition then works offline.",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  164,
+                                                             "width":  556,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "NextSetupAction",
+                                              "name":  "Start setup: download model",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  186,
+                                                             "width":  169,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Readiness: Whisper ✓ · Model — · Microphone — · Hotkey —",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  228,
+                                                             "width":  329,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Interface · recognition language (auto = automatic) · hotkey",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  254,
+                                                             "width":  323,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Interface · recognition language (auto = automatic) · hotkey",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  276,
+                                                             "width":  498,
+                                                             "height":  29
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Interface language",
+                                              "type":  "ControlType.ComboBox",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  211,
+                                                             "y":  279,
+                                                             "width":  150,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Interface language",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  211,
+                                                             "y":  279,
+                                                             "width":  150,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Open",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  345,
+                                                             "y":  280,
+                                                             "width":  15,
+                                                             "height":  21
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Recognition language",
+                                              "type":  "ControlType.ComboBox",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  367,
+                                                             "y":  279,
+                                                             "width":  150,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Recognition language",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  367,
+                                                             "y":  279,
+                                                             "width":  150,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Open",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  501,
+                                                             "y":  280,
+                                                             "width":  15,
+                                                             "height":  21
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Hotkey",
+                                              "type":  "ControlType.ComboBox",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  523,
+                                                             "y":  279,
+                                                             "width":  180,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Hotkey",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  523,
+                                                             "y":  279,
+                                                             "width":  180,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Open",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  687,
+                                                             "y":  280,
+                                                             "width":  15,
+                                                             "height":  21
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Model is missing or unreadable. Choose a Whisper ggml .bin or download the verified model.",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  315,
+                                                             "width":  499,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Model is missing or unreadable. Choose a Whisper ggml .bin or download the verified model.",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  337,
+                                                             "width":  210,
+                                                             "height":  38
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Download model",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  211,
+                                                             "y":  340,
+                                                             "width":  108,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Choose .bin…",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  325,
+                                                             "y":  340,
+                                                             "width":  90,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Microphone",
+                                              "type":  "ControlType.ComboBox",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  381,
+                                                             "width":  400,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Microphone",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  381,
+                                                             "width":  400,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Open",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  592,
+                                                             "y":  382,
+                                                             "width":  15,
+                                                             "height":  21
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  410,
+                                                             "width":  210,
+                                                             "height":  38
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Test microphone",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  211,
+                                                             "y":  413,
+                                                             "width":  106,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Refresh inputs",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  323,
+                                                             "y":  413,
+                                                             "width":  92,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Microphone signal",
+                                              "type":  "ControlType.ProgressBar",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  454,
+                                                             "width":  320,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Windows usually shows no separate prompt for a desktop app. In Privacy → Microphone, enable microphone access and allow desktop apps. Return here and repeat the test.",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  487,
+                                                             "width":  581,
+                                                             "height":  30
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Windows usually shows no separate prompt for a desktop app. In Privacy → Microphone, enable microphone access and allow desktop apps. Return here and repeat the test.",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  524,
+                                                             "width":  282,
+                                                             "height":  38
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Windows microphone privacy",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  211,
+                                                             "y":  527,
+                                                             "width":  175,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Sound settings",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  392,
+                                                             "y":  527,
+                                                             "width":  95,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Global dictation: tap left Alt twice quickly to start; tap twice again to stop. Right Alt/AltGr and chords do not record. Maximum 2 minutes. From another app, text is inserted only into the original input; otherwise copy it here. Closing this window leaves MacDictate in the tray; double-click its icon or launch again to reopen.",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  572,
+                                                             "width":  581,
+                                                             "height":  45
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Test hotkey without recording",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  624,
+                                                             "width":  175,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Hotkey registered; test it here.",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  666,
+                                                             "width":  164,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Copy private-safe diagnostics",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  688,
+                                                             "width":  173,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "CurrentStatus",
+                                              "name":  "",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  187,
+                                                             "y":  43,
+                                                             "width":  650,
+                                                             "height":  60
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "OperationStatus",
+                                              "name":  "MacDictate · ready for the next action",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  54,
+                                                             "width":  204,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "MicrophoneStatus",
+                                              "name":  "No input device. Connect a microphone and refresh inputs.",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  80,
+                                                             "width":  320,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  187,
+                                                             "y":  626,
+                                                             "width":  650,
+                                                             "height":  74
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "StartStopRecording",
+                                              "name":  "Start recording",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  false,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  202,
+                                                             "y":  641,
+                                                             "width":  220,
+                                                             "height":  44
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "CancelOperation",
+                                              "name":  "Cancel",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  false,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  428,
+                                                             "y":  641,
+                                                             "width":  110,
+                                                             "height":  44
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          }
+                                      ]
+                     },
+                     {
+                         "state":  "synthetic-persisted-result",
+                         "window":  {
+                                        "id":  "MacDictateMainWindow",
+                                        "name":  "MacDictate",
+                                        "type":  "ControlType.Window",
+                                        "enabled":  true,
+                                        "offscreen":  false,
+                                        "bounds":  {
+                                                       "x":  179,
+                                                       "y":  12,
+                                                       "width":  666,
+                                                       "height":  696
+                                                   },
+                                        "value":  null,
+                                        "readOnly":  null,
+                                        "invokable":  false
+                                    },
+                         "controls":  [
+                                          {
+                                              "id":  "",
+                                              "name":  "",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  187,
+                                                             "y":  103,
+                                                             "width":  650,
+                                                             "height":  397
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Your voice → text on this computer",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  128,
+                                                             "width":  310,
+                                                             "height":  25
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "1. Download the model (~488 MB). It is verified and saved automatically. Recognition then works offline.",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  164,
+                                                             "width":  556,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "NextSetupAction",
+                                              "name":  "Start setup: download model",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  186,
+                                                             "width":  169,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Readiness: Whisper ✓ · Model — · Microphone — · Hotkey —",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  228,
+                                                             "width":  329,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Interface · recognition language (auto = automatic) · hotkey",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  254,
+                                                             "width":  323,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Interface · recognition language (auto = automatic) · hotkey",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  276,
+                                                             "width":  498,
+                                                             "height":  29
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Interface language",
+                                              "type":  "ControlType.ComboBox",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  211,
+                                                             "y":  279,
+                                                             "width":  150,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Interface language",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  211,
+                                                             "y":  279,
+                                                             "width":  150,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Open",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  345,
+                                                             "y":  280,
+                                                             "width":  15,
+                                                             "height":  21
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Recognition language",
+                                              "type":  "ControlType.ComboBox",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  367,
+                                                             "y":  279,
+                                                             "width":  150,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Recognition language",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  367,
+                                                             "y":  279,
+                                                             "width":  150,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Open",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  501,
+                                                             "y":  280,
+                                                             "width":  15,
+                                                             "height":  21
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Hotkey",
+                                              "type":  "ControlType.ComboBox",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  523,
+                                                             "y":  279,
+                                                             "width":  180,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Hotkey",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  523,
+                                                             "y":  279,
+                                                             "width":  180,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Open",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  687,
+                                                             "y":  280,
+                                                             "width":  15,
+                                                             "height":  21
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Model is missing or unreadable. Choose a Whisper ggml .bin or download the verified model.",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  315,
+                                                             "width":  499,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Model is missing or unreadable. Choose a Whisper ggml .bin or download the verified model.",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  337,
+                                                             "width":  210,
+                                                             "height":  38
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Download model",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  211,
+                                                             "y":  340,
+                                                             "width":  108,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Choose .bin…",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  325,
+                                                             "y":  340,
+                                                             "width":  90,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Microphone",
+                                              "type":  "ControlType.ComboBox",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  381,
+                                                             "width":  400,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Microphone",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  381,
+                                                             "width":  400,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Open",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  592,
+                                                             "y":  382,
+                                                             "width":  15,
+                                                             "height":  21
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  410,
+                                                             "width":  210,
+                                                             "height":  38
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Test microphone",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  211,
+                                                             "y":  413,
+                                                             "width":  106,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Refresh inputs",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  323,
+                                                             "y":  413,
+                                                             "width":  92,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Microphone signal",
+                                              "type":  "ControlType.ProgressBar",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  454,
+                                                             "width":  320,
+                                                             "height":  23
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Windows usually shows no separate prompt for a desktop app. In Privacy → Microphone, enable microphone access and allow desktop apps. Return here and repeat the test.",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  487,
+                                                             "width":  581,
+                                                             "height":  30
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Windows usually shows no separate prompt for a desktop app. In Privacy → Microphone, enable microphone access and allow desktop apps. Return here and repeat the test.",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  524,
+                                                             "width":  282,
+                                                             "height":  38
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Windows microphone privacy",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  211,
+                                                             "y":  527,
+                                                             "width":  175,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Sound settings",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  392,
+                                                             "y":  527,
+                                                             "width":  95,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Global dictation: tap left Alt twice quickly to start; tap twice again to stop. Right Alt/AltGr and chords do not record. Maximum 2 minutes. From another app, text is inserted only into the original input; otherwise copy it here. Closing this window leaves MacDictate in the tray; double-click its icon or launch again to reopen.",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  572,
+                                                             "width":  581,
+                                                             "height":  45
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Test hotkey without recording",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  624,
+                                                             "width":  175,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Hotkey registered; test it here.",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  666,
+                                                             "width":  164,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "Copy private-safe diagnostics",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  688,
+                                                             "width":  173,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "DictationResult",
+                                              "name":  "",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  187,
+                                                             "y":  500,
+                                                             "width":  650,
+                                                             "height":  126
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "LastDictationText",
+                                              "name":  "Last dictation",
+                                              "type":  "ControlType.Edit",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  503,
+                                                             "width":  583,
+                                                             "height":  76
+                                                         },
+                                              "value":  "SYNTHETIC installed normal-launch result: The quick brown fox jumps over the lazy dog.",
+                                              "readOnly":  true,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "CopyLastDictation",
+                                              "name":  "Copy text",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  585,
+                                                             "width":  90,
+                                                             "height":  32
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "CurrentStatus",
+                                              "name":  "",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  187,
+                                                             "y":  43,
+                                                             "width":  650,
+                                                             "height":  60
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "OperationStatus",
+                                              "name":  "MacDictate · ready for the next action",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  54,
+                                                             "width":  204,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "MicrophoneStatus",
+                                              "name":  "No input device. Connect a microphone and refresh inputs.",
+                                              "type":  "ControlType.Text",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  208,
+                                                             "y":  80,
+                                                             "width":  320,
+                                                             "height":  15
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "",
+                                              "name":  "",
+                                              "type":  "ControlType.Pane",
+                                              "enabled":  true,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  187,
+                                                             "y":  626,
+                                                             "width":  650,
+                                                             "height":  74
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  false
+                                          },
+                                          {
+                                              "id":  "StartStopRecording",
+                                              "name":  "Start recording",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  false,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  202,
+                                                             "y":  641,
+                                                             "width":  220,
+                                                             "height":  44
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          },
+                                          {
+                                              "id":  "CancelOperation",
+                                              "name":  "Cancel",
+                                              "type":  "ControlType.Button",
+                                              "enabled":  false,
+                                              "offscreen":  false,
+                                              "bounds":  {
+                                                             "x":  428,
+                                                             "y":  641,
+                                                             "width":  110,
+                                                             "height":  44
+                                                         },
+                                              "value":  null,
+                                              "readOnly":  null,
+                                              "invokable":  true
+                                          }
+                                      ]
+                     }
+                 ],
+    "resultSource":  "synthetic persisted text, not ASR; real Whisper covered separately by onboarding-smoke.json",
+    "dpi":  96,
+    "dpi125":  "NOT_RUN",
+    "dpi150":  "NOT_RUN",
+    "microphone":  "real enumeration only; physical capture NOT_RUN",
+    "keyboard":  "real registration; physical Alt NOT_RUN",
+    "physicalWindows10_11":  "NOT_RUN"
+}

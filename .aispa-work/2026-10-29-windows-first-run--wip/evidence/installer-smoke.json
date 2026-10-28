@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "scenario": "installer-payload-upgrade-uninstall",
+  "payloadFilesVerified": 492,
+  "version": "1.6.1",
+  "installedMainWindow": "fresh blank-state and populated-result UIA/Copy read-back verified by installed-first-launch-smoke.json in normal production mode",
+  "settingsModelsLastText": "synthetic sentinels preserved byte-for-byte across reinstall",
+  "uninstallPreservation": "synthetic settings/model/last text retained byte-for-byte"
+}

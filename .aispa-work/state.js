@@ -15,7 +15,7 @@ window.STATE =
   "skillVersion": "1.0.2",
   "baseCommit": "9531dcc",
   "startedAt": "2026-10-29T00:59:49+08:00",
-  "updatedAt": "2026-10-29T02:40:35+08:00",
+  "updatedAt": "2026-10-29T02:57:36+08:00",
   "finishedAt": null,
   "stages": [
     {
@@ -224,7 +224,14 @@ window.STATE =
     "T02 self-review: result TextBox can remain below initial viewport in long Home flow; test must not hide this with forcedscroll. R07/R10i production first result should be visibly reachable automatically without stealing external paste focus.",
     "T02 UI inspection: operation Message/mic status may be below initial viewport in long setup. Wholebranch must evaluate production visibility, not merely source text or forced test scrolling."
   ],
-  "blind": null,
+  "blind": {
+    "checked": 8,
+    "matched": 4,
+    "mismatches": [
+      "Physical microphone/Alt/editor on friend Windows10/11 nottested; automaticServer2025 accepted only",
+      "New public website/download notyetdeployed; localbrowserchecked, candidateaccepted"
+    ]
+  },
   "beats": [
     "2026-10-29T00:59:49+08:00",
     "2026-10-29T01:00:45+08:00",
@@ -258,9 +265,10 @@ window.STATE =
     "2026-10-29T02:24:33+08:00",
     "2026-10-29T02:25:58+08:00",
     "2026-10-29T02:33:09+08:00",
-    "2026-10-29T02:40:35+08:00"
+    "2026-10-29T02:40:35+08:00",
+    "2026-10-29T02:57:36+08:00"
   ],
-  "rev": 57,
+  "rev": 59,
   "waiting": null,
   "waits": [],
   "log": [
@@ -676,6 +684,20 @@ window.STATE =
       "k": "add",
       "key": "report",
       "n": 1
+    },
+    {
+      "t": "2026-10-29T02:57:36+08:00",
+      "k": "gate",
+      "g": "G4",
+      "ok": false,
+      "checked": 8,
+      "matched": 4
+    },
+    {
+      "t": "2026-10-29T02:57:36+08:00",
+      "k": "add",
+      "key": "report",
+      "n": 1
     }
   ],
   "reqList": [
@@ -748,6 +770,12 @@ window.STATE =
       "ok": true,
       "at": "2026-10-29T01:56:48+08:00",
       "problems": 0
+    },
+    "G4": {
+      "ok": false,
+      "at": "2026-10-29T02:57:36+08:00",
+      "checked": 8,
+      "matched": 4
     }
   },
   "result": null,
@@ -762,6 +790,7 @@ window.STATE =
     "Набор33b3687 передан независимой G4-проверке: чистый GitHubклон + единственный manualWindowsCI. Orchestrator не запускаетдубликат; ждём фактическиеUI/ASR/installer/PNG",
     "CI40744090057 RED on check-delivery charmap decode7147; packagesbuilt, WindowsUI/ASR/installnotrun. OnlyconcreteUTF8repairjustifiesnextmanualrun",
     "RepairCI40745192074 realWhisperUIonboarding/nativePASS; installednormalfreshUI failed LastDictationText missing. Mustdiagnoseactualvisibility vswrongassertion, no passclaim.",
-    "CI40745192074 actualUI+realWhisperPASS, normalfreshgatehadincorrectalways-result assumption. Fixedstate-aware34contractcases; native rerunneeded. Appcodeunchanged."
+    "CI40745192074 actualUI+realWhisperPASS, normalfreshgatehadincorrectalways-result assumption. Fixedstate-aware34contractcases; native rerunneeded. Appcodeunchanged.",
+    "G4actual finalJSON/PNG PASSautomatic: installed normal UI/Copy/reopen/492payload/reinstall/uninstall, realbundledWhisperresultvisible. Retention1populatedPNGmissing; UIA/clipboard+realASRPNGverified."
   ]
 }
