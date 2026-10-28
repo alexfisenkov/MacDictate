@@ -8,6 +8,7 @@ internal static class Program
     private static int Main(string[] args)
     {
         ApplicationConfiguration.Initialize();
+        if (args.Contains("--onboarding-smoke")) return OnboardingSmoke.Run(Value(args, "--report"), Value(args, "--model"), Value(args, "--fixture-wave"));
         if (args.Contains("--smoke-test")) return NativeSmoke.Run(Value(args, "--report"));
         if (args.Contains("--transcribe"))
         {
@@ -19,8 +20,12 @@ internal static class Program
             catch (Exception error) { WriteReport(new { success = false, error = error.Message }, Value(args, "--report")); return 1; }
         }
         using var instance = new Mutex(true, "Local\\MacDictate.Desktop", out bool created);
-        if (!created) { MessageBox.Show("MacDictate is already running. Look for its icon in the notification area.", "MacDictate"); return 0; }
-        try { using var context = new TrayApplication(); Application.Run(context); return 0; }
+        if (!created)
+        {
+            if (!InstanceActivation.NotifyExisting()) MessageBox.Show("MacDictate is starting. Try opening it again in a moment. / MacDictate запускается. Повторите запуск через несколько секунд.", "MacDictate");
+            return 0;
+        }
+        try { using var context = new TrayApplication(); using var activation = new InstanceActivation(context.RequestShow); Application.Run(context); return 0; }
         catch (Exception error) { MessageBox.Show(error.Message, "MacDictate could not start", MessageBoxButtons.OK, MessageBoxIcon.Error); return 1; }
         finally { instance.ReleaseMutex(); }
     }

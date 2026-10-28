@@ -41,6 +41,21 @@ try
 {
     var store = new LocalStore(directory); Check(store.LoadSettings() == new AppSettings(), "Missing settings fallback");
     var settings = new AppSettings("ru", "F8", Path.Combine(directory, "model space.bin")); store.SaveSettings(settings); Check(store.LoadSettings() == settings, "Settings roundtrip");
+    File.WriteAllText(Path.Combine(directory, "settings.json"), "{\"Language\":\"ru\",\"Hotkey\":\"F8\",\"ModelPath\":\"old.bin\"}");
+    Check(store.LoadSettings().MicrophoneDeviceId == uint.MaxValue && store.LoadSettings().UiLanguage == "", "Legacy settings must preserve values and default new setup fields");
+    Check(SetupReadiness.Evaluate(true, true, MicrophoneReadiness.Untested, true).Next == SetupStep.Microphone, "Model and hook alone must not declare microphone ready");
+    Check(SetupReadiness.Evaluate(true, true, MicrophoneReadiness.Untested, true).CanRecord, "Untested microphone permits explicit real trial without claiming verified readiness");
+    Check(!SetupReadiness.Evaluate(true, true, MicrophoneReadiness.Silent, true).CanRecord, "Silence must block trial readiness");
+    Check(SetupReadiness.Evaluate(true, true, MicrophoneReadiness.Signal, false).CanRecord && SetupReadiness.Evaluate(true, true, MicrophoneReadiness.Signal, false).Next == SetupStep.Hotkey, "Record button remains usable when hotkey registration fails");
+    Check(SetupReadiness.Evaluate(false, true, MicrophoneReadiness.Signal, true).Next == SetupStep.Runtime && !SetupReadiness.Evaluate(true, false, MicrophoneReadiness.Signal, true).CanRecord, "Missing runtime or model must block recording");
+    var meter = new PcmSignalMeter(); meter.Append(new byte[16000]); Check(!meter.HasSignal && meter.Level == 0, "Silent PCM never verifies a microphone");
+    byte[] speechPcm = new byte[16000]; for (int i = 0; i < speechPcm.Length; i += 2) { speechPcm[i] = 0; speechPcm[i + 1] = 16; }
+    meter.Append(speechPcm); Check(meter.HasSignal && meter.Level > .1, "Sustained nonzero PCM establishes actual signal");
+    var transient = new PcmSignalMeter(); transient.Append([255, 127]); transient.Append(new byte[16000]); Check(!transient.HasSignal, "One isolated full-scale spike cannot verify microphone");
+    string invalidModel = Path.Combine(directory, "invalid.bin"); File.WriteAllBytes(invalidModel, new byte[2048]);
+    Check(!ModelFile.IsUsable(invalidModel) && !ModelFile.IsUsable(null), "Existing arbitrary files must not declare a Whisper model ready");
+    byte[] headerModel = new byte[2048]; System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(headerModel, 0x67676d6c); File.WriteAllBytes(invalidModel, headerModel);
+    Check(ModelFile.IsUsable(invalidModel), "Whisper ggml header passes preliminary model check; actual ASR remains required");
     store.SaveLastText("Привет мир"); Check(store.LoadLastText() == "Привет мир", "Unicode recovery roundtrip"); store.SaveLastText(""); Check(store.LoadLastText() == "", "Clear recovery text");
     byte[] content = Encoding.UTF8.GetBytes("verified model fixture");
     var pin = new ModelPin("fixture.bin", "https://example.invalid/model", Convert.ToHexString(SHA256.HashData(content)), content.Length);

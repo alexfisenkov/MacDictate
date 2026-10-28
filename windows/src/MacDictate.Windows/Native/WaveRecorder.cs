@@ -1,8 +1,9 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using MacDictate.Core;
 
 namespace MacDictate.Windows.Native;
-internal sealed class WaveRecorder : IDisposable
+internal sealed class WaveRecorder : IAudioCapture
 {
     [StructLayout(LayoutKind.Sequential, Pack = 2)] private struct Format { public ushort Tag, Channels; public uint Rate, BytesPerSecond; public ushort Align, Bits, Extra; }
     [StructLayout(LayoutKind.Sequential)] private struct Header { public nint Data; public uint Length, Recorded; public nuint User; public uint Flags, Loops; public nint Next; public nuint Reserved; }
@@ -23,18 +24,21 @@ internal sealed class WaveRecorder : IDisposable
     private bool disposed;
     private Exception? captureError;
     private long bytes;
+    private readonly PcmSignalMeter meter = new();
+    private readonly IProgress<double>? level;
     private const long MaximumBytes = 120L * 32000;
     private static uint HeaderSize => (uint)Marshal.SizeOf<Header>();
     public string AudioPath { get; }
-    public WaveRecorder(string path)
+    public bool HasSignal => meter.HasSignal;
+    public WaveRecorder(string path, uint deviceId = uint.MaxValue, IProgress<double>? level = null)
     {
-        AudioPath = path;
+        AudioPath = path; this.level = level;
         try
         {
             output = new FileStream(path, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
             output.Write(new byte[44]);
             var format = new Format { Tag = 1, Channels = 1, Rate = 16000, BytesPerSecond = 32000, Align = 2, Bits = 16 };
-            Check(waveInOpen(out device, uint.MaxValue, ref format, notification.SafeWaitHandle.DangerousGetHandle(), 0, 0x50000));
+            Check(waveInOpen(out device, deviceId, ref format, notification.SafeWaitHandle.DangerousGetHandle(), 0, 0x50000));
             for (int i = 0; i < 4; i++)
             {
                 var buffer = GCHandle.Alloc(new byte[8000], GCHandleType.Pinned);
@@ -74,6 +78,7 @@ internal sealed class WaveRecorder : IDisposable
                             int count = (int)Math.Min(header.Recorded, MaximumBytes - bytes);
                             byte[] data = new byte[count]; Marshal.Copy(header.Data, data, 0, count);
                             output!.Write(data); bytes += count;
+                            meter.Append(data); level?.Report(meter.Level);
                         }
                         if (recording && bytes < MaximumBytes) Check(waveInAddBuffer(device, item.Header, HeaderSize));
                     }

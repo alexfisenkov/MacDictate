@@ -1,7 +1,8 @@
 using System.Text.Json;
 
 namespace MacDictate.Core;
-public sealed record AppSettings(string Language = "auto", string Hotkey = "DoubleAlt", string? ModelPath = null);
+public sealed record AppSettings(string Language = "auto", string Hotkey = "DoubleAlt", string? ModelPath = null,
+    uint MicrophoneDeviceId = uint.MaxValue, string UiLanguage = "");
 public sealed class LocalStore
 {
     public string DirectoryPath { get; }
@@ -15,7 +16,7 @@ public sealed class LocalStore
     public string LoadLastText()
     {
         try { return File.ReadAllText(Path.Combine(DirectoryPath, "last-dictation.txt")); }
-        catch (IOException) { return ""; }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { return ""; }
     }
     public void SaveLastText(string text) => AtomicWrite("last-dictation.txt", text);
     private void AtomicWrite(string name, string text)

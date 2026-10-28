@@ -24,14 +24,14 @@ internal static class NativeSmoke
             try
             {
                 using var keyboard = new KeyboardService(); int activations = 0;
-                keyboard.Activated += () => activations++; keyboard.Configure("DoubleAlt");
+                keyboard.Activated += () => Interlocked.Increment(ref activations); keyboard.Configure("DoubleAlt");
                 form.Activate(); textbox.Focus(); NativeMethods.SetForegroundWindow(form.Handle);
                 await Task.Delay(250);
                 if (NativeMethods.GetForegroundWindow() != form.Handle) throw new InvalidOperationException("Interactive foreground desktop is unavailable.");
                 NativeMethods.Input[] alt = [NativeMethods.Key(0xA4, false), NativeMethods.Key(0xA4, true), NativeMethods.Key(0xA4, false), NativeMethods.Key(0xA4, true)];
                 if (NativeMethods.SendInput((uint)alt.Length, alt, Marshal.SizeOf<NativeMethods.Input>()) != alt.Length) throw new InvalidOperationException("Injected input was blocked.");
                 await Task.Delay(150);
-                if (activations != 0) throw new InvalidOperationException("Injected Alt events must not trigger recording.");
+                if (Volatile.Read(ref activations) != 0) throw new InvalidOperationException("Injected Alt events must not trigger recording.");
                 await PasteService.DismissAltMenuAsync(form.Handle);
                 textbox.Focus();
                 var original = await PasteService.CaptureTargetAsync() ?? throw new InvalidOperationException("UI Automation could not identify the original input.");
