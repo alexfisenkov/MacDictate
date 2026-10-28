@@ -15,3 +15,23 @@
 
 ## Исполнители
 01 owns windows/src, windows/tests, windows/scripts/check-local.sh, implementation seams; may update interfaces only to record actual contracts. 02 owns web-landing, WindowsREADME/installer/build/acceptance scripts, workflow, release/governance docs and registry, windows csproj version bump after01; no competing writers.
+
+## Что построила задача01
+- AppSettings optional fields: uint MicrophoneDeviceId=uint.MaxValue, string UiLanguage=""; старые JSON читаются.
+- Native: MicrophoneDevice(uint Id,string Name); MicrophoneTestResult(MicrophoneReadiness State,string Code); WaveRecorder(path,uint deviceId=uint.MaxValue,IProgress<double>? level=null):IAudioCapture. KeyboardService.Observed(HotkeyObservation LeftAlt/Pressed/Injected/Activated), dedicated message-loop thread.
+- MainForm acceptance control names: StartStopRecording, CancelOperation, CopyLastDictation, LastDictationText, NextSetupAction.
+- CLI --onboarding-smoke --report PATH [--model PATH --fixture-wave PATH]. При двух опциональных флагах один realWhisper проходит через запись/stop/result приложения; ожидаемая fixture фраза quick brown fox. Остальные быстрые error/cancel сценарии synthetic, явно обозначены.
+- Report: success,scenario,checks,screenshots (PNG basename рядом),sources,realWhisper,syntheticMicrophone,syntheticHotkeyActivation,realFixturePhraseMatched; physicalWin10/11NOT_TESTED. Existing --smoke-test and --transcribe preserved.
+- check-local.sh:46portable tests + Windows cross-build0warnings/errors, root independently confirmed. Native/DPI/physical still pending. SettingsForm removed/replaced main UI.
+
+## Ремонт01
+MicrophoneSelection.Reconcile(uint storedId,IReadOnlyCollection<uint> availableIds,MicrophoneReadiness readiness) returnsDeviceId/Readiness; unknown/disconnected selection no longerinherits signal. ModelDownloadRecovery.Classify(Exception) returnsIntegrity orTransferOrStorage; actualintegrityfailure hasseparateRU/ENrecovery. Rootcheck54PASS0warnings afterrepair.
+
+## Что построила задача02
+Windows-only channel/candidate1.6.1, csproj-derivedcanonicalnames, source/hashchecker windows/scripts/check-delivery.py. StableWindowsURLостаётсяpublished1.6.0дофинализации. Native scripts test-onboarding.ps1/test-first-launch.ps1 calloneactualWhisperUIscenario, separatecheaplayout125/150. --layout-scale1.25|1.5reportssyntheticLayoutStress/requestedLayoutScale/actualDesktopDpi; resultVisibleBeforeTestScroll musttrueinfinalacceptance, extraTestScrollnotproductionproof. Rootindependentlyconfirmed54PASS/build0warnings,PSsyntax/packaging/delivery/governancePASS. Native/browserchecksnotyetexecuted.
+
+## F1 actual contracts
+OperationBoundary.CompleteAfterAsync<TInput,TResult>(prepare,complete,CancellationToken,bool waitForCleanup=false); TextInsertion.TryAsync<TIdentity>(text,identity,observe,canSend,sendChunk,CancellationToken). Bothwiredtoproductionstartup/ASR/insertion. MainForm.RefreshMicrophones(bool=false):bool; MicrophoneRefreshed Action<MicrophoneSelection>, ShowOutcome. TrayApplication optionalDictationInteraction; PasteService.TryPasteAsync optionalCancellationToken. ActualHTMLpinnedEXEfallback2checksPASS. Root59portablePASS/crossbuild0warnings, delivery/arch/governancePASS. Nativeviewport/controller-cancel assertions present, executionpendingWindows.
+
+## F1 bounded follow-up
+LocalErrorState.ShowError/Render/Text/Visible and MainForm.ShowLocalError route clipboard/settings errors through visible retainedlocalstate. NativeSmoke assertsimmediate+repeatRender. Root60portablePASS/build0warnings; no thirdfullreviewclaimed (costdeviation announced).

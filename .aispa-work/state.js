@@ -13,9 +13,9 @@ window.STATE =
   "memoryOwner": "user",
   "skillDir": "/Users/AlexFisenkov/.agents/skills/aispa",
   "skillVersion": "1.0.2",
-  "baseCommit": null,
+  "baseCommit": "9531dcc",
   "startedAt": "2026-10-29T00:59:49+08:00",
-  "updatedAt": "2026-10-29T01:12:20+08:00",
+  "updatedAt": "2026-10-29T02:18:18+08:00",
   "finishedAt": null,
   "stages": [
     {
@@ -45,26 +45,32 @@ window.STATE =
     },
     {
       "id": "plan",
-      "status": "active",
-      "startedAt": "2026-10-29T01:10:59+08:00"
+      "status": "done",
+      "startedAt": "2026-10-29T01:10:59+08:00",
+      "finishedAt": "2026-10-29T01:12:20+08:00"
     },
     {
       "id": "build",
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-10-29T01:12:20+08:00",
+      "finishedAt": "2026-10-29T01:48:25+08:00"
     },
     {
       "id": "review",
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-10-29T01:48:25+08:00",
+      "finishedAt": "2026-10-29T02:18:18+08:00"
     },
     {
       "id": "final",
-      "status": "pending"
+      "status": "active",
+      "startedAt": "2026-10-29T02:18:18+08:00"
     }
   ],
   "requirements": {
     "total": 10,
-    "done": 0,
-    "inTicket": 10,
+    "done": 10,
+    "inTicket": 0,
     "inSpec": 0,
     "placeholder": 0,
     "deferred": 0,
@@ -95,9 +101,19 @@ window.STATE =
       ],
       "review": "да — фундамент",
       "model": "сильная",
-      "status": "pending",
+      "status": "done",
+      "startedAt": "2026-10-29T01:12:20+08:00",
+      "finishedAt": "2026-10-29T01:41:46+08:00",
       "retries": 0,
-      "repairs": 0
+      "repairs": 1,
+      "repairFindings": [
+        "Исчезнувший micID остаётся активным; ошибка целостности модели скрыта общим текстом"
+      ],
+      "tests": {
+        "passed": 54,
+        "failed": 0
+      },
+      "commit": "f1582a5"
     },
     {
       "id": "02",
@@ -114,6 +130,7 @@ window.STATE =
       ],
       "wave": 2,
       "zone": [
+        "windows/src/MacDictate.Windows/OnboardingSmoke.cs",
         "web-landing",
         "windows/README.md",
         "windows/scripts (кроме check-local.sh)",
@@ -124,12 +141,66 @@ window.STATE =
       ],
       "review": "нет",
       "model": "сильная",
-      "status": "pending",
+      "status": "done",
+      "startedAt": "2026-10-29T01:28:21+08:00",
+      "finishedAt": "2026-10-29T01:59:30+08:00",
       "retries": 0,
-      "repairs": 0
+      "repairs": 1,
+      "tests": {
+        "passed": 54,
+        "failed": 0
+      },
+      "commit": "7a4907d",
+      "repairFindings": [
+        "Existing docs-layout check red: five stale line counts in docs/00-индекс.md"
+      ]
+    },
+    {
+      "id": "F1",
+      "title": "Заключительный ремонт первого запуска",
+      "requirements": [
+        "R02",
+        "R03",
+        "R05",
+        "R06",
+        "R07",
+        "R08i",
+        "R09i",
+        "R10i"
+      ],
+      "blockedBy": [],
+      "wave": 3,
+      "zone": [
+        "windows/src/MacDictate.Core",
+        "windows/src/MacDictate.Windows/MainForm.cs",
+        "windows/src/MacDictate.Windows/TrayApplication.cs",
+        "windows/src/MacDictate.Windows/Native/MicrophoneService.cs",
+        "windows/src/MacDictate.Windows/Native/PasteService.cs",
+        "windows/src/MacDictate.Windows/OnboardingSmoke.cs",
+        "windows/tests",
+        "web-landing/index.html"
+      ],
+      "review": "да — ремонт ветки",
+      "model": "сильная",
+      "status": "done",
+      "retries": 0,
+      "repairs": 1,
+      "startedAt": "2026-10-29T01:56:48+08:00",
+      "finishedAt": "2026-10-29T02:18:18+08:00",
+      "tests": {
+        "passed": 60,
+        "failed": 0
+      },
+      "commit": "b87038f",
+      "repairFindings": [
+        "Render скрывает local ms-settings/clipboard ошибку; связать её с видимым состоянием"
+      ]
     }
   ],
-  "tests": null,
+  "tests": {
+    "passed": 60,
+    "failed": 0
+  },
   "debt": {
     "placeholders": [],
     "assumptions": [
@@ -146,7 +217,12 @@ window.STATE =
     "deferred": 0,
     "items": []
   },
-  "concerns": [],
+  "concerns": [
+    "OnboardingSmoke.cs:51 — Visible property не доказывает видимость поверх других окон; T02/native read-back должен проверить настоящее окно",
+    "T01 repair re-review: NoDevice state lost after empty device refresh/WM_DEVICECHANGE; Record stays enabled Untested untilclick. Capture guarded but UI readiness false; fix-now candidate for wholebranch F1. Integrity error condition closed.",
+    "T02 self-review: result TextBox can remain below initial viewport in long Home flow; test must not hide this with forcedscroll. R07/R10i production first result should be visibly reachable automatically without stealing external paste focus.",
+    "T02 UI inspection: operation Message/mic status may be below initial viewport in long setup. Wholebranch must evaluate production visibility, not merely source text or forced test scrolling."
+  ],
   "blind": null,
   "beats": [
     "2026-10-29T00:59:49+08:00",
@@ -155,9 +231,29 @@ window.STATE =
     "2026-10-29T01:01:20+08:00",
     "2026-10-29T01:10:59+08:00",
     "2026-10-29T01:12:04+08:00",
-    "2026-10-29T01:12:20+08:00"
+    "2026-10-29T01:12:20+08:00",
+    "2026-10-29T01:17:33+08:00",
+    "2026-10-29T01:24:05+08:00",
+    "2026-10-29T01:28:20+08:00",
+    "2026-10-29T01:28:21+08:00",
+    "2026-10-29T01:34:20+08:00",
+    "2026-10-29T01:34:21+08:00",
+    "2026-10-29T01:39:46+08:00",
+    "2026-10-29T01:41:46+08:00",
+    "2026-10-29T01:43:14+08:00",
+    "2026-10-29T01:46:10+08:00",
+    "2026-10-29T01:48:24+08:00",
+    "2026-10-29T01:48:25+08:00",
+    "2026-10-29T01:56:47+08:00",
+    "2026-10-29T01:56:48+08:00",
+    "2026-10-29T01:58:21+08:00",
+    "2026-10-29T01:58:42+08:00",
+    "2026-10-29T01:59:30+08:00",
+    "2026-10-29T02:10:32+08:00",
+    "2026-10-29T02:14:44+08:00",
+    "2026-10-29T02:18:18+08:00"
   ],
-  "rev": 15,
+  "rev": 49,
   "waiting": null,
   "waits": [],
   "log": [
@@ -247,58 +343,319 @@ window.STATE =
       "g": "G3",
       "ok": true,
       "problems": 0
+    },
+    {
+      "t": "2026-10-29T01:12:20+08:00",
+      "k": "stage",
+      "id": "build",
+      "act": "start"
+    },
+    {
+      "t": "2026-10-29T01:12:20+08:00",
+      "k": "ticket",
+      "ids": [
+        "01"
+      ],
+      "act": "start"
+    },
+    {
+      "t": "2026-10-29T01:17:33+08:00",
+      "k": "add",
+      "key": "report",
+      "n": 3
+    },
+    {
+      "t": "2026-10-29T01:24:05+08:00",
+      "k": "add",
+      "key": "report",
+      "n": 1
+    },
+    {
+      "t": "2026-10-29T01:28:20+08:00",
+      "k": "ticket",
+      "ids": [
+        "01"
+      ],
+      "act": "done",
+      "tests": {
+        "passed": 46,
+        "failed": 0
+      }
+    },
+    {
+      "t": "2026-10-29T01:28:21+08:00",
+      "k": "ticket",
+      "ids": [
+        "01"
+      ],
+      "act": "review"
+    },
+    {
+      "t": "2026-10-29T01:28:21+08:00",
+      "k": "ticket",
+      "ids": [
+        "02"
+      ],
+      "act": "start"
+    },
+    {
+      "t": "2026-10-29T01:34:20+08:00",
+      "k": "ticket",
+      "ids": [
+        "01"
+      ],
+      "act": "repair",
+      "note": "Исчезнувший micID остаётся активным; ошибка целостности модели скрыта общим текстом"
+    },
+    {
+      "t": "2026-10-29T01:34:20+08:00",
+      "k": "add",
+      "key": "concerns",
+      "n": 1
+    },
+    {
+      "t": "2026-10-29T01:34:20+08:00",
+      "k": "tickets",
+      "n": 2
+    },
+    {
+      "t": "2026-10-29T01:34:21+08:00",
+      "k": "gate",
+      "g": "G3",
+      "ok": true,
+      "problems": 0
+    },
+    {
+      "t": "2026-10-29T01:39:46+08:00",
+      "k": "ticket",
+      "ids": [
+        "01"
+      ],
+      "act": "done",
+      "tests": {
+        "passed": 54,
+        "failed": 0
+      }
+    },
+    {
+      "t": "2026-10-29T01:39:46+08:00",
+      "k": "ticket",
+      "ids": [
+        "01"
+      ],
+      "act": "review"
+    },
+    {
+      "t": "2026-10-29T01:41:46+08:00",
+      "k": "add",
+      "key": "concerns",
+      "n": 1
+    },
+    {
+      "t": "2026-10-29T01:41:46+08:00",
+      "k": "ticket",
+      "ids": [
+        "01"
+      ],
+      "act": "done",
+      "tests": {
+        "passed": 54,
+        "failed": 0
+      }
+    },
+    {
+      "t": "2026-10-29T01:43:14+08:00",
+      "k": "add",
+      "key": "concerns",
+      "n": 1
+    },
+    {
+      "t": "2026-10-29T01:46:10+08:00",
+      "k": "add",
+      "key": "concerns",
+      "n": 1
+    },
+    {
+      "t": "2026-10-29T01:48:24+08:00",
+      "k": "ticket",
+      "ids": [
+        "02"
+      ],
+      "act": "done",
+      "tests": {
+        "passed": 54,
+        "failed": 0
+      }
+    },
+    {
+      "t": "2026-10-29T01:48:25+08:00",
+      "k": "stage",
+      "id": "review",
+      "act": "start"
+    },
+    {
+      "t": "2026-10-29T01:56:47+08:00",
+      "k": "add",
+      "key": "report",
+      "n": 1
+    },
+    {
+      "t": "2026-10-29T01:56:48+08:00",
+      "k": "tickets",
+      "n": 3
+    },
+    {
+      "t": "2026-10-29T01:56:48+08:00",
+      "k": "gate",
+      "g": "G3",
+      "ok": true,
+      "problems": 0
+    },
+    {
+      "t": "2026-10-29T01:56:48+08:00",
+      "k": "ticket",
+      "ids": [
+        "F1"
+      ],
+      "act": "start"
+    },
+    {
+      "t": "2026-10-29T01:58:21+08:00",
+      "k": "add",
+      "key": "report",
+      "n": 1
+    },
+    {
+      "t": "2026-10-29T01:58:42+08:00",
+      "k": "ticket",
+      "ids": [
+        "02"
+      ],
+      "act": "repair",
+      "note": "Existing docs-layout check red: five stale line counts in docs/00-индекс.md"
+    },
+    {
+      "t": "2026-10-29T01:59:30+08:00",
+      "k": "ticket",
+      "ids": [
+        "02"
+      ],
+      "act": "done",
+      "tests": {
+        "passed": 54,
+        "failed": 0
+      }
+    },
+    {
+      "t": "2026-10-29T02:10:32+08:00",
+      "k": "ticket",
+      "ids": [
+        "F1"
+      ],
+      "act": "done",
+      "tests": {
+        "passed": 59,
+        "failed": 0
+      }
+    },
+    {
+      "t": "2026-10-29T02:10:32+08:00",
+      "k": "ticket",
+      "ids": [
+        "F1"
+      ],
+      "act": "review"
+    },
+    {
+      "t": "2026-10-29T02:14:44+08:00",
+      "k": "add",
+      "key": "report",
+      "n": 1
+    },
+    {
+      "t": "2026-10-29T02:14:44+08:00",
+      "k": "ticket",
+      "ids": [
+        "F1"
+      ],
+      "act": "repair",
+      "note": "Render скрывает local ms-settings/clipboard ошибку; связать её с видимым состоянием"
+    },
+    {
+      "t": "2026-10-29T02:18:18+08:00",
+      "k": "ticket",
+      "ids": [
+        "F1"
+      ],
+      "act": "done",
+      "tests": {
+        "passed": 60,
+        "failed": 0
+      }
+    },
+    {
+      "t": "2026-10-29T02:18:18+08:00",
+      "k": "stage",
+      "id": "final",
+      "act": "start"
+    },
+    {
+      "t": "2026-10-29T02:18:18+08:00",
+      "k": "tests",
+      "passed": 60,
+      "failed": 0
     }
   ],
   "reqList": [
     {
       "id": "R01",
       "text": "«Проверяй - куча вопросов про винду!»",
-      "status": "in-ticket"
+      "status": "done"
     },
     {
       "id": "R02",
       "text": "«Кнопки по скачиванию не очевидны»",
-      "status": "in-ticket"
+      "status": "done"
     },
     {
       "id": "R03",
       "text": "«после установки ни каких разрешений не выскакивает»",
-      "status": "in-ticket"
+      "status": "done"
     },
     {
       "id": "R04",
       "text": "«ничего в итоге не работает при нажатии на альт»",
-      "status": "in-ticket"
+      "status": "done"
     },
     {
       "id": "R05",
       "text": "«никаких инструкций что куда нажать?»",
-      "status": "in-ticket"
+      "status": "done"
     },
     {
       "id": "R06",
       "text": "«Никаких автоматических действий»",
-      "status": "in-ticket"
+      "status": "done"
     },
     {
       "id": "R07",
       "text": "«ни какой работы в итоге! Доводи до конца!»",
-      "status": "in-ticket"
+      "status": "done"
     },
     {
       "id": "R08i",
       "text": "(подразумевается) модель, микрофон и приложение должны быть готовы до диктовки",
-      "status": "in-ticket"
+      "status": "done"
     },
     {
       "id": "R09i",
       "text": "(подразумевается) при ошибке понятно, что делать дальше",
-      "status": "in-ticket"
+      "status": "done"
     },
     {
       "id": "R10i",
       "text": "(подразумевается) видно, что приложение запущено и запись началась",
-      "status": "in-ticket"
+      "status": "done"
     }
   ],
   "gates": {
@@ -317,9 +674,18 @@ window.STATE =
     },
     "G3": {
       "ok": true,
-      "at": "2026-10-29T01:12:20+08:00",
+      "at": "2026-10-29T01:56:48+08:00",
       "problems": 0
     }
   },
-  "result": null
+  "result": null,
+  "report": [
+    "Подтверждены два UX-барьера: модальные настройки блокируют Alt, скачанная модель не активируется до Save; причина конкретного ПК пока неизвестна",
+    "Windows WinMM не гарантирует отдельный OS consent prompt; проверяем реальную запись и общий desktop microphone toggle",
+    "Без физического Windows устройства не выдаём синтетический PCM/hotkey seam за подтверждение на компьютере друга",
+    "Локальная реализация приложения прошла cross-build без warnings и46portable checks по отчёту исполнителя; native UI/ASR приёмка ещё впереди",
+    "Уже существующий по адресу загрузки файл с другимSHA сохраняется; повтор без смены/переноса файла не ремонтирует его. Ручное восстановление остаётся отдельным ограничением",
+    "Browser runtime QA: RU/EN390px и1440px безoverflow; EXEявныйprimary,ZIPотдельнораскрывается; текущиепубличныеURLещёv1.6.0доverifiedpublication1.6.1",
+    "Ограниченное отступление от лимита F1: scoped review оставил невидимые local errors ms-settings/clipboard. По явному уведомлению пользователя закрываем тем же writer коротким ремонтом и локальной проверкой, без третьего полного ревью"
+  ]
 }

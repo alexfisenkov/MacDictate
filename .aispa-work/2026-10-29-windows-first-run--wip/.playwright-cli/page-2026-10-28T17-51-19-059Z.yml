@@ -1,0 +1,78 @@
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: MacDictate
+      - generic [ref=e7]:
+        - link "Установка" [ref=e9] [cursor=pointer]:
+          - /url: "#download"
+        - button "EN" [ref=e10] [cursor=pointer]
+  - generic [ref=e13]:
+    - heading "Бесплатная диктовка для macOS и Windows" [level=1] [ref=e14]
+    - paragraph [ref=e15]: Распознавайте речь на своём компьютере и вставляйте текст в активное окно. После загрузки модели диктовка работает без интернета.
+    - generic [ref=e16]:
+      - link "Скачать установщик EXE · Windows 10/11 x64" [ref=e17] [cursor=pointer]:
+        - /url: https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.0/MacDictate_Windows_v1.6.0_x64.exe
+      - link "Скачать для macOS ( Silicon)" [ref=e18] [cursor=pointer]:
+        - /url: https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg
+        - generic [ref=e19]: Скачать для macOS
+        - generic [ref=e20]: ( Silicon)
+      - link "Как установить" [ref=e21] [cursor=pointer]:
+        - /url: "#download"
+    - paragraph [ref=e23]: Бесплатно без ограничения срока. Без регистрации и активации.
+  - generic [ref=e25]:
+    - heading "Идеально для работы" [level=2] [ref=e26]
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - generic [ref=e29]: ⚡️
+        - heading "Локальное распознавание" [level=3] [ref=e30]
+        - paragraph [ref=e31]: Whisper обрабатывает речь на вашем компьютере. Для диктовки не нужен удалённый сервис распознавания.
+      - generic [ref=e32]:
+        - generic [ref=e33]: 🔒
+        - heading "Приватность диктовки" [level=3] [ref=e34]
+        - paragraph [ref=e35]: Распознавание и улучшение текста выполняются локально. Аудио и текст диктовки не отправляются на сервер.
+      - generic [ref=e36]:
+        - generic [ref=e37]: ⌨️
+        - heading "Текст в активном окне" [level=3] [ref=e38]
+        - paragraph [ref=e39]: Пишите в редакторе, мессенджере или таблице. MacDictate вставляет распознанный текст туда, где установлен курсор.
+  - generic [ref=e41]:
+    - heading "Скачайте и начните диктовать" [level=2] [ref=e42]
+    - article [ref=e43]:
+      - heading "Windows 10 / 11 x64" [level=3] [ref=e44]
+      - paragraph [ref=e45]: Рекомендуем установщик EXE. Он добавит MacDictate в меню «Пуск» и откроет окно первой настройки.
+      - link "Скачать установщик EXE · Windows 10/11 x64" [ref=e46] [cursor=pointer]:
+        - /url: https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.0/MacDictate_Windows_v1.6.0_x64.exe
+      - generic [ref=e47]:
+        - paragraph [ref=e48]: "1. Скачайте EXE, запустите его и завершите установку. Оставьте включённым «Запустить MacDictate»: откроется основное окно. Позже откройте программу из меню «Пуск»."
+        - paragraph [ref=e49]: "2. Нажмите «Начать настройку: скачать модель» (~488 МБ). Дождитесь проверки и автоматического сохранения. Затем распознавание работает без сети."
+        - paragraph [ref=e50]: 3. Выберите микрофон и нажмите «Проверить микрофон». Говорите 3 секунды и следите за уровнем. Если сигнала нет, откройте «Доступ к микрофону в Windows», разрешите доступ классическим приложениям и повторите тест. Отдельного запроса Windows обычно нет.
+        - paragraph [ref=e51]: 4. Нажмите «Начать запись», произнесите фразу и нажмите «Остановить и распознать». Дождитесь текста в окне и нажмите «Копировать текст». Кнопка работает независимо от Alt.
+        - paragraph [ref=e52]: 5. Для диктовки в другое приложение проверьте клавишу, затем поставьте курсор в текстовое поле. Два быстрых нажатия левого Alt начинают запись; ещё два останавливают. Правый Alt/AltGr не подходит. Максимум — 2 минуты; если автопечать не сработала, скопируйте текст в окне MacDictate.
+      - paragraph [ref=e53]: Закрытие окна оставляет MacDictate в трее. Двойной щелчок по его значку или повторный запуск из «Пуска» снова покажет окно.
+      - group [ref=e54]:
+        - generic "Portable ZIP · без установки" [active] [ref=e55] [cursor=pointer]
+        - paragraph [ref=e72]: "ZIP — дополнительный вариант для запуска без установки: распакуйте всю папку и откройте MacDictate.exe. Не запускайте EXE прямо из архива и сохраняйте папку runtime рядом с ним."
+        - link "Portable ZIP · без установки" [ref=e73] [cursor=pointer]:
+          - /url: https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.0/MacDictate_Windows_v1.6.0_x64.zip
+      - paragraph [ref=e56]: "Windows-пакет без цифровой подписи: Windows может предупредить или заблокировать запуск. Проверьте источник — официальный GitHub Release; при необходимости сверьте SHA-256 из WINDOWS-SHA256SUMS. Если доступно, выберите «Подробнее» → «Выполнить в любом случае» только после проверки. Если политика компьютера запрещает запуск, обратитесь к администратору. Не отключайте защиту Windows. Проверки на Windows Server 2025 и синтетическое аудио не подтверждают работу физического микрофона и Alt на Windows 10/11. Windows 10 Home/Pro вне официального срока поддержки .NET 10. Дополнительной модели улучшения текста в Windows пока нет."
+      - paragraph [ref=e57]: При ошибке нажмите в окне «Копировать диагностику без личных данных» и отправьте этот текст в поддержку. Аудио, диктовку, пароли и снимки чужой переписки отправлять не нужно.
+    - separator [ref=e58]
+    - heading "macOS · Apple Silicon" [level=3] [ref=e59]
+    - paragraph [ref=e60]: Установите MacDictate на Mac с Apple Silicon. При первом запуске загрузите модель Whisper и разрешите доступ к микрофону и «Универсальному доступу». Дважды нажмите Option для начала записи и один раз — для завершения.
+    - link "Скачать для macOS" [ref=e61] [cursor=pointer]:
+      - /url: https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg
+    - paragraph [ref=e62]:
+      - text: Нужна помощь?
+      - link "a.fisenkov@gmail.com" [ref=e63] [cursor=pointer]:
+        - /url: mailto:a.fisenkov@gmail.com
+  - contentinfo [ref=e64]:
+    - generic [ref=e65]:
+      - generic [ref=e66]: "© 2026 ИП Фисенков Александр Андреевич. ИНН: 772607547835"
+      - generic [ref=e67]:
+        - link "Политика конфиденциальности" [ref=e68] [cursor=pointer]:
+          - /url: ./legal.html?lang=ru#privacy
+        - link "Условия использования" [ref=e69] [cursor=pointer]:
+          - /url: ./legal.html?lang=ru#eula
+        - link "Обработка данных" [ref=e70] [cursor=pointer]:
+          - /url: ./legal.html?lang=ru#consent
+        - link "Контакты" [ref=e71] [cursor=pointer]:
+          - /url: mailto:a.fisenkov@gmail.com

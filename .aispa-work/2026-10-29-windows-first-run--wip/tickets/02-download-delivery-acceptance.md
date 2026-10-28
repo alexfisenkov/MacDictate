@@ -2,7 +2,7 @@
 
 **Требования:** R01, R02, R05, R07, R09i
 **Зависит от:** 01
-**Зона:** `web-landing` · `windows/README.md` · `windows/scripts (кроме check-local.sh)` · `.github/workflows` · `releases` · `docs` · `windows/src/MacDictate.Windows/MacDictate.Windows.csproj`
+**Зона:** `windows/src/MacDictate.Windows/OnboardingSmoke.cs` · `web-landing` · `windows/README.md` · `windows/scripts (кроме check-local.sh)` · `.github/workflows` · `releases` · `docs` · `windows/src/MacDictate.Windows/MacDictate.Windows.csproj`
 **Волна:** 2
 **Ревью:** нет
 **Модель:** сильная
@@ -24,3 +24,5 @@ Windows EXE становится очевидным рекомендуемым �
 - [ ] Один общий ручной final workflow имеет свежий профиль UI onboarding acceptance, actual ASR и installed-copy checks; тесты не подменяют hardware proof и не публикуют пользовательское аудио. Добавлены проверки required payload/sourceSHA/hash, диагностический safe report.
 - [ ] Версия Windows1.6.1 централизована для build/installer/CI asset naming без изменения macOS1.6.0/build14; ledger и отдельный Windows manifest/пин на Windows-only tag согласованы. Старые артефакты не перезаписаны. Mac latest не смещается (make_latest=false).
 - [ ] Docs/checklist/debt содержат реальные команды и честные результаты; публикация/gh-pages не выполняется исполнителем, готовится конкретный проверяемый комплект для основного агента.
+
+D01 refinement: expose --layout-scale1.25/1.5 in explicit isolated OnboardingSmoke only. Call Home.Scale in that test path, check footer/NextSetupAction bounds and capture PNG. Report syntheticLayoutStress + requested scale + actual desktopDPI separately. No MainForm/Program edits; T01 repair owns MainForm. Physical native DPI is not inferred.

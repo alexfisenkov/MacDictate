@@ -1,0 +1,78 @@
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: MacDictate
+      - generic [ref=e7]:
+        - link "Setup" [ref=e74] [cursor=pointer]:
+          - /url: "#download"
+        - button "RU" [active] [ref=e75] [cursor=pointer]
+  - generic [ref=e13]:
+    - heading "Free dictation for macOS and Windows" [level=1] [ref=e76]
+    - paragraph [ref=e15]: Recognize speech on your computer and insert text into the active window. Once the model is downloaded, dictation works offline.
+    - generic [ref=e16]:
+      - link "Download EXE installer · Windows 10/11 x64" [ref=e77] [cursor=pointer]:
+        - /url: https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.0/MacDictate_Windows_v1.6.0_x64.exe
+      - link "Download for macOS ( Silicon)" [ref=e78] [cursor=pointer]:
+        - /url: https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg
+        - generic [ref=e19]: Download for macOS
+        - generic [ref=e20]: ( Silicon)
+      - link "How to install" [ref=e79] [cursor=pointer]:
+        - /url: "#download"
+    - paragraph [ref=e23]: Free with no time limit. No registration or activation.
+  - generic [ref=e25]:
+    - heading "Built for everyday work" [level=2] [ref=e80]
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - generic [ref=e29]: ⚡️
+        - heading "Local recognition" [level=3] [ref=e81]
+        - paragraph [ref=e31]: Whisper processes speech on your computer. Dictation does not need a remote speech recognition service.
+      - generic [ref=e32]:
+        - generic [ref=e33]: 🔒
+        - heading "Private dictation" [level=3] [ref=e82]
+        - paragraph [ref=e35]: Speech recognition and text improvement run locally. Dictation audio and text are not sent to a server.
+      - generic [ref=e36]:
+        - generic [ref=e37]: ⌨️
+        - heading "Text in the active window" [level=3] [ref=e83]
+        - paragraph [ref=e39]: Write in an editor, messenger, or spreadsheet. MacDictate inserts recognized text where your cursor is.
+  - generic [ref=e41]:
+    - heading "Download and start dictating" [level=2] [ref=e84]
+    - article [ref=e43]:
+      - heading "Windows 10 / 11 x64" [level=3] [ref=e44]
+      - paragraph [ref=e45]: "Recommended: the EXE installer. It adds MacDictate to Start and opens the first setup window."
+      - link "Download EXE installer · Windows 10/11 x64" [ref=e85] [cursor=pointer]:
+        - /url: https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.0/MacDictate_Windows_v1.6.0_x64.exe
+      - generic [ref=e47]:
+        - paragraph [ref=e48]: 1. Download the EXE, run it, and finish installation. Keep “Launch MacDictate” selected to open the main window. Later, open it from Start.
+        - paragraph [ref=e49]: "2. Select “Start setup: download model” (~488 MB). Wait for verification and automatic saving. Recognition then works offline."
+        - paragraph [ref=e50]: 3. Choose your microphone and select “Test microphone”. Speak for 3 seconds and watch the level. If there is no signal, open “Windows microphone privacy”, allow desktop apps, and retry. Windows usually shows no separate permission prompt.
+        - paragraph [ref=e51]: 4. Select “Start recording”, say a phrase, then select “Stop and recognize”. Wait for text in the window and select “Copy text”. This button works independently of Alt.
+        - paragraph [ref=e52]: "5. For dictation in another app, test the hotkey and place the cursor in an input field. Tap left Alt twice quickly to start; tap twice again to stop. Right Alt/AltGr does not work. Maximum: 2 minutes. If automatic typing fails, copy the result from MacDictate."
+      - paragraph [ref=e53]: Closing the window leaves MacDictate in the tray. Double-click its icon or launch it from Start again to reopen the window.
+      - group [ref=e54]:
+        - generic "Portable ZIP · no installer" [ref=e86] [cursor=pointer]
+        - paragraph [ref=e72]: "ZIP is an alternative for use without installation: extract the whole folder and open MacDictate.exe. Do not run the EXE inside the archive; keep the runtime folder beside it."
+        - link "Portable ZIP · no installer" [ref=e87] [cursor=pointer]:
+          - /url: https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.0/MacDictate_Windows_v1.6.0_x64.zip
+      - paragraph [ref=e56]: "The Windows package has no digital signature: Windows may warn or block it. Verify the official GitHub Release source and, if needed, the SHA-256 in WINDOWS-SHA256SUMS. If available, use “More info” → “Run anyway” only after verification. If computer policy blocks it, contact your administrator. Do not disable Windows protection. Windows Server 2025 checks and synthetic audio do not confirm physical microphone or Alt behavior on Windows 10/11. Windows 10 Home/Pro is outside the official .NET 10 OS support lifecycle. The optional text improvement model is not available on Windows yet."
+      - paragraph [ref=e57]: For an error, select “Copy private-safe diagnostics” in the app and send that text to support. You do not need to send audio, dictation, passwords, or screenshots of private conversations.
+    - separator [ref=e58]
+    - heading "macOS · Apple Silicon" [level=3] [ref=e59]
+    - paragraph [ref=e60]: Install MacDictate on a Mac with Apple Silicon. On first launch, download the Whisper model and allow Microphone and Accessibility access. Press Option twice to start recording and once to finish.
+    - link "Download for macOS" [ref=e88] [cursor=pointer]:
+      - /url: https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg
+    - paragraph [ref=e62]:
+      - text: Need help?
+      - link "a.fisenkov@gmail.com" [ref=e63] [cursor=pointer]:
+        - /url: mailto:a.fisenkov@gmail.com
+  - contentinfo [ref=e64]:
+    - generic [ref=e65]:
+      - generic [ref=e66]: "© 2026 ИП Фисенков Александр Андреевич. ИНН: 772607547835"
+      - generic [ref=e67]:
+        - link "Privacy Policy" [ref=e89] [cursor=pointer]:
+          - /url: ./legal.html?lang=en#privacy
+        - link "Terms of Use" [ref=e90] [cursor=pointer]:
+          - /url: ./legal.html?lang=en#eula
+        - link "Data Processing" [ref=e91] [cursor=pointer]:
+          - /url: ./legal.html?lang=en#consent
+        - link "Contact" [ref=e92] [cursor=pointer]:
+          - /url: mailto:a.fisenkov@gmail.com
