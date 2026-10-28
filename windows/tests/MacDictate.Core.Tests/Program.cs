@@ -57,6 +57,48 @@ try
     var noDevices = MicrophoneSelection.Reconcile(7, Array.Empty<uint>(), MicrophoneReadiness.Signal);
     Check(noDevices.DeviceId == uint.MaxValue && noDevices.Readiness == MicrophoneReadiness.NoDevice, "No devices clears stale ID and never keeps green readiness");
     Check(MicrophoneSelection.Reconcile(noDevices.DeviceId, new uint[] { 0 }, noDevices.Readiness).Readiness == MicrophoneReadiness.Untested, "Reconnected input becomes testable without inheriting prior signal");
+    Check(MicrophoneSelection.Invalidate(noDevices.Readiness) == MicrophoneReadiness.NoDevice &&
+        MicrophoneSelection.Invalidate(MicrophoneReadiness.Error) == MicrophoneReadiness.Error,
+        "Refreshing input configuration must preserve actual NoDevice and enumeration Error statuses");
+    Check(MicrophoneEnumeration.Read<string>(0, _ => throw new Exception("No capabilities call expected")).Count == 0, "Zero physical inputs remains distinct from capability failure");
+    await Throws<IOException>(() => Task.FromResult(MicrophoneEnumeration.Read(1, _ => (5u, "unavailable input"))));
+    // Deterministic async startup seam: cancellation arrives during target/UIA
+    // discovery, before the actual microphone capture is allowed to start.
+    using (var cancelStart = new CancellationTokenSource())
+    {
+        var pendingTarget = new TaskCompletionSource<string?>(); int starts = 0;
+        Task<int> starting = OperationBoundary.CompleteAfterAsync(() => pendingTarget.Task, _ => ++starts, cancelStart.Token);
+        cancelStart.Cancel(); pendingTarget.SetResult("synthetic external target");
+        bool cancelledStart = false;
+        try { await starting; } catch (OperationCanceledException) { cancelledStart = true; }
+        using var cancelPublish = new CancellationTokenSource(); int publications = 0; bool cancelledPublication = false;
+        try
+        {
+            await OperationBoundary.CompleteAfterAsync(() => { cancelPublish.Cancel(); return Task.FromResult("late ASR answer"); },
+                _ => ++publications, cancelPublish.Token, waitForCleanup: true);
+        }
+        catch (OperationCanceledException) { cancelledPublication = true; }
+        Check(cancelledStart && starts == 0 && cancelledPublication && publications == 0,
+            "Cancel during async target discovery or immediately after ASR must prevent capture/publication");
+    }
+    // Synthetic UIA observations/sends exercise the production insertion policy.
+    // No Win32 input, clipboard, or real target app is used by this portable test.
+    bool allInsertionCancellationsBlocked = true;
+    foreach (int cancelObservation in new[] { 1, 2, 3 })
+    {
+        using var cancelPaste = new CancellationTokenSource(); int observations = 0, chunksSent = 0; bool cancelledPaste = false;
+        var pendingObservation = new TaskCompletionSource<string?>();
+        Task<string?> Observe()
+        {
+            observations++;
+            return observations == cancelObservation ? pendingObservation.Task : Task.FromResult<string?>("target");
+        }
+        Task<bool> inserting = TextInsertion.TryAsync(new string('x', 300), "target", Observe, _ => true, _ => { chunksSent++; return true; }, cancelPaste.Token);
+        cancelPaste.Cancel(); pendingObservation.SetResult("target");
+        try { await inserting; } catch (OperationCanceledException) { cancelledPaste = true; }
+        allInsertionCancellationsBlocked &= cancelledPaste && chunksSent == Math.Max(0, cancelObservation - 2);
+    }
+    Check(allInsertionCancellationsBlocked, "Cancel during initial UIA, before first SendInput chunk, or before later chunks must stop insertion");
     var meter = new PcmSignalMeter(); meter.Append(new byte[16000]); Check(!meter.HasSignal && meter.Level == 0, "Silent PCM never verifies a microphone");
     byte[] speechPcm = new byte[16000]; for (int i = 0; i < speechPcm.Length; i += 2) { speechPcm[i] = 0; speechPcm[i + 1] = 16; }
     meter.Append(speechPcm); Check(meter.HasSignal && meter.Level > .1, "Sustained nonzero PCM establishes actual signal");

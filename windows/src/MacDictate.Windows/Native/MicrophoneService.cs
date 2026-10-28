@@ -19,17 +19,20 @@ internal static class MicrophoneService
     [DllImport("winmm.dll", CharSet = CharSet.Unicode)] private static extern uint waveInGetDevCaps(nuint device, out Capabilities capabilities, uint size);
     public static IReadOnlyList<MicrophoneDevice> Enumerate()
     {
-        var devices = new List<MicrophoneDevice>();
-        for (uint id = 0; id < waveInGetNumDevs(); id++)
-            if (waveInGetDevCaps(id, out var capabilities, (uint)Marshal.SizeOf<Capabilities>()) == 0) devices.Add(new(id, capabilities.Name));
-        return devices;
+        return MicrophoneEnumeration.Read(waveInGetNumDevs(), id =>
+        {
+            uint code = waveInGetDevCaps(id, out var capabilities, (uint)Marshal.SizeOf<Capabilities>());
+            return (code, new MicrophoneDevice(id, capabilities.Name));
+        });
     }
     public static async Task<MicrophoneTestResult> TestAsync(uint deviceId, IProgress<double>? level, CancellationToken cancellation)
     {
-        if (Enumerate().Count == 0) return new(MicrophoneReadiness.NoDevice, "NO_INPUT_DEVICE");
         string path = Path.Combine(Path.GetTempPath(), "macdictate-mic-test-" + Guid.NewGuid().ToString("N") + ".wav");
         try
         {
+            cancellation.ThrowIfCancellationRequested();
+            try { if (Enumerate().Count == 0) return new(MicrophoneReadiness.NoDevice, "NO_INPUT_DEVICE"); }
+            catch { return new(MicrophoneReadiness.Error, "INPUT_ENUMERATION_FAILED"); }
             return await Task.Run(async () =>
             {
                 using var recorder = new WaveRecorder(path, deviceId, level);

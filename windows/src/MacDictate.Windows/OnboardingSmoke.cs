@@ -25,14 +25,33 @@ internal static class OnboardingSmoke
             if ((modelPath == null) != (fixtureWave == null)) throw new ArgumentException("Both --model and --fixture-wave are required for real recognition acceptance.");
             if (modelPath != null && (!ModelFile.IsUsable(modelPath) || !File.Exists(fixtureWave) || !File.Exists(Program.RuntimePath))) throw new InvalidOperationException("Real recognition fixture, model, or bundled runtime is unavailable.");
             var fixtures = new SyntheticServices(directory, fixtureWave);
+            var interaction = new SyntheticInteraction();
             byte[]? originalFixtureHash = fixtureWave == null ? null : SHA256.HashData(File.ReadAllBytes(fixtureWave));
-            using var context = new TrayApplication(store, fixtures);
+            using var context = new TrayApplication(store, fixtures, interaction);
             context.Home.BeginInvoke(async () =>
             {
                 try
                 {
                     void Check(bool condition, string name) { if (!condition) throw new InvalidOperationException(name); checks.Add(name); }
                     T Control<T>(string name) where T : Control => context.Home.Controls.Find(name, true).OfType<T>().Single();
+                    bool InViewport(Control control)
+                    {
+                        if (!control.Visible || control.Parent == null) return false;
+                        Rectangle bounds = control.Parent.RectangleToScreen(control.Bounds);
+                        for (Control? parent = control.Parent; parent != null; parent = parent.Parent)
+                            if (!parent.Visible || !parent.RectangleToScreen(parent.ClientRectangle).Contains(bounds)) return false;
+                        return true;
+                    }
+                    void CheckCurrentStatus(string scenario)
+                    {
+                        foreach (string name in new[] { "OperationStatus", "MicrophoneStatus" })
+                            Check(InViewport(Control<Label>(name)), scenario + ": current " + name + " is in the visible window viewport");
+                        if (context.View.Message.Length > 0)
+                        {
+                            var label = Control<Label>("OperationMessage");
+                            Check(label.Text == context.View.Message && InViewport(label), scenario + ": actual current recovery/progress message reads back in the visible viewport");
+                        }
+                    }
                     async Task WaitForIdle()
                     {
                         var deadline = System.Diagnostics.Stopwatch.StartNew();
@@ -56,11 +75,11 @@ internal static class OnboardingSmoke
                     {
                         var action = Control<Button>("NextSetupAction");
                         var body = action.Parent as ScrollableControl ?? throw new InvalidOperationException("Setup action needs scrollable content.");
-                        body.ScrollControlIntoView(action); context.Home.PerformLayout();
+                        context.Home.PerformLayout();
                         foreach (var button in new[] { action, Control<Button>("StartStopRecording"), Control<Button>("CancelOperation") })
                         {
                             var parent = button.Parent!;
-                            Check(button.Visible && parent.ClientRectangle.Contains(button.Bounds), $"{language} layout: {button.Name} fits its visible parent");
+                            Check(button.Visible && parent.ClientRectangle.Contains(button.Bounds) && InViewport(button), $"{language} layout: {button.Name} fits its visible parent and window viewport");
                             Size preferred = button.GetPreferredSize(new Size(button.Width, 0));
                             Check(button.Width >= preferred.Width && button.Height >= preferred.Height, $"{language} layout: {button.Name} text fits at requested scale");
                         }
@@ -68,14 +87,14 @@ internal static class OnboardingSmoke
                         Check(context.Home.ClientRectangle.Contains(footer.Bounds), $"{language} layout: record/cancel footer fits the main window");
                         foreach (var label in body.Controls.OfType<Label>().Where(label => label.Visible && label.Text.Length > 0))
                             Check(label.Height >= label.GetPreferredSize(new Size(label.Width, 0)).Height, $"{language} layout: body label wraps without vertical clipping");
+                        foreach (var label in Control<Label>("OperationStatus").Parent!.Controls.OfType<Label>().Where(label => label.Visible && label.Text.Length > 0))
+                            Check(label.Height >= label.GetPreferredSize(new Size(label.Width, 0)).Height, $"{language} layout: current status label wraps without vertical clipping");
+                        CheckCurrentStatus(language);
                     }
-                    void ShowResultForSnapshot()
+                    void CheckResultVisible()
                     {
                         var text = Control<TextBox>("LastDictationText");
-                        var body = text.Parent as ScrollableControl ?? throw new InvalidOperationException("Result needs scrollable content.");
-                        var copyRow = Control<Button>("CopyLastDictation").Parent!;
-                        body.ScrollControlIntoView(copyRow); context.Home.PerformLayout();
-                        Check(body.ClientRectangle.Contains(text.Bounds) && body.ClientRectangle.Contains(copyRow.Bounds), "result text and Copy are reachable together in the actual visible viewport");
+                        Check(InViewport(text) && InViewport(Control<Button>("CopyLastDictation")), "production result text and Copy are visible together without any test scrolling");
                     }
                     await Task.Delay(100);
                     int actualDesktopDpi = context.Home.DeviceDpi;
@@ -99,6 +118,7 @@ internal static class OnboardingSmoke
                         fixtures.DownloadFailure = failure; await context.DownloadAsync();
                         Check(!context.View.ModelReady && context.View.Activity == AppActivity.Idle && store.LoadSettings().ModelPath == null && Control<Button>("NextSetupAction").Enabled, "failed synthetic download blocks readiness and permits retry: " + failure);
                         Check(context.View.Message.Length > 0 && (failure != "integrity" || context.View.Message.Contains("SHA-256")), "download recovery text is populated: " + failure);
+                        CheckCurrentStatus("download " + failure);
                         Snapshot("01-download-" + failure);
                     }
                     fixtures.DownloadFailure = null;
@@ -109,40 +129,86 @@ internal static class OnboardingSmoke
                     {
                         fixtures.Microphone = state; await context.TestMicrophoneAsync();
                         Check(context.View.Microphone == state && (state == MicrophoneReadiness.Signal || !context.View.Readiness.CanRecord), "synthetic microphone outcome: " + state);
+                        CheckCurrentStatus("microphone " + state);
+                        if (state == MicrophoneReadiness.NoDevice)
+                        {
+                            context.Home.RefreshMicrophones(true);
+                            Check(context.View.Microphone == MicrophoneReadiness.NoDevice, "empty synthetic enumeration remains NoDevice after a refresh");
+                        }
                         Snapshot("03-microphone-" + state);
                     }
+                    fixtures.EnumerationFailure = true; context.Home.RefreshMicrophones(true);
+                    Check(context.View.Microphone == MicrophoneReadiness.Error && !context.View.Readiness.CanRecord, "synthetic capabilities failure remains Error after refresh");
+                    CheckCurrentStatus("enumeration failure"); fixtures.EnumerationFailure = false; await context.TestMicrophoneAsync();
                     context.Home.SetHotkeyTest(true);
                     context.Home.ObserveHotkey(new(true, false, false, true));
                     await context.ActivateHotkeyAsync();
                     Check(context.View.HotkeyVerified && context.View.Activity == AppActivity.Idle, "explicit test activation is visible and never starts audio");
                     Snapshot("04-hotkey-test"); context.Home.SetHotkeyTest(false);
+                    interaction.HoldCapture(); int capturesBeforeCancel = fixtures.CaptureCount;
+                    Task starting = context.ToggleAsync(true);
+                    Check(context.View.Activity == AppActivity.Starting && Control<Button>("CancelOperation").Enabled, "synthetic pending target exposes cancellable Starting");
+                    CheckCurrentStatus("starting"); Control<Button>("CancelOperation").PerformClick();
+                    await starting.WaitAsync(TimeSpan.FromSeconds(2)); interaction.ReleaseCapture(); await Task.Delay(20);
+                    Check(context.View.Activity == AppActivity.Idle && fixtures.CaptureCount == capturesBeforeCancel, "actual controller Cancel before target discovery completes never starts capture");
+                    interaction.Reset();
                     if (modelPath != null) { context.UpdateSettings(context.View.Settings with { ModelPath = modelPath, Language = "en" }); fixtures.UseRealRecognition = true; }
                     Control<Button>("StartStopRecording").PerformClick();
                     Check(context.View.Activity == AppActivity.Recording, "Home record button starts synthetic capture"); Snapshot("05-recording");
+                    CheckCurrentStatus("recording");
                     Control<Button>("StartStopRecording").PerformClick(); await Task.Delay(30);
                     Check(context.View.Activity == AppActivity.Processing, "processing and cancellation are visible"); Snapshot("06-processing");
+                    CheckCurrentStatus("processing");
                     await WaitForIdle();
                     string expectedText = context.View.LastText;
                     Check(context.View.Activity == AppActivity.Idle && expectedText.Length > 0 && (modelPath != null || expectedText == SyntheticServices.TestText), "transcription appears in actual Home result surface");
                     Check(Control<TextBox>("LastDictationText").Text == expectedText, "visible result textbox reads back recognized text");
+                    CheckResultVisible(); CheckCurrentStatus("recognized result");
                     Control<Button>("CopyLastDictation").PerformClick(); Check(Clipboard.GetText() == expectedText, "actual Copy button writes recognized text to clipboard");
                     if (modelPath != null) Check(expectedText.Contains("quick brown fox", StringComparison.OrdinalIgnoreCase), "real bundled Whisper recognizes expected synthetic fixture phrase");
                     fixtures.UseRealRecognition = false;
                     Check(store.LoadLastText() == expectedText && !File.Exists(fixtures.LastCapture), "last text persisted and captured temporary audio deleted");
                     Check(!context.Home.DiagnosticsText().Contains(expectedText) && !context.Home.DiagnosticsText().Contains(directory), "copy diagnostics excludes transcript and profile path");
-                    var resultControl = Control<TextBox>("LastDictationText");
-                    var resultBody = (ScrollableControl)resultControl.Parent!;
-                    bool resultVisibleBeforeTestScroll = resultBody.ClientRectangle.Contains(resultControl.Bounds) && resultBody.ClientRectangle.Contains(Control<Button>("CopyLastDictation").Parent!.Bounds);
+                    bool resultVisibleBeforeTestScroll = InViewport(Control<TextBox>("LastDictationText")) && InViewport(Control<Button>("CopyLastDictation"));
+                    Check(resultVisibleBeforeTestScroll, "resultVisibleBeforeTestScroll is a required production visibility assertion");
                     Snapshot("07-result-before-test-scroll");
-                    // Diagnostic scroll only; the report preserves production visibility before it.
-                    ShowResultForSnapshot(); Snapshot("07-result-ru");
-                    context.UpdateSettings(context.View.Settings with { UiLanguage = "en" }); CheckLayout("en"); ShowResultForSnapshot(); Snapshot("08-result-en");
+                    Snapshot("07-result-ru");
+                    context.UpdateSettings(context.View.Settings with { UiLanguage = "en" }); CheckLayout("en"); CheckResultVisible(); Snapshot("08-result-en");
                     await context.ToggleAsync(false); string? cancelledAudio = fixtures.LastCapture; context.Cancel();
                     Check(context.View.Activity == AppActivity.Idle && !File.Exists(cancelledAudio), "cancel recording deletes only synthetic captured audio");
                     await context.ToggleAsync(false); Task recognizing = context.StopAsync(); context.Cancel(); await recognizing;
                     Check(context.View.Activity == AppActivity.Idle && context.View.LastText == expectedText, "cancel recognition retains prior result and returns to idle");
+                    fixtures.Transcript = "SYNTHETIC LATE ANSWER THAT MUST NOT BE PUBLISHED"; fixtures.AfterRecognition = context.Cancel;
+                    await context.ToggleAsync(false); await context.StopAsync(); fixtures.AfterRecognition = null;
+                    Check(context.View.LastText == expectedText && store.LoadLastText() == expectedText && Control<TextBox>("LastDictationText").Text == expectedText,
+                        "actual controller cancellation immediately after ASR prevents late answer publication and persistence");
+                    CheckCurrentStatus("cancelled after ASR"); CheckResultVisible();
+                    // Real foreground read-back around synthetic focus/input timing.
+                    // There is no real SendInput or UIA identity claim in this seam.
+                    using (var external = new Form { Text = "Synthetic acceptance target", Width = 400, Height = 160 })
+                    {
+                        var input = new TextBox { Dock = DockStyle.Fill, Multiline = true }; external.Controls.Add(input);
+                        external.Show(); external.Activate(); input.Focus(); await Task.Delay(80);
+                        Check(NativeMethods.GetForegroundWindow() == external.Handle, "real foreground is the isolated synthetic external target before insertion timing tests");
+                        fixtures.Transcript = string.Concat(Enumerable.Repeat("SYNTHETIC PASTE TIMING. ", 20));
+                        foreach (int observation in new[] { 1, 2, 3 })
+                        {
+                            context.Home.Hide(); interaction.HoldPaste(observation);
+                            await context.ToggleAsync(true); Task inserting = context.StopAsync();
+                            await interaction.PasteHeld.Task.WaitAsync(TimeSpan.FromSeconds(3)); context.Cancel();
+                            await inserting.WaitAsync(TimeSpan.FromSeconds(2)); interaction.ReleasePaste(); await Task.Delay(20);
+                            Check(context.View.Activity == AppActivity.Idle && interaction.SentChunks == Math.Max(0, observation - 2), "actual controller Cancel reaches synthetic UIA/chunk boundary " + observation);
+                            Check(NativeMethods.GetForegroundWindow() == external.Handle, "automatic recovery/result reveal preserves external foreground after cancel boundary " + observation);
+                            Check(Control<TextBox>("LastDictationText").Text == fixtures.Transcript && store.LoadLastText() == fixtures.Transcript,
+                                "cancelled insertion keeps the recognized text available for manual recovery " + observation);
+                            CheckResultVisible(); CheckCurrentStatus("cancelled insertion " + observation);
+                        }
+                        expectedText = fixtures.Transcript; interaction.Reset(); external.Close();
+                    }
+                    context.ShowMain();
                     fixtures.ReturnEmptyText = true; await context.ToggleAsync(false); await context.StopAsync();
                     Check(context.View.LastText == expectedText && context.View.Activity == AppActivity.Idle, "empty recognition never replaces the last successful text");
+                    CheckCurrentStatus("empty recognition error"); CheckResultVisible();
                     var validSettings = context.View.Settings;
                     context.UpdateSettings(validSettings with { ModelPath = Path.Combine(directory, "missing-test-model.bin") });
                     Check(context.View.Readiness.Next == SetupStep.Model && !context.View.Readiness.CanRecord, "missing model exposes actionable blocked state");
@@ -161,8 +227,8 @@ internal static class OnboardingSmoke
                     try { devices = MicrophoneService.Enumerate().Count; enumeration = "real WinMM enumeration only"; } catch { enumeration = "real WinMM enumeration failed"; }
                     Program.WriteReport(new { success = true, scenario = "isolated-onboarding", checks, screenshots,
                         sources = new { microphone = fixtureWave == null ? "synthetic PCM seam; physical capture NOT_TESTED" : "synthetic fixture WAV copied to capture seam; physical capture NOT_TESTED", keyboard = "real dedicated hook installed; activation via explicit test seam; physical Alt NOT_TESTED", recognition = modelPath == null ? "synthetic transcript seam; real Whisper validated separately" : "real bundled Whisper" },
-                        realWhisper = modelPath != null, syntheticMicrophone = true, syntheticHotkeyActivation = true, realFixturePhraseMatched = modelPath != null,
-                        resultVisibleBeforeTestScroll, resultScreenshotsUseTestScroll = true,
+                        realWhisper = modelPath != null, syntheticMicrophone = true, syntheticHotkeyActivation = true, syntheticFocusAndInputTiming = true, realFixturePhraseMatched = modelPath != null,
+                        resultVisibleBeforeTestScroll, resultScreenshotsUseTestScroll = false,
                         realDeviceProbe = new { enumeration, count = devices, capture = "NOT_RUN" }, physicalWindows10 = "NOT_TESTED", physicalWindows11 = "NOT_TESTED",
                         syntheticLayoutStress = layoutScale != 1, requestedLayoutScale = layoutScale, actualDesktopDpi,
                         dpi = "actual desktop DPI reported separately; synthetic control Scale is not native 125/150 percent monitor acceptance" }, reportPath);
@@ -185,21 +251,26 @@ internal static class OnboardingSmoke
         public override string RuntimePath => Path.Combine(directory, "synthetic-runtime-marker.exe");
         public MicrophoneReadiness Microphone { get; set; } = MicrophoneReadiness.Signal;
         public bool ReturnEmptyText { get; set; }
+        public bool EnumerationFailure { get; set; }
+        public string Transcript { get; set; } = TestText;
+        public Action? AfterRecognition { get; set; }
+        public int CaptureCount { get; private set; }
         public string? DownloadFailure { get; set; }
         public bool UseRealRecognition { get; set; }
         public string? LastCapture { get; private set; }
         public SyntheticServices(string directory, string? fixtureWave) { this.directory = directory; this.fixtureWave = fixtureWave; File.WriteAllText(RuntimePath, "synthetic runtime marker"); }
-        public override IReadOnlyList<MicrophoneDevice> Microphones() => [new(0, "Synthetic test input (not a physical microphone)")];
+        public override IReadOnlyList<MicrophoneDevice> Microphones() => EnumerationFailure ? throw new IOException("SYNTHETIC_CAPABILITIES_FAILURE")
+            : Microphone == MicrophoneReadiness.NoDevice ? [] : [new(0, "Synthetic test input (not a physical microphone)")];
         public override async Task<MicrophoneTestResult> TestMicrophoneAsync(uint device, IProgress<double> level, CancellationToken token)
         {
             token.ThrowIfCancellationRequested(); level.Report(Microphone == MicrophoneReadiness.Signal ? .3 : 0); await Task.Delay(40, token);
             return new(Microphone, "SYNTHETIC_" + Microphone);
         }
-        public override IAudioCapture StartCapture(string path, uint device, IProgress<double> level) { LastCapture = path; return new SyntheticCapture(path, fixtureWave); }
+        public override IAudioCapture StartCapture(string path, uint device, IProgress<double> level) { CaptureCount++; LastCapture = path; return new SyntheticCapture(path, fixtureWave); }
         public override async Task<string> TranscribeAsync(string audio, AppSettings settings, CancellationToken token)
         {
             if (UseRealRecognition) return await new WhisperRunner(Program.RuntimePath).TranscribeAsync(audio, settings.ModelPath!, settings.Language, token);
-            await Task.Delay(200, token); return ReturnEmptyText ? "" : TestText;
+            await Task.Delay(200, token); AfterRecognition?.Invoke(); return ReturnEmptyText ? "" : Transcript;
         }
         public override async Task<string> DownloadModelAsync(LocalStore store, IProgress<double> progress, CancellationToken token)
         {
@@ -210,6 +281,35 @@ internal static class OnboardingSmoke
             string expectedHash = DownloadFailure == "integrity" ? new string('0', 64) : Convert.ToHexString(SHA256.HashData(content));
             await new ModelStore(http).DownloadAsync(new("synthetic-only.bin", "https://example.invalid/synthetic", expectedHash, content.Length), path, progress, token);
             return path;
+        }
+    }
+    // Explicit CLI-only async timing seam. Production DictationInteraction never
+    // constructs these synthetic identities or substitutes input delivery.
+    private sealed class SyntheticInteraction : DictationInteraction
+    {
+        private readonly FocusIdentity identity = new(1, 1, 1, 1, "SYNTHETIC_TEST_IDENTITY");
+        private TaskCompletionSource<FocusIdentity?>? capture, observation;
+        private bool synthetic;
+        private int heldObservation, observations;
+        public int SentChunks { get; private set; }
+        public TaskCompletionSource<bool> PasteHeld { get; private set; } = new();
+        public void HoldCapture() { synthetic = true; capture = new(); }
+        public void ReleaseCapture() { capture?.TrySetResult(identity); capture = null; }
+        public void HoldPaste(int number) { synthetic = true; heldObservation = number; observations = 0; SentChunks = 0; observation = new(); PasteHeld = new(); }
+        public void ReleasePaste() { observation?.TrySetResult(identity); observation = null; }
+        public void Reset() { ReleaseCapture(); ReleasePaste(); synthetic = false; heldObservation = 0; }
+        public override bool IsExternalTarget(nint home) => synthetic || base.IsExternalTarget(home);
+        public override Task<FocusIdentity?> CaptureTargetAsync() => synthetic ? capture?.Task ?? Task.FromResult<FocusIdentity?>(identity) : base.CaptureTargetAsync();
+        public override Task DismissAltMenuAsync(nint target, CancellationToken cancellation) => synthetic ? Task.CompletedTask : base.DismissAltMenuAsync(target, cancellation);
+        public override Task<bool> TryPasteAsync(string text, FocusIdentity? target, CancellationToken cancellation)
+        {
+            if (!synthetic) return base.TryPasteAsync(text, target, cancellation);
+            Task<FocusIdentity?> Observe()
+            {
+                if (++observations != heldObservation) return Task.FromResult<FocusIdentity?>(identity);
+                PasteHeld.TrySetResult(true); return observation!.Task;
+            }
+            return TextInsertion.TryAsync(text, target, Observe, _ => true, _ => { SentChunks++; return true; }, cancellation);
         }
     }
     private sealed class SyntheticCapture : IAudioCapture

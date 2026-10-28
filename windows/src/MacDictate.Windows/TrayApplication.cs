@@ -8,6 +8,7 @@ internal sealed class TrayApplication : ApplicationContext
     private readonly KeyboardService keyboard;
     private readonly LocalStore store;
     private readonly SessionServices services;
+    private readonly DictationInteraction interaction;
     private readonly MainForm home;
     private readonly RecordingOverlay overlay = new();
     private readonly System.Windows.Forms.Timer clock = new() { Interval = 250 };
@@ -21,9 +22,9 @@ internal sealed class TrayApplication : ApplicationContext
     internal MainForm Home => home;
     internal ViewState View => view;
     public TrayApplication() : this(new LocalStore(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MacDictate")), new SessionServices()) { }
-    internal TrayApplication(LocalStore store, SessionServices services)
+    internal TrayApplication(LocalStore store, SessionServices services, DictationInteraction? interaction = null)
     {
-        this.store = store; this.services = services;
+        this.store = store; this.services = services; this.interaction = interaction ?? new DictationInteraction();
         var settings = store.LoadSettings();
         view = new(settings, File.Exists(services.RuntimePath), ModelFile.IsUsable(settings.ModelPath), MicrophoneReadiness.Untested, false, false, AppActivity.Idle, "", store.LoadLastText());
         home = new(view, services.Microphones); home.CreateControl(); _ = home.Handle;
@@ -32,7 +33,21 @@ internal sealed class TrayApplication : ApplicationContext
         home.MicrophoneTestRequested += async () => await TestMicrophoneAsync();
         home.RecordRequested += async () => await ToggleAsync(false);
         home.CancelRequested += Cancel;
-        home.InputConfigurationChanged += () => { if (view.Activity == AppActivity.Idle) { view = view with { Microphone = MicrophoneReadiness.Untested }; Render(); } };
+        home.MicrophoneRefreshed += selection =>
+        {
+            if (view.Activity != AppActivity.Idle) return;
+            try
+            {
+                var updated = view.Settings with { MicrophoneDeviceId = selection.DeviceId };
+                bool changed = updated != view.Settings;
+                if (changed) store.SaveSettings(updated);
+                view = view with { Settings = updated, Microphone = selection.Readiness };
+                if (changed) view = view with { Message = T("Выбранный вход отключён. Доступный вход выбран и сохранён; проверьте микрофон заново.", "The selected input disconnected. An available input was selected and saved; test the microphone again.") };
+            }
+            catch { view = view with { Microphone = MicrophoneReadiness.Error, Message = T("Не удалось сохранить вход. Проверьте права на локальные настройки и повторите.", "Cannot save the input. Check local settings permissions and retry.") }; }
+            Render();
+        };
+        home.InputConfigurationChanged += () => { if (view.Activity == AppActivity.Idle) ReconcileMicrophone(true); };
         home.HiddenToTray += () =>
         {
             if (trayExplanationShown) return; trayExplanationShown = true;
@@ -52,7 +67,7 @@ internal sealed class TrayApplication : ApplicationContext
         menu.Items.Add(T("Выход", "Quit"), null, (_, _) => ExitThread());
         tray.ContextMenuStrip = menu; tray.DoubleClick += (_, _) => ShowMain();
         clock.Tick += async (_, _) => { if (view.Activity != AppActivity.Recording) return; view = view with { ElapsedSeconds = (int)(DateTime.UtcNow - started).TotalSeconds }; Render(); if (view.ElapsedSeconds >= 120) await StopAsync(); };
-        ConfigureKeyboard(); ReconcileMicrophone(); home.RefreshMicrophones(); Render(); home.Show();
+        ConfigureKeyboard(); ReconcileMicrophone(); Render(); home.Show();
     }
     private string T(string ru, string en) => home.T(ru, en);
     private void Dispatch(Action callback)
@@ -70,24 +85,7 @@ internal sealed class TrayApplication : ApplicationContext
     }
     internal void ShowMain() { if (!shuttingDown) { RefreshFiles(); home.ShowMain(); Render(); } }
     private void RefreshFiles() => view = view with { RuntimeReady = File.Exists(services.RuntimePath), ModelReady = ModelFile.IsUsable(view.Settings.ModelPath) };
-    private bool ReconcileMicrophone()
-    {
-        try
-        {
-            var selection = MicrophoneSelection.Reconcile(view.Settings.MicrophoneDeviceId, services.Microphones().Select(x => x.Id).ToArray(), view.Microphone);
-            bool changed = selection.DeviceId != view.Settings.MicrophoneDeviceId;
-            var settings = view.Settings with { MicrophoneDeviceId = selection.DeviceId };
-            if (changed) store.SaveSettings(settings);
-            view = view with { Settings = settings, Microphone = selection.Readiness };
-            if (changed) view = view with { Message = T("Выбранный вход отключён. Доступный вход выбран и сохранён; проверьте микрофон заново.", "The selected input disconnected. An available input was selected and saved; test the microphone again.") };
-            return selection.Readiness != MicrophoneReadiness.NoDevice;
-        }
-        catch
-        {
-            view = view with { Microphone = MicrophoneReadiness.Error, Message = T("Не удалось обновить или сохранить вход. Обновите список; проверьте права на локальные настройки и повторите.", "Cannot refresh or save the input. Refresh inputs, check local settings permissions, and retry.") };
-            return false;
-        }
-    }
+    private bool ReconcileMicrophone(bool invalidateSignal = false) => home.RefreshMicrophones(invalidateSignal);
     private void ConfigureKeyboard()
     {
         try { keyboard.Configure(view.Settings.Hotkey); view = view with { HotkeyReady = true, HotkeyVerified = false }; }
@@ -128,7 +126,7 @@ internal sealed class TrayApplication : ApplicationContext
     internal async Task TestMicrophoneAsync()
     {
         if (view.Activity != AppActivity.Idle) return;
-        if (!ReconcileMicrophone()) { home.RefreshMicrophones(); Render(); return; }
+        if (!ReconcileMicrophone()) { Render(); return; }
         using var cancellation = new CancellationTokenSource(); operation = cancellation;
         view = view with { Microphone = MicrophoneReadiness.Untested, Activity = AppActivity.TestingMicrophone, Message = T("Говорите сейчас — 3 секунды. Тестовая запись будет удалена.", "Speak now for 3 seconds. The test recording will be deleted.") }; Render();
         try
@@ -146,21 +144,23 @@ internal sealed class TrayApplication : ApplicationContext
         if (view.Activity == AppActivity.Recording) { await StopAsync(); return; }
         if (view.Activity != AppActivity.Idle) return;
         RefreshFiles();
-        if (!ReconcileMicrophone()) { ShowMain(); return; }
-        if (!view.Readiness.CanRecord) { SetMessage(T("Сначала выполните выделенный шаг настройки.", "Complete the indicated setup step first.")); ShowMain(); return; }
+        if (!ReconcileMicrophone()) { home.ShowOutcome(); return; }
+        if (!view.Readiness.CanRecord) { SetMessage(T("Сначала выполните выделенный шаг настройки.", "Complete the indicated setup step first.")); home.ShowOutcome(); return; }
         string path = Path.Combine(Path.GetTempPath(), "macdictate-audio-" + Guid.NewGuid().ToString("N") + ".wav");
+        using var cancellation = new CancellationTokenSource(); operation = cancellation;
         view = view with { Activity = AppActivity.Starting, Message = "" }; Render();
         try
         {
             // Never capture our own UI as an insertion target, even for a global key.
-            bool external = global && NativeMethods.GetForegroundWindow() != home.Handle;
-            target = external ? await PasteService.CaptureTargetAsync() : null;
-            if (shuttingDown) return;
-            recorder = services.StartCapture(path, view.Settings.MicrophoneDeviceId, new Progress<double>(home.SetLevel));
+            bool external = global && interaction.IsExternalTarget(home.Handle);
+            recorder = await OperationBoundary.CompleteAfterAsync(
+                () => external ? interaction.CaptureTargetAsync() : Task.FromResult<FocusIdentity?>(null),
+                identity => { target = identity; return services.StartCapture(path, view.Settings.MicrophoneDeviceId, new Progress<double>(home.SetLevel)); }, cancellation.Token);
             started = DateTime.UtcNow; view = view with { Activity = AppActivity.Recording, ElapsedSeconds = 0, Message = T("Говорите. Для остановки нажмите кнопку или дважды левый Alt.", "Speak now. Stop with the button or by tapping left Alt twice.") }; clock.Start();
         }
-        catch { DeleteAudio(path); view = view with { Microphone = MicrophoneReadiness.Error, Activity = AppActivity.Idle }; SetMessage(T("Запись не началась. Проверьте вход и доступ к микрофону Windows, затем повторите тест.", "Recording did not start. Check input and Windows microphone access, then retry the test.")); ShowMain(); }
-        finally { if (shuttingDown && recorder == null) view = view with { Activity = AppActivity.Idle }; Render(); FinishExit(); }
+        catch (OperationCanceledException) { DeleteAudio(path); target = null; SetMessage(T("Подготовка записи отменена. Микрофон не запущен.", "Recording preparation cancelled. The microphone was not started.")); }
+        catch { DeleteAudio(path); view = view with { Microphone = MicrophoneReadiness.Error, Activity = AppActivity.Idle }; SetMessage(T("Запись не началась. Проверьте вход и доступ к микрофону Windows, затем повторите тест.", "Recording did not start. Check input and Windows microphone access, then retry the test.")); home.ShowOutcome(); }
+        finally { operation = null; if (recorder == null) view = view with { Activity = AppActivity.Idle }; Render(); FinishExit(); }
     }
     internal async Task StopAsync()
     {
@@ -170,23 +170,29 @@ internal sealed class TrayApplication : ApplicationContext
         using var cancellation = new CancellationTokenSource(); operation = cancellation;
         try
         {
-            if (target != null) await PasteService.DismissAltMenuAsync(target.Window);
+            if (target != null) await interaction.DismissAltMenuAsync(target.Window, cancellation.Token);
+            cancellation.Token.ThrowIfCancellationRequested();
             try { captured.Stop(); }
             catch { view = view with { Microphone = MicrophoneReadiness.Error }; throw; }
             if (!captured.HasSignal) { view = view with { Microphone = MicrophoneReadiness.Silent }; throw new InvalidDataException("NO_SIGNAL"); }
             try { captured.Dispose(); }
             catch { view = view with { Microphone = MicrophoneReadiness.Error }; throw; }
             view = view with { Microphone = MicrophoneReadiness.Signal };
-            string text = await services.TranscribeAsync(captured.AudioPath, view.Settings, cancellation.Token);
-            if (string.IsNullOrWhiteSpace(text)) throw new InvalidDataException("NO_TEXT");
-            view = view with { LastText = text };
-            bool saved = true; try { store.SaveLastText(text); } catch { saved = false; }
-            bool pasted = !shuttingDown && target != null && await PasteService.TryPasteAsync(text, target);
+            bool saved = true;
+            string text = await OperationBoundary.CompleteAfterAsync(() => services.TranscribeAsync(captured.AudioPath, view.Settings, cancellation.Token), recognized =>
+            {
+                if (string.IsNullOrWhiteSpace(recognized)) throw new InvalidDataException("NO_TEXT");
+                view = view with { LastText = recognized };
+                try { store.SaveLastText(recognized); } catch { saved = false; }
+                return recognized;
+            }, cancellation.Token, waitForCleanup: true);
+            cancellation.Token.ThrowIfCancellationRequested();
+            bool pasted = !shuttingDown && target != null && await interaction.TryPasteAsync(text, target, cancellation.Token);
             SetMessage(!saved ? T("Текст готов, но не сохранён на диск. Скопируйте перед выходом; проверьте место и права.", "Text ready, but not saved to disk. Copy before quitting; check space and permissions.") : pasted ? T("Текст введён в исходное поле и сохранён локально.", "Text inserted into the original input and saved locally.") : T("Текст готов ниже. Нажмите «Копировать». Если поле или фокус изменились, автоматический ввод безопасно пропускается.", "Text is ready below. Select Copy. If focus or input changed, automatic insertion is safely skipped."));
-            if (!pasted && !shuttingDown) home.ShowMain();
+            if (!pasted && !shuttingDown) home.ShowOutcome();
         }
-        catch (OperationCanceledException) { SetMessage(T("Распознавание отменено. Можно записать снова.", "Recognition cancelled. You can record again.")); }
-        catch { SetMessage(view.Microphone == MicrophoneReadiness.Silent ? T("Достаточного сигнала нет. Проверьте mute и вход, говорите во время теста, затем повторите.", "Insufficient signal. Check mute and input, speak during the test, then retry.") : view.Microphone == MicrophoneReadiness.Error ? T("Ошибка записи или освобождения микрофона. Проверьте доступ и вход, перезапустите программу и повторите тест микрофона.", "Microphone capture or cleanup failed. Check access and input, restart the app and retry the microphone test.") : T("Распознавание не завершено. Проверьте модель и runtime; при пустом тексте повторите запись с речью. Можно выбрать другую модель или переустановить приложение.", "Recognition did not complete. Check model and runtime; if no text was recognized, record speech again. Choose another model or reinstall the app.")); if (!shuttingDown) home.ShowMain(); }
+        catch (OperationCanceledException) { SetMessage(T("Обработка или ввод отменены. Доступный текст можно скопировать; можно записать снова.", "Processing or insertion cancelled. Any available text can be copied; you can record again.")); if (!shuttingDown) home.ShowOutcome(); }
+        catch { SetMessage(view.Microphone == MicrophoneReadiness.Silent ? T("Достаточного сигнала нет. Проверьте mute и вход, говорите во время теста, затем повторите.", "Insufficient signal. Check mute and input, speak during the test, then retry.") : view.Microphone == MicrophoneReadiness.Error ? T("Ошибка записи или освобождения микрофона. Проверьте доступ и вход, перезапустите программу и повторите тест микрофона.", "Microphone capture or cleanup failed. Check access and input, restart the app and retry the microphone test.") : T("Распознавание не завершено. Проверьте модель и runtime; при пустом тексте повторите запись с речью. Можно выбрать другую модель или переустановить приложение.", "Recognition did not complete. Check model and runtime; if no text was recognized, record speech again. Choose another model or reinstall the app.")); if (!shuttingDown) home.ShowOutcome(); }
         finally { Cleanup(captured); target = null; operation = null; home.SetLevel(0); view = view with { Activity = AppActivity.Idle }; Render(); FinishExit(); }
     }
     internal void Cancel()
@@ -214,4 +220,14 @@ internal sealed class TrayApplication : ApplicationContext
         if (view.Activity != AppActivity.Idle) return;
         exiting = true; keyboard.Dispose(); clock.Dispose(); overlay.Dispose(); tray.Visible = false; tray.Dispose(); home.CloseForExit(); home.Dispose(); base.ExitThreadCore();
     }
+}
+
+// Only the explicit onboarding CLI injects an alternative interaction. Production
+// always uses native focus identity and fail-closed input delivery below.
+internal class DictationInteraction
+{
+    public virtual bool IsExternalTarget(nint home) => NativeMethods.GetForegroundWindow() != home;
+    public virtual Task<FocusIdentity?> CaptureTargetAsync() => PasteService.CaptureTargetAsync();
+    public virtual Task DismissAltMenuAsync(nint target, CancellationToken cancellation) => PasteService.DismissAltMenuAsync(target, cancellation);
+    public virtual Task<bool> TryPasteAsync(string text, FocusIdentity? identity, CancellationToken cancellation) => PasteService.TryPasteAsync(text, identity, cancellation);
 }
