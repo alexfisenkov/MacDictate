@@ -104,17 +104,18 @@
 - Physical Windows10/11 mic/Alt/editor and macOS mic/Option/editor remain NOT_RUN.
 
 
-## Windows 1.6.1 checked local candidate — 2026-10-29
+## Windows 1.6.1 release — 2026-10-29
 
 - [x] Local app/delivery/package checks and independent source review completed before final hosted packaging; G4 evidence is in `.aispa-work/2026-10-29-windows-first-run--wip/blind-acceptance.md`.
 - [x] Final `desktop-release.yml` run40747430459 all3jobs PASS on exact source56b45301bc0e98c12f4823e5039152a3c3dd5229. Two earlier failed attempts and separately authorized repairs remain recorded; no new CI for release preparation.
 - [x] Actual JSON/PNG read-back: RU/EN/error/no-device/process/result and real bundled Whisper on synthetic PCM/key seams; native hook/paste/clipboard safety PASS.
 - [x] Ordinary installed production launch in empty runner profile, close-to-tray/reopen/no implicit download, populated UIA/Copy/clipboard, 492-file payload and synthetic sentinel preservation through reinstall/uninstall PASS.
 - [x] Final EXE/ZIP/manifests/checksums retained in canonical `v1.6.1/artifacts/` and rehashed; local-only aliases/evidence retained; no raw WAV/model/user content copied or published.
-- [x] Matching `v1.6.1` registry row and release card use `local_only`; release body/pending metadata prepared. Windows stable, both public manifests, pinned HTML URLs and Mac1.6.0/build14 remain unchanged.
+- [x] Candidate was prepared as `local_only` before publication; after actual API read-back the matching registry/card use `public_release`. Mac1.6.0/build14/latest-desktop remain unchanged.
 - [x] Missing populated installed PNG warning retained; actual UIA/clipboard and separate real-ASR result PNG are distinguished. Synthetic125/150% layout stress at actual DPI96 is explicit.
-- [ ] Root publishes annotated v1.6.1 on checked source with `make_latest=false`; actual publication timestamp/source/assets/digests read back; global latest remains Mac1.6.0.
-- [ ] Promote Windows registry → public manifest → exact pinned HTML fallback URLs only after actual publication evidence; final staged Pages push + HTTPS/file/download hash read-back.
+- [x] Root published annotated v1.6.1 on checked source with `make_latest=false`; actual API release ID427078400/timestamp2026-10-28T19:07:43Z and4asset size/digest read-back PASS; global latest remains Mac1.6.0.
+- [x] Promoted Windows registry → public manifest → all3exact pinned HTML fallback URLs after actual publication evidence.
+- [ ] Root final staged Pages push + browser/HTTPS/file/download hash read-back.
 - [ ] Physical Windows10/11 microphone/Alt/editor, native125/150%, GUI model HTTP-success and interactive installer/SmartScreen acceptance. Until then retain NOT_RUN and unsigned/manual-model-recovery limitations.
 
-Candidate checks do not establish public delivery or physical client-OS acceptance.
+GitHub publication and API asset metadata checks do not establish Pages delivery, complete public download hashes or physical client-OS acceptance.

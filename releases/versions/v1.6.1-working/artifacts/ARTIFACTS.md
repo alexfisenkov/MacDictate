@@ -7,4 +7,4 @@ After the single final manual workflow, retain the exact EXE/ZIP, `windows-build
 Audio WAV and model files are test inputs, not published artifacts. macOS DMG and all historical Windows files remain untouched.
 
 
-Preparation-stage note above is historical. Final checked artifacts are retained under `releases/versions/v1.6.1/artifacts/`, registered as `local_only`; this working folder deliberately has no duplicate package set.
+Preparation-stage note above is historical. Final checked artifacts are retained under `releases/versions/v1.6.1/artifacts/`, registered as `public_release` after actual public API read-back; this working folder deliberately has no duplicate package set.

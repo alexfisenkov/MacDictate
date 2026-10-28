@@ -182,3 +182,5 @@
 - **Публикация:** candidate registry entry and site source may be prepared locally, but published manifest remains1.6.0 until actual release digest/source read-back. New UI instructions are staged for1.6.1 and must not be pushed to Pages before that promotion.
 
 - **Реализация / 2026-10-29:** final source56b45301/run40747430459 passed hosted G4. Canonical v1.6.1 is `local_only`; Windows stable and public URLs stay1.6.0 until actual publication read-back. A Windows-only tag must point to checked build source, not a later metadata-only commit. Local Latest-named package copies are verification artifacts, not public aliases. Missing populated installed PNG is retained as evidence debt; no physical client-OS/native-DPI acceptance is inferred.
+
+- **Публикация / 2026-10-29:** actual GitHub release ID427078400/publishedAt2026-10-28T19:07:43Z and4asset size/digest read-back satisfied D-025 promotion gate. Only Windows stable/manifest/HTML pins promoted to1.6.1; global Mac latest stays1.6.0. Pages/browser/HTTPS/full download hash evidence remains a separate unfinished gate.

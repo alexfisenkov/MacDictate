@@ -2,7 +2,7 @@
 
 Этот changelog фиксирует только пользовательски и релизно значимые изменения.
 
-## [v1.6.1] - Local Windows candidate, 2026-10-29
+## [v1.6.1] - 2026-10-28 (Windows only)
 
 ### Added
 - Main first-run window with Russian/English model, microphone and hotkey guidance, visible recording/recognition status, result and Copy actions.
@@ -11,7 +11,7 @@
 
 ### Verification and limits
 - Exact candidate source56b45301; final CI40747430459 all3jobs PASS, including real bundled Whisper on synthetic PCM/key seams, normal installed launch/UIA/clipboard/reopen, 492 payload files and synthetic-data preservation through reinstall/uninstall.
-- Packages are retained and rehashed locally; publication and Windows stable/manifest/Pages promotion are pending. macOS remains1.6.0/build14.
+- Published at2026-10-28T19:07:43Z with make_latest=false; annotated tag is on checked source and all four public asset sizes/digests match. Windows stable/manifest/HTML pins now select1.6.1. Final Pages publication/read-back is pending; macOS/global latest remain1.6.0/build14.
 - Physical Windows10/11 microphone/Alt/editor, native125/150%, GUI HTTP-success model download and interactive installer/SmartScreen remain NOT_RUN. Distribution remains unsigned; corrupted existing model recovery is manual. One populated installed PNG is missing; actual UIA/clipboard passed and separate real-ASR result PNG is retained.
 
 ## [v1.6.0] - 2026-10-19

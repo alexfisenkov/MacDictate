@@ -19,4 +19,4 @@ Known source-review gate: the long setup flow may leave result/Copy below the vi
 
 ## Preparation history closed — 2026-10-29
 
-The paragraphs above describe the source-preparation stage, not current hosted acceptance. The checked final source56b45301/run40747430459 and exact packages now have a separate canonical `v1.6.1` entry with status `local_only`; see `releases/versions/v1.6.1/RELEASE.md`. The working pointer and null build/publication fields remain preparation history. Do not infer publication or physical Windows10/11/native-DPI acceptance from hosted G4 PASS.
+The paragraphs above describe the source-preparation stage, not current hosted acceptance. The checked final source56b45301/run40747430459 and exact packages now have a separate canonical `v1.6.1` entry, published with status `public_release` at2026-10-28T19:07:43Z; see `releases/versions/v1.6.1/RELEASE.md`. The working pointer and null build/publication fields remain preparation history. Do not infer publication or physical Windows10/11/native-DPI acceptance from hosted G4 PASS.

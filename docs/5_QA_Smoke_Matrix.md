@@ -73,9 +73,9 @@ Public GitHub update check from 1.5.1 to free1.5.2 uses GitHub directly; no reti
 | Physical macOS mic/Option/editor | NOT_RUN; preexisting acceptance gap retained |
 
 
-## Windows 1.6.1 local candidate — 2026-10-29
+## Windows 1.6.1 release — 2026-10-29
 
-Exact source `56b45301bc0e98c12f4823e5039152a3c3dd5229`; final CI `40747430459`, all three jobs PASS. These are hosted Windows Server 2025 results; public delivery is pending. Full boundaries: `releases/versions/v1.6.1/RELEASE.md`.
+Exact source `56b45301bc0e98c12f4823e5039152a3c3dd5229`; final CI `40747430459`, all three jobs PASS. These are hosted Windows Server 2025 results; GitHub release is public at2026-10-28T19:07:43Z, while final Pages delivery remains pending. Full boundaries: `releases/versions/v1.6.1/RELEASE.md`.
 
 | Scenario | Result / evidence |
 |---|---|
@@ -87,4 +87,6 @@ Exact source `56b45301bc0e98c12f4823e5039152a3c3dd5229`; final CI `40747430459`,
 | Layout stress125/150% | Synthetic geometry/font scaling PASS at actual desktop DPI96; native monitor125/150% NOT_RUN |
 | Physical Windows10/11 mic/Alt/editor | NOT_RUN; capture/key seams and Server2025 do not substitute |
 | GUI HTTP-success / installer UI / SmartScreen | NOT_RUN; scripted pinned model download and silent install are separate evidence |
-| Public release/Pages/HTTPS | NOT_RUN in local preparation; public Windows stable remains1.6.0 |
+| Public GitHub release | Actual public ID427078400/timestamp2026-10-28T19:07:43Z; annotated tag at checked source, four exact asset sizes/digests PASS; root confirmed global latest still1.6.0 |
+| Windows channel/static source | Registry stable/latest-windows manifest and all3HTML fallback URLs pin published1.6.1; Mac plist/latest-desktop preserved |
+| Pages/browser/HTTPS/download | NOT_RUN after channel finalization; staged source awaits root publication/read-back |
