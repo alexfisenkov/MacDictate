@@ -571,6 +571,65 @@
       },
       "summary": "Windows-only first-run UI and delivery candidate; no compiled/public artifact or hosted acceptance claimed. macOS remains1.6.0/build14 and GitHub latest must remain v1.6.0.",
       "sourceConfidence": "source_candidate_only"
+    },
+    {
+      "version": "v1.6.1",
+      "status": "local_only",
+      "platform": "win-x64",
+      "channel": "windows-only-candidate",
+      "git": {
+        "commit": "56b45301bc0e98c12f4823e5039152a3c3dd5229",
+        "localTag": null,
+        "remoteTags": [],
+        "tagRequiredLocally": false
+      },
+      "github": {
+        "releaseUrl": null,
+        "assetName": null,
+        "githubAssetSha256": null,
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.6.1",
+        "artifactPath": "releases/versions/v1.6.1/artifacts/MacDictate_Windows_v1.6.1_x64.exe",
+        "localArtifactSha256": "fe85fd784649f057d16a115392b3c09cb7ceaf42e8f59beefc05d8149b3307e9",
+        "buildLogPath": null
+      },
+      "windows": {
+        "version": "1.6.1",
+        "platform": "win-x64",
+        "minimumWindowsBuild": 19041,
+        "status": "candidate_checked",
+        "signed": false,
+        "sourceSHA": "56b45301bc0e98c12f4823e5039152a3c3dd5229",
+        "ciRunURL": "https://github.com/alexfisenkov/MacDictate/actions/runs/40747430459",
+        "installerAssetName": "MacDictate_Windows_v1.6.1_x64.exe",
+        "installerBytes": 54351051,
+        "installerSha256": "fe85fd784649f057d16a115392b3c09cb7ceaf42e8f59beefc05d8149b3307e9",
+        "portableAssetName": "MacDictate_Windows_v1.6.1_x64.zip",
+        "portableBytes": 77339968,
+        "portableSha256": "55eedeed0bda8e91dc807cab00fefc9041e5c3d1151984508107e1e287c6365d",
+        "manifestAssetName": "windows-build-manifest.json",
+        "checksumsAssetName": "WINDOWS-SHA256SUMS",
+        "makeLatest": false,
+        "validation": {
+          "hostedOS": "Windows Server2025",
+          "coreTests": 62,
+          "finalCIJobs": "3/3 PASS",
+          "nativeInput": "PASS",
+          "onboardingRealASR": "PASS (real bundled Whisper; synthetic PCM and key activation seams)",
+          "installerNormalProfile": "PASS (normal production launch; UIA and clipboard read-back)",
+          "installedPayloadFilesVerified": 492,
+          "reinstallUninstallPreservation": "PASS (synthetic sentinels only)",
+          "syntheticLayout125_150": "PASS (actual desktop DPI96)",
+          "nativeMonitor125_150": "NOT_RUN",
+          "physicalWindows10_11MicAltEditor": "NOT_RUN",
+          "guiModelHttpSuccess": "NOT_RUN",
+          "installedPopulatedPng": "MISSING; actual UIA/clipboard PASS; separate real-ASR result PNG retained"
+        }
+      },
+      "summary": "Windows-only 1.6.1 first-run candidate from checked source; final CI and hosted G4 PASS within explicit synthetic-input bounds. Local artifacts verified; tag/public release/Pages publication pending. Mac/global latest and Windows stable stay v1.6.0.",
+      "sourceConfidence": "verified_ci_and_hosted_ui_candidate_not_published"
     }
   ],
   "checkpoints": [

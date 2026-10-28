@@ -71,3 +71,20 @@ Public GitHub update check from 1.5.1 to free1.5.2 uses GitHub directly; no reti
 | Public GitHub assets | Complete9asset draft then publish, all9digests/sizes match; platform aliases identical |
 | Physical Windows10/11 mic/Alt/editor | NOT_RUN; hostedServer2025 does not substitute |
 | Physical macOS mic/Option/editor | NOT_RUN; preexisting acceptance gap retained |
+
+
+## Windows 1.6.1 local candidate — 2026-10-29
+
+Exact source `56b45301bc0e98c12f4823e5039152a3c3dd5229`; final CI `40747430459`, all three jobs PASS. These are hosted Windows Server 2025 results; public delivery is pending. Full boundaries: `releases/versions/v1.6.1/RELEASE.md`.
+
+| Scenario | Result / evidence |
+|---|---|
+| Portable/native delivery | 62 portable checks; native Unicode/surrogate/focus/clipboard/hook registration PASS; exact EXE/ZIP bytes/sourceSHA/runtime pins rechecked locally |
+| Visible onboarding → ASR → Copy | Real bundled Whisper on synthetic spoken fixture/PCM and key seams PASS; result+Copy visible before diagnostic scroll, exact clipboard read-back PASS |
+| Fresh installed production launch | No test CLI, empty runner profile; setup action, blank-state guards, no implicit download, close-to-tray and same-process reopen PASS |
+| Installed populated state | Synthetic persisted text; actual UIA read-only ValuePattern, visible/enabled Copy and exact clipboard PASS. Populated PNG absent: visual check of that file NOT_RUN |
+| Installer/reinstall/uninstall | All 492 payload files verified; synthetic settings/model/last text preserved byte-for-byte; existing user data untouched |
+| Layout stress125/150% | Synthetic geometry/font scaling PASS at actual desktop DPI96; native monitor125/150% NOT_RUN |
+| Physical Windows10/11 mic/Alt/editor | NOT_RUN; capture/key seams and Server2025 do not substitute |
+| GUI HTTP-success / installer UI / SmartScreen | NOT_RUN; scripted pinned model download and silent install are separate evidence |
+| Public release/Pages/HTTPS | NOT_RUN in local preparation; public Windows stable remains1.6.0 |

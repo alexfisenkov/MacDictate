@@ -15,3 +15,8 @@ Pending: final independent review, one manual CI exact sourceSHA, real ASR on sy
 Publication sequence: `docs/7_Release_Governance.md` Windows-only hotfix section. Create v1.6.1 with `make_latest=false`, upload only actual checked Windows assets and manifests/checksums, read back public digests, then promote Windows ledger/manifest/HTML fallback links to exact tag. Preserve prior assets/models and the global Mac latest.
 
 Known source-review gate: the long setup flow may leave result/Copy below the visible viewport. `resultVisibleBeforeTestScroll` is captured before diagnostic scrolling; final acceptance requires true, including synthetic layout125/150%. F1 production repair/verification is pending; scrolled screenshots are not used to claim automatic visibility.
+
+
+## Preparation history closed — 2026-10-29
+
+The paragraphs above describe the source-preparation stage, not current hosted acceptance. The checked final source56b45301/run40747430459 and exact packages now have a separate canonical `v1.6.1` entry with status `local_only`; see `releases/versions/v1.6.1/RELEASE.md`. The working pointer and null build/publication fields remain preparation history. Do not infer publication or physical Windows10/11/native-DPI acceptance from hosted G4 PASS.
