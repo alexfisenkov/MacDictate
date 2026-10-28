@@ -14,6 +14,7 @@ internal sealed class MainForm : Form
     private readonly ProgressBar transfer = new() { Minimum = 0, Maximum = 100, Width = 320, AccessibleName = "Model download" };
     private readonly TextBox result = new() { Multiline = true, ReadOnly = true, ScrollBars = ScrollBars.Vertical, Height = 110, Width = 540, AccessibleName = "Last dictation" };
     private ViewState view;
+    private readonly LocalErrorState localFeedback = new();
     private bool updating, allowClose, showWithoutActivation;
     private readonly Func<IReadOnlyList<MicrophoneDevice>> enumerate;
     public bool TestingHotkey { get; private set; }
@@ -151,7 +152,7 @@ internal sealed class MainForm : Form
             instructions.Text = T("Глобальная запись: два быстрых нажатия левого Alt начинают запись; ещё два — останавливают. Правый Alt/AltGr и сочетания не запускают запись. Максимум 2 минуты. При запуске из другого приложения текст вводится только в исходное поле; иначе скопируйте его здесь. Закрытие окна оставляет MacDictate в трее; двойной щелчок по значку или повторный запуск открывают окно.", "Global dictation: tap left Alt twice quickly to start; tap twice again to stop. Right Alt/AltGr and chords do not record. Maximum 2 minutes. From another app, text is inserted only into the original input; otherwise copy it here. Closing this window leaves MacDictate in the tray; double-click its icon or launch again to reopen.");
             keyTest.Text = TestingHotkey ? T("Завершить проверку клавиши", "Finish hotkey test") : T("Проверить клавишу без записи", "Test hotkey without recording");
             if (!TestingHotkey) keyStatus.Text = !state.HotkeyReady ? T("Горячая клавиша недоступна: выберите F8 или Ctrl+Shift+Space. Кнопка записи работает отдельно.", "Hotkey unavailable: choose F8 or Ctrl+Shift+Space. The record button works separately.") : state.HotkeyVerified ? T("Горячая клавиша сработала.", "Hotkey activated.") : T("Клавиша зарегистрирована, ожидает проверки.", "Hotkey registered; test it here.");
-            message.Text = state.Message; message.Visible = state.Message.Length > 0;
+            localFeedback.Render(state.Message); message.Text = localFeedback.Text; message.Visible = localFeedback.Visible;
             result.Text = state.LastText; copy.Text = T("Копировать текст", "Copy text"); copy.Enabled = result.Text.Length > 0;
             result.Parent!.Visible = result.Text.Length > 0;
             diagnostics.Text = T("Копировать диагностику без личных данных", "Copy private-safe diagnostics");
@@ -197,11 +198,12 @@ internal sealed class MainForm : Form
     }
     public void CloseForExit() { allowClose = true; Close(); }
     internal string DiagnosticsText() => $"MacDictate Windows {Application.ProductVersion}\nOS: {Environment.OSVersion.Version}\nRuntime: {view.RuntimeReady}\nModel: {view.ModelReady}\nMicrophone: {view.Microphone}\nHotkey registered: {view.HotkeyReady}\nHotkey observed: {view.HotkeyVerified}\nActivity: {view.Activity}\nPhysical client acceptance: NOT_VERIFIED";
-    private void ShowCopyFailure() => message.Text = T("Не удалось скопировать. Выделите текст и нажмите Ctrl+C; повторите после закрытия другой программы, использующей буфер.", "Could not copy. Select the text and press Ctrl+C; retry after another clipboard app releases it.");
+    internal void ShowLocalError(string text) { localFeedback.ShowError(text); Render(view); }
+    private void ShowCopyFailure() => ShowLocalError(T("Не удалось скопировать. Выделите текст и нажмите Ctrl+C; повторите после закрытия другой программы, использующей буфер.", "Could not copy. Select the text and press Ctrl+C; retry after another clipboard app releases it."));
     private void ChooseModel()
     {
         using var picker = new OpenFileDialog { Filter = "Whisper ggml (*.bin)|*.bin", CheckFileExists = true };
         if (picker.ShowDialog(this) == DialogResult.OK) Save(view.Settings with { ModelPath = picker.FileName });
     }
-    private void Open(string uri) { try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uri) { UseShellExecute = true }); } catch { message.Text = T("Не удалось открыть настройки. Откройте их через меню «Пуск» Windows.", "Could not open settings. Open them from Windows Start."); } }
+    private void Open(string uri) { try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uri) { UseShellExecute = true }); } catch { ShowLocalError(T("Не удалось открыть настройки. Откройте их через меню «Пуск» Windows.", "Could not open settings. Open them from Windows Start.")); } }
 }

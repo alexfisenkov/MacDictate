@@ -113,6 +113,13 @@ internal static class OnboardingSmoke
                     Check(context.Home.Visible && context.View.Readiness.Next == SetupStep.Model, "fresh launch visible with model as next action");
                     Check(context.KeyboardThreadId != Environment.CurrentManagedThreadId && context.View.HotkeyReady, "real native hook owns a separate pumping thread");
                     Snapshot("01-fresh-ru");
+                    foreach (string localError in new[] { "SYNTHETIC clipboard failure: select text and press Ctrl+C.", "SYNTHETIC settings failure: open Windows Start." })
+                    {
+                        context.Home.ShowLocalError(localError);
+                        Check(Control<Label>("OperationMessage").Text == localError && InViewport(Control<Label>("OperationMessage")), "synthetic local error is immediately visible with empty controller message");
+                        context.Home.Render(context.View); context.Home.Render(context.View);
+                        Check(Control<Label>("OperationMessage").Text == localError && InViewport(Control<Label>("OperationMessage")), "synthetic local error survives repeated rendering of unchanged controller state");
+                    }
                     foreach (string failure in new[] { "network", "integrity" })
                     {
                         fixtures.DownloadFailure = failure; await context.DownloadAsync();

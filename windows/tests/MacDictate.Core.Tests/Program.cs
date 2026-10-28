@@ -99,6 +99,17 @@ try
         allInsertionCancellationsBlocked &= cancelledPaste && chunksSent == Math.Max(0, cancelObservation - 2);
     }
     Check(allInsertionCancellationsBlocked, "Cancel during initial UIA, before first SendInput chunk, or before later chunks must stop insertion");
+    bool localErrorsSurviveRendering = true;
+    foreach (string errorText in new[] { "Clipboard unavailable. Select text and press Ctrl+C.", "Settings unavailable. Open Windows Start." })
+    {
+        var feedback = new LocalErrorState(); feedback.Render(""); feedback.ShowError(errorText);
+        localErrorsSurviveRendering &= feedback.Visible && feedback.Text == errorText;
+        feedback.Render(""); feedback.Render("");
+        localErrorsSurviveRendering &= feedback.Visible && feedback.Text == errorText;
+        feedback.Render("New operation progress");
+        localErrorsSurviveRendering &= feedback.Visible && feedback.Text == "New operation progress";
+    }
+    Check(localErrorsSurviveRendering, "Clipboard/settings local errors must be immediately visible and survive repeated unchanged rendering");
     var meter = new PcmSignalMeter(); meter.Append(new byte[16000]); Check(!meter.HasSignal && meter.Level == 0, "Silent PCM never verifies a microphone");
     byte[] speechPcm = new byte[16000]; for (int i = 0; i < speechPcm.Length; i += 2) { speechPcm[i] = 0; speechPcm[i + 1] = 16; }
     meter.Append(speechPcm); Check(meter.HasSignal && meter.Level > .1, "Sustained nonzero PCM establishes actual signal");
