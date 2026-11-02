@@ -11,7 +11,7 @@
     "bundleVersion": "14",
     "distributionChannel": "github-releases",
     "windows": {
-      "publicStable": "v1.6.1",
+      "publicStable": "v1.6.2",
       "workingLine": "v1.6.2-working",
       "releaseTag": "v1.6.2",
       "makeLatest": false
@@ -698,20 +698,23 @@
     },
     {
       "version": "v1.6.2",
-      "status": "local_only",
+      "status": "public_release",
       "platform": "win-x64",
-      "channel": "windows-only-checked-candidate",
+      "channel": "windows-stable",
       "git": {
         "commit": "3ce00dc83a149eba60ea1413cf60fd91efd2762f",
         "localTag": "v1.6.2",
-        "remoteTags": [],
+        "remoteTags": [
+          "v1.6.2"
+        ],
         "tagRequiredLocally": true
       },
       "github": {
-        "releaseUrl": null,
-        "assetName": null,
-        "githubAssetSha256": null,
-        "publishedAt": null
+        "releaseUrl": "https://github.com/alexfisenkov/MacDictate/releases/tag/v1.6.2",
+        "assetName": "MacDictate_Windows_v1.6.2_x64.exe",
+        "githubAssetSha256": "bb23e61ece6acefcdd63b893ab4faccf670077c8f0f336a23e61aca66f88ea54",
+        "publishedAt": "2026-11-02T03:52:09Z",
+        "releaseId": 431052903
       },
       "local": {
         "releaseDir": "releases/versions/v1.6.2",
@@ -723,7 +726,7 @@
         "version": "1.6.2",
         "platform": "win-x64",
         "minimumWindowsBuild": 19041,
-        "status": "checked-candidate",
+        "status": "stable",
         "signed": false,
         "sourceSHA": "3ce00dc83a149eba60ea1413cf60fd91efd2762f",
         "ciRunURL": "https://github.com/alexfisenkov/MacDictate/actions/runs/41384129041",
@@ -749,15 +752,28 @@
           "installedPopulatedPng": "retained; actual UIA/clipboard PASS",
           "nativeMonitor125_150": "NOT_RUN",
           "physicalWindows10_11MicAltEditor": "NOT_RUN",
-          "guiModelHttpSuccess": "NOT_RUN"
+          "guiModelHttpSuccess": "NOT_RUN",
+          "publicReleaseAssetMetadata": "4/4 actual public API sizes/digests PASS; checked annotated tag source; global latest remainsv1.6.0",
+          "publicInstallerDownload": "Complete unauthenticated EXE size/SHA256 PASS"
         },
         "manifestSha256": "5c905f4d043e7000d5e12b207c9c56743d888bf0a651d05193334328c2abb7c5",
         "manifestBytes": 1917,
         "checksumsSha256": "eef4de8a567643ca7ada6d3aa90d945f7b4da945c4a6a3d0f78e32d53e0ee0de",
-        "checksumsBytes": 202
+        "checksumsBytes": 202,
+        "distribution": {
+          "websiteURL": "https://alexfisenkov.github.io/MacDictate/",
+          "installerPublicDownload": {
+            "url": "https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.2/MacDictate_Windows_v1.6.2_x64.exe",
+            "bytes": 54367459,
+            "sha256": "bb23e61ece6acefcdd63b893ab4faccf670077c8f0f336a23e61aca66f88ea54",
+            "authentication": "none",
+            "status": "PASS"
+          },
+          "pagesPublication": "pending"
+        }
       },
-      "summary": "Windows1.6.2 exact-source candidate; first final manual CI3/3 PASS and actual JSON/PNG/package hashes verified locally. Not published yet; Windows1.6.1 remains stable and Mac/global latest1.6.0 unchanged.",
-      "sourceConfidence": "verified_ci_hosted_ui_and_exact_artifact_bytes"
+      "summary": "Windows1.6.2 offline setup help published withmake_latest=false at2026-11-02T03:52:09Z; exact checked source/tag and four public asset sizes/digests verified. Windows channel promoted; Complete unauthenticated EXE read-back PASS; Pages publication pending. Mac/global latest remainsv1.6.0.",
+      "sourceConfidence": "verified_ci_hosted_ui_exact_artifacts_and_public_assets"
     }
   ],
   "checkpoints": [

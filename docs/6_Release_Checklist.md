@@ -128,8 +128,8 @@ HTTPS file and complete EXE download receipts establish delivered bytes; final P
 
 - [x] Baseline governance passes; isolated working branch preserves unrelated main files.
 - [x] Windows-only candidate recorded; global/Mac latest unchanged.
-- [ ] RU/EN offline help and Windows10/11 selector checked in hosted GUI; physical hardware status explicit.
-- [ ] Targeted local build/landing/governance checks pass.
-- [ ] One final manual exact-source CI passes; actual JSON/PNG/package bytes read back.
-- [ ] Checked-source annotated tag, four Windows public assets, make_latest=false read back.
+- [x] RU/EN offline help and Windows10/11 selector checked in hosted GUI; physical hardware status explicit.
+- [x] Targeted local build/landing/governance checks pass.
+- [x] One final manual exact-source CI passes; actual JSON/PNG/package bytes read back.
+- [x] Checked-source annotated tag, four Windows public assets, make_latest=false read back.
 - [ ] Windows ledger/manifest/HTML promoted; one final Pages snapshot/HTTPS read-back.

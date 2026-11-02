@@ -1,8 +1,8 @@
 # Windows v1.6.2
 
-Status: `local_only`
+Status: `public_release`
 
-Checked source `3ce00dc83a149eba60ea1413cf60fd91efd2762f`; [final CI](https://github.com/alexfisenkov/MacDictate/actions/runs/41384129041)3/3 PASS on first attempt. Actual downloaded package digests, all smoke JSON and all referenced PNG files verified. Publication pending; Windows stable remains1.6.1 and global/Mac latest1.6.0.
+Checked source `3ce00dc83a149eba60ea1413cf60fd91efd2762f`; [final CI](https://github.com/alexfisenkov/MacDictate/actions/runs/41384129041)3/3 PASS on first attempt. Actual downloaded package digests, all smoke JSON and all referenced PNG files verified. Published [v1.6.2](https://github.com/alexfisenkov/MacDictate/releases/tag/v1.6.2) at`2026-11-02T03:52:09Z`, releaseID431052903, make_latest=false. Four public asset sizes/digests and annotated checked-source tag verified; global/Mac latest remains1.6.0.
 
 ## Changes and scope
 
@@ -30,4 +30,4 @@ CI host is Windows Server2025 atactualDPI96. Physical Windows10/11 microphone, a
 
 ## Delivery
 
-Next: publish four exact Windows assets with make_latest=false, promote Windows manifest/pinned links, one final Pages publication and HTTPS/download read-back. Do not claim complete delivery from this preparation entry.
+Windows public ledger/manifest and all3HTML fallback links pin the actual published assets. Complete unauthenticated EXE download verified54367459bytes and SHA256`bb23e61ece6acefcdd63b893ab4faccf670077c8f0f336a23e61aca66f88ea54`. Pages publication remains pending; existing site is not yet claimed updated.
