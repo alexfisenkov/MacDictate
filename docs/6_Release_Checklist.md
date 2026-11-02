@@ -132,4 +132,4 @@ HTTPS file and complete EXE download receipts establish delivered bytes; final P
 - [x] Targeted local build/landing/governance checks pass.
 - [x] One final manual exact-source CI passes; actual JSON/PNG/package bytes read back.
 - [x] Checked-source annotated tag, four Windows public assets, make_latest=false read back.
-- [ ] Windows ledger/manifest/HTML promoted; one final Pages snapshot/HTTPS read-back.
+- [x] Windows ledger/manifest/HTML promoted; one final Pages snapshot/HTTPS read-back.

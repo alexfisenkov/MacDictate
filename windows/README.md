@@ -123,3 +123,10 @@ MacDictate.exe --onboarding-smoke --layout-scale 1.5 --report layout-1.5-smoke.j
 Финальный run [40747430459](https://github.com/alexfisenkov/MacDictate/actions/runs/40747430459) на source `56b45301bc0e98c12f4823e5039152a3c3dd5229` прошёл все три jobs. Actual JSON подтвердили 62 portable checks, real bundled ASR на synthetic PCM/key seams, normal installed fresh launch/reopen и populated UIA/Copy/clipboard, 492 payload files и сохранность synthetic sentinels при reinstall/uninstall. Два ранних failed attempts и разрешённые repairs сохранены в acceptance report. Релиз `releases/versions/v1.6.1/RELEASE.md` имеет статус `public_release`: четыре public API digest/size совпали с проверенными артефактами; Pages/browser/HTTP-download read-back ещё не выполнен.
 
 Actual desktop DPI96; layout125/150% проверен синтетическим масштабированием. Один populated installed PNG отсутствует в artifact; actual UIA/clipboard PASS и отдельный real-ASR result PNG не заменяют визуальную проверку этого отсутствующего файла. Физические Windows10/11 microphone/Alt/editor, native125/150%, GUI HTTP-success model download и interactive installer/SmartScreen остаются NOT_RUN.
+
+
+## Проверка Windows1.6.2 — 2026-11-02
+
+Один финальный [CI41384129041](https://github.com/alexfisenkov/MacDictate/actions/runs/41384129041) прошёл с первой попытки на исходнике`3ce00dc83a149eba60ea1413cf60fd91efd2762f`: помощь Win10/11×RU/EN, реальные окна, прокрутка, повторное открытие, синтетические125/150%; прежняя проверка bundled Whisper/Copy и установленного приложения также PASS. Все сохранённые PNG, включая populated installed, присутствуют. Тесты не меняют настройки приватности ОС; маршрутизация кнопок проверяется через контролируемый callback. Физические микрофон/Alt/редактор на Windows10/11, нативныйDPI и интерактивный SmartScreen остаются NOT_RUN.
+
+Публичные4файла, полный скачанный EXE и Pages16/16HTTPSфайлов сверены. Точный реестр, SHA256 и границы — `releases/versions/v1.6.2/RELEASE.md`.

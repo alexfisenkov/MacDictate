@@ -30,4 +30,8 @@ CI host is Windows Server2025 atactualDPI96. Physical Windows10/11 microphone, a
 
 ## Delivery
 
-Windows public ledger/manifest and all3HTML fallback links pin the actual published assets. Complete unauthenticated EXE download verified54367459bytes and SHA256`bb23e61ece6acefcdd63b893ab4faccf670077c8f0f336a23e61aca66f88ea54`. Pages publication remains pending; existing site is not yet claimed updated.
+Windows public ledger/manifest and all3HTML fallback links pin the actual published assets. Complete unauthenticated EXE download verified54367459bytes and SHA256`bb23e61ece6acefcdd63b893ab4faccf670077c8f0f336a23e61aca66f88ea54`. One final Pages publication atcommit`a1fe97ec1d2e0d163f1bfa4c28f344ad070594e4` completed successfully ([deployment](https://github.com/alexfisenkov/MacDictate/actions/runs/41385625431)); all16HTTPS files, including guide and both download manifests, match the checked snapshot byte-for-byte. Website source`46a08964dbd52aa32599f0690c4e09e2b3b02dcf`. macOS/global latest remains1.6.0.
+
+## Result and next step
+
+Owner asked for detailed, OS-specific directions rather than an expectation of automatic permission dialogs. The shipped app and public guide now explain what to click and what successful microphone/first-text verification looks like. Existing Windows installations need the1.6.2installer to get the new offline help button; the public web guide is already available. Next physical acceptance: on the friend's Windows10/11, follow the help through real signal → first text → physical leftAlt → editor; report only private-safe diagnostics if it fails. This physical check is unfinished, not implied by CI. No new account, API key or runtime dependency is required.

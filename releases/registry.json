@@ -754,7 +754,8 @@
           "physicalWindows10_11MicAltEditor": "NOT_RUN",
           "guiModelHttpSuccess": "NOT_RUN",
           "publicReleaseAssetMetadata": "4/4 actual public API sizes/digests PASS; checked annotated tag source; global latest remainsv1.6.0",
-          "publicInstallerDownload": "Complete unauthenticated EXE size/SHA256 PASS"
+          "publicInstallerDownload": "Complete unauthenticated EXE size/SHA256 PASS",
+          "publicPagesReadback": "16/16 exact HTTPS files PASS; one Pages deployment41385625431 success"
         },
         "manifestSha256": "5c905f4d043e7000d5e12b207c9c56743d888bf0a651d05193334328c2abb7c5",
         "manifestBytes": 1917,
@@ -769,11 +770,15 @@
             "authentication": "none",
             "status": "PASS"
           },
-          "pagesPublication": "pending"
+          "sourceMainCommit": "46a08964dbd52aa32599f0690c4e09e2b3b02dcf",
+          "pagesCommit": "a1fe97ec1d2e0d163f1bfa4c28f344ad070594e4",
+          "pagesDeploymentRun": "https://github.com/alexfisenkov/MacDictate/actions/runs/41385625431",
+          "pagesWorkflowConclusion": "success (exact pages head verified)",
+          "websiteHTTPSReadback": "16/16 exact files PASS"
         }
       },
-      "summary": "Windows1.6.2 offline setup help published withmake_latest=false at2026-11-02T03:52:09Z; exact checked source/tag and four public asset sizes/digests verified. Windows channel promoted; Complete unauthenticated EXE read-back PASS; Pages publication pending. Mac/global latest remainsv1.6.0.",
-      "sourceConfidence": "verified_ci_hosted_ui_exact_artifacts_and_public_assets"
+      "summary": "Windows1.6.2 offline setup help published withmake_latest=false at2026-11-02T03:52:09Z; exact checked source/tag and four public asset sizes/digests verified. Windows channel promoted; Complete unauthenticated EXE read-back PASS; Pages commita1fe97ec1d2e0d163f1bfa4c28f344ad070594e4 deployed successfully and16/16HTTPS files exactly match the checked snapshot. Mac/global latest remainsv1.6.0.",
+      "sourceConfidence": "verified_ci_hosted_ui_public_assets_https_and_installer_download"
     }
   ],
   "checkpoints": [
