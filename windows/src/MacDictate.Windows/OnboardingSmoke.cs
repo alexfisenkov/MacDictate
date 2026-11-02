@@ -113,6 +113,7 @@ internal static class OnboardingSmoke
                     Check(context.Home.Visible && context.View.Readiness.Next == SetupStep.Model, "fresh launch visible with model as next action");
                     Check(context.KeyboardThreadId != Environment.CurrentManagedThreadId && context.View.HotkeyReady, "real native hook owns a separate pumping thread");
                     Snapshot("01-fresh-ru");
+                    WindowsSetupHelpSmoke.Run(context.Home, language => context.UpdateSettings(context.View.Settings with { UiLanguage = language }), layoutScale, reportPath, checks, screenshots);
                     foreach (string localError in new[] { "SYNTHETIC clipboard failure: select text and press Ctrl+C.", "SYNTHETIC settings failure: open Windows Start." })
                     {
                         context.Home.ShowLocalError(localError);
@@ -235,6 +236,7 @@ internal static class OnboardingSmoke
                     Program.WriteReport(new { success = true, scenario = "isolated-onboarding", checks, screenshots,
                         sources = new { microphone = fixtureWave == null ? "synthetic PCM seam; physical capture NOT_TESTED" : "synthetic fixture WAV copied to capture seam; physical capture NOT_TESTED", keyboard = "real dedicated hook installed; activation via explicit test seam; physical Alt NOT_TESTED", recognition = modelPath == null ? "synthetic transcript seam; real Whisper validated separately" : "real bundled Whisper" },
                         realWhisper = modelPath != null, syntheticMicrophone = true, syntheticHotkeyActivation = true, syntheticFocusAndInputTiming = true, realFixturePhraseMatched = modelPath != null,
+                        offlineSetupHelp = true, helpWindows10And11 = true, helpRussianAndEnglish = true, helpSettingsOpenedInSmoke = false,
                         resultVisibleBeforeTestScroll, resultScreenshotsUseTestScroll = false,
                         realDeviceProbe = new { enumeration, count = devices, capture = "NOT_RUN" }, physicalWindows10 = "NOT_TESTED", physicalWindows11 = "NOT_TESTED",
                         syntheticLayoutStress = layoutScale != 1, requestedLayoutScale = layoutScale, actualDesktopDpi,

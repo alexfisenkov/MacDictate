@@ -2,6 +2,12 @@
 
 Этот changelog фиксирует только пользовательски и релизно значимые изменения.
 
+## Windows 1.6.2 — in development (2026-11-02)
+
+- Step-by-step offline setup help, with separate Windows10/11 instructions in Russian and English.
+- Microphone access, sound input and return/test steps, first dictation/Copy and double-left-Alt recovery instructions on the download page.
+- This entry is source preparation; public Windows remains1.6.1 until verified publication.
+
 ## [v1.6.1] - 2026-10-28 (Windows only)
 
 ### Added

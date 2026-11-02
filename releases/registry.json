@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "product": "MacDictate desktop (macOS and Windows)",
-  "registryUpdatedAt": "2026-10-29",
+  "registryUpdatedAt": "2026-11-02",
   "governanceDocument": "docs/7_Release_Governance.md",
   "current": {
     "publicStable": "v1.6.0",
@@ -12,8 +12,8 @@
     "distributionChannel": "github-releases",
     "windows": {
       "publicStable": "v1.6.1",
-      "workingLine": "v1.6.1-working",
-      "releaseTag": "v1.6.1",
+      "workingLine": "v1.6.2-working",
+      "releaseTag": "v1.6.2",
       "makeLatest": false
     }
   },
@@ -657,6 +657,44 @@
       },
       "summary": "Windows-only 1.6.1 published with make_latest=false at2026-10-28T19:07:43Z; exact checked source/tag and four public asset sizes/digests verified. Windows channel promoted; Pages commit1d4873e628956a8bde3d76bcd07de9cfd66de62a serves16/16 exact HTTPS files and complete unauthenticated EXE download matches expected size/SHA256. Pages workflow40752369737 completed success on exact pages head; browser/physical client acceptance remains unconfirmed. Mac/global latest remainsv1.6.0.",
       "sourceConfidence": "verified_ci_hosted_ui_public_assets_https_and_installer_download"
+    },
+    {
+      "version": "v1.6.2-working",
+      "status": "working_line",
+      "platform": "win-x64",
+      "channel": "windows-only-candidate",
+      "git": {
+        "commit": null,
+        "localTag": null,
+        "remoteTags": [],
+        "tagRequiredLocally": false
+      },
+      "github": {
+        "releaseUrl": null,
+        "assetName": null,
+        "githubAssetSha256": null,
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.6.2-working",
+        "artifactPath": null,
+        "localArtifactSha256": null,
+        "buildLogPath": null
+      },
+      "windows": {
+        "version": "1.6.2",
+        "signed": false,
+        "sourceSHA": null,
+        "validation": {
+          "hostedOS": "Windows Server2025 (planned)",
+          "onboardingRealASR": "NOT_RUN",
+          "installerNormalProfile": "NOT_RUN",
+          "syntheticLayout125_150": "NOT_RUN",
+          "physicalWindows10_11MicAltEditor": "NOT_RUN"
+        }
+      },
+      "summary": "Windows-only step-by-step offline setup help for Windows10/11 in RU/EN plus public landing instructions. Candidate only; no new hosted or published artifact claimed.",
+      "sourceConfidence": "source_candidate_only"
     }
   ],
   "checkpoints": [

@@ -10,6 +10,8 @@ internal sealed class MainForm : Form
     private readonly ComboBox microphone = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 320, DisplayMember = "Name", AccessibleName = "Microphone" };
     private readonly Label options = Label(), heading = Label(), next = Label(), readiness = Label(), privacy = Label(), instructions = Label(), model = Label(), micStatus = Label(), keyStatus = Label(), message = Label(), operationStatus = Label();
     private readonly Button nextAction = Button(), download = Button(), browse = Button(), micTest = Button(), refreshMic = Button(), privacyButton = Button(), soundButton = Button(), keyTest = Button(), copy = Button(), diagnostics = Button(), record = Button(), cancel = Button();
+    private readonly Button setupHelp = Button();
+    private WindowsSetupHelpForm? helpWindow;
     private readonly ProgressBar level = new() { Minimum = 0, Maximum = 100, Width = 320, AccessibleName = "Microphone signal" };
     private readonly ProgressBar transfer = new() { Minimum = 0, Maximum = 100, Width = 320, AccessibleName = "Model download" };
     private readonly TextBox result = new() { Multiline = true, ReadOnly = true, ScrollBars = ScrollBars.Vertical, Height = 110, Width = 540, AccessibleName = "Last dictation" };
@@ -30,13 +32,13 @@ internal sealed class MainForm : Form
         view = initial; this.enumerate = enumerate ?? MicrophoneService.Enumerate;
         Text = "MacDictate"; Name = "MacDictateMainWindow";
         record.Name = "StartStopRecording"; cancel.Name = "CancelOperation"; copy.Name = "CopyLastDictation";
-        result.Name = "LastDictationText"; nextAction.Name = "NextSetupAction";
+        result.Name = "LastDictationText"; nextAction.Name = "NextSetupAction"; setupHelp.Name = "OpenWindowsSetupHelp";
         message.Name = "OperationMessage"; micStatus.Name = "MicrophoneStatus"; operationStatus.Name = "OperationStatus";
         AutoScaleMode = AutoScaleMode.Dpi; AutoScaleDimensions = new SizeF(96, 96);
         ClientSize = new Size(650, 680); MinimumSize = new Size(520, 580); StartPosition = FormStartPosition.CenterScreen;
         heading.Font = new Font(Font.FontFamily, 13, FontStyle.Bold);
         var footer = new FlowLayoutPanel { Dock = DockStyle.Bottom, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, Padding = new Padding(12), WrapContents = true };
-        record.MinimumSize = new Size(220, 44); cancel.MinimumSize = new Size(110, 44); footer.Controls.AddRange([record, cancel]);
+        record.MinimumSize = new Size(220, 44); cancel.MinimumSize = new Size(110, 44); setupHelp.MinimumSize = new Size(100, 44); footer.Controls.AddRange([record, cancel, setupHelp]);
         // Current state and recovery text never scroll away with setup instructions.
         var current = new FlowLayoutPanel { Name = "CurrentStatus", Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.TopDown, WrapContents = false, Padding = new Padding(18, 4, 18, 4) };
         current.Controls.AddRange([operationStatus, micStatus, message]);
@@ -64,6 +66,7 @@ internal sealed class MainForm : Form
         download.Click += (_, _) => DownloadRequested?.Invoke(); browse.Click += (_, _) => ChooseModel();
         micTest.Click += (_, _) => MicrophoneTestRequested?.Invoke(); refreshMic.Click += (_, _) => RefreshMicrophones(true);
         privacyButton.Click += (_, _) => { InputConfigurationChanged?.Invoke(); Open("ms-settings:privacy-microphone"); }; soundButton.Click += (_, _) => { InputConfigurationChanged?.Invoke(); Open("ms-settings:sound"); };
+        setupHelp.Click += (_, _) => ShowSetupHelp();
         keyTest.Click += (_, _) => { TestingHotkey = !TestingHotkey; keyStatus.Text = TestingHotkey ? view.Settings.Hotkey == "DoubleAlt" ? T("Дважды быстро нажмите и отпустите левый Alt. Повторите двойное нажатие для остановки записи.", "Quickly tap and release left Alt twice. Repeat the double tap to stop a recording.") : T("Нажмите выбранную клавишу: ", "Press the selected hotkey: ") + view.Settings.Hotkey : ""; Render(view); };
         record.Click += (_, _) => { TestingHotkey = false; RecordRequested?.Invoke(); };
         cancel.Click += (_, _) => CancelRequested?.Invoke();
@@ -81,7 +84,7 @@ internal sealed class MainForm : Form
             }
         };
         FormClosing += (_, e) => { if (!allowClose) { e.Cancel = true; Hide(); HiddenToTray?.Invoke(); } };
-        VisibleChanged += (_, _) => { if (!Visible) TestingHotkey = false; };
+        VisibleChanged += (_, _) => { if (!Visible) { TestingHotkey = false; if (helpWindow is { IsDisposed: false }) helpWindow.Hide(); } };
         Resize += (_, _) => { if (WindowState == FormWindowState.Minimized) TestingHotkey = false; };
         RefreshMicrophones(); Render(view);
     }
@@ -147,8 +150,9 @@ internal sealed class MainForm : Form
             transfer.Visible = state.Activity == AppActivity.Downloading; transfer.Value = state.DownloadPercent;
             micTest.Text = T("Проверить микрофон", "Test microphone"); refreshMic.Text = T("Обновить входы", "Refresh inputs");
             micStatus.Text = state.Microphone switch { MicrophoneReadiness.Signal => T("Сигнал получен в этом сеансе. Можно записывать.", "Signal received in this session. You can record."), MicrophoneReadiness.Silent => T("Запись получена, но достаточного сигнала нет. Говорите громче, проверьте mute и выбранный вход; повторите тест.", "Capture completed without sufficient signal. Speak louder, check mute and selected input; retry the test."), MicrophoneReadiness.NoDevice => T("Нет входного устройства. Подключите микрофон и обновите входы.", "No input device. Connect a microphone and refresh inputs."), MicrophoneReadiness.Error => T("Не удалось получить список входов или записать. Проверьте настройки звука и доступ для классических приложений; обновите входы и повторите тест.", "Cannot list inputs or capture. Check Sound settings and desktop-app access; refresh inputs and retry the test."), _ => T("Микрофон ещё не проверен. Во время теста говорите и следите за уровнем.", "Microphone is not tested yet. Speak during the test and watch the level.") };
-            privacy.Text = T("Windows обычно не показывает отдельный запрос для классической программы. В «Конфиденциальность → Микрофон» включите доступ к микрофону и разрешение классическим приложениям. Затем вернитесь и повторите проверку.", "Windows usually shows no separate prompt for a desktop app. In Privacy → Microphone, enable microphone access and allow desktop apps. Return here and repeat the test.");
+            privacy.Text = T("Окно разрешения Windows может не появиться. Нажмите «Пошаговая настройка Windows» внизу: там отдельные шаги для Windows 10 и 11, проверки звука и клавиши. После изменения доступа вернитесь, обновите входы и повторите тест микрофона.", "A Windows permission prompt may not appear. Select Step-by-step Windows setup below for separate Windows 10/11 instructions, sound and hotkey checks. After changing access, return, refresh inputs and test the microphone again.");
             privacyButton.Text = T("Доступ к микрофону в Windows", "Windows microphone privacy"); soundButton.Text = T("Настройки звука", "Sound settings");
+            setupHelp.Text = T("Пошаговая настройка Windows", "Step-by-step Windows setup"); if (helpWindow is { IsDisposed: false }) helpWindow.SetLanguage(UiLanguage);
             instructions.Text = T("Глобальная запись: два быстрых нажатия левого Alt начинают запись; ещё два — останавливают. Правый Alt/AltGr и сочетания не запускают запись. Максимум 2 минуты. При запуске из другого приложения текст вводится только в исходное поле; иначе скопируйте его здесь. Закрытие окна оставляет MacDictate в трее; двойной щелчок по значку или повторный запуск открывают окно.", "Global dictation: tap left Alt twice quickly to start; tap twice again to stop. Right Alt/AltGr and chords do not record. Maximum 2 minutes. From another app, text is inserted only into the original input; otherwise copy it here. Closing this window leaves MacDictate in the tray; double-click its icon or launch again to reopen.");
             keyTest.Text = TestingHotkey ? T("Завершить проверку клавиши", "Finish hotkey test") : T("Проверить клавишу без записи", "Test hotkey without recording");
             if (!TestingHotkey) keyStatus.Text = !state.HotkeyReady ? T("Горячая клавиша недоступна: выберите F8 или Ctrl+Shift+Space. Кнопка записи работает отдельно.", "Hotkey unavailable: choose F8 or Ctrl+Shift+Space. The record button works separately.") : state.HotkeyVerified ? T("Горячая клавиша сработала.", "Hotkey activated.") : T("Клавиша зарегистрирована, ожидает проверки.", "Hotkey registered; test it here.");
@@ -196,7 +200,17 @@ internal sealed class MainForm : Form
         Size = new Size(Math.Min(Width, area.Width - 24), Math.Min(Height, area.Height - 24));
         Location = new Point(area.Left + (area.Width - Width) / 2, area.Top + (area.Height - Height) / 2);
     }
-    public void CloseForExit() { allowClose = true; Close(); }
+    internal WindowsSetupHelpForm ShowSetupHelp()
+    {
+        if (helpWindow == null || helpWindow.IsDisposed)
+            helpWindow = new WindowsSetupHelpForm(uri => { if (uri.StartsWith("ms-settings:", StringComparison.Ordinal)) InputConfigurationChanged?.Invoke(); return Open(uri); }, ShowMain);
+        helpWindow.SetLanguage(UiLanguage);
+        if (helpWindow.WindowState == FormWindowState.Minimized) helpWindow.WindowState = FormWindowState.Normal;
+        if (!helpWindow.Visible) helpWindow.Show(this);
+        helpWindow.Activate();
+        return helpWindow;
+    }
+    public void CloseForExit() { allowClose = true; if (helpWindow is { IsDisposed: false }) helpWindow.Close(); Close(); }
     internal string DiagnosticsText() => $"MacDictate Windows {Application.ProductVersion}\nOS: {Environment.OSVersion.Version}\nRuntime: {view.RuntimeReady}\nModel: {view.ModelReady}\nMicrophone: {view.Microphone}\nHotkey registered: {view.HotkeyReady}\nHotkey observed: {view.HotkeyVerified}\nActivity: {view.Activity}\nPhysical client acceptance: NOT_VERIFIED";
     internal void ShowLocalError(string text) { localFeedback.ShowError(text); Render(view); }
     private void ShowCopyFailure() => ShowLocalError(T("Не удалось скопировать. Выделите текст и нажмите Ctrl+C; повторите после закрытия другой программы, использующей буфер.", "Could not copy. Select the text and press Ctrl+C; retry after another clipboard app releases it."));
@@ -205,5 +219,5 @@ internal sealed class MainForm : Form
         using var picker = new OpenFileDialog { Filter = "Whisper ggml (*.bin)|*.bin", CheckFileExists = true };
         if (picker.ShowDialog(this) == DialogResult.OK) Save(view.Settings with { ModelPath = picker.FileName });
     }
-    private void Open(string uri) { try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uri) { UseShellExecute = true }); } catch { ShowLocalError(T("Не удалось открыть настройки. Откройте их через меню «Пуск» Windows.", "Could not open settings. Open them from Windows Start.")); } }
+    private bool Open(string uri) { try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uri) { UseShellExecute = true }); return true; } catch { ShowLocalError(T("Не удалось открыть настройки или страницу. Настройки доступны через меню «Пуск» Windows; пошаговая помощь работает без сети.", "Could not open settings or the page. Open Settings from Windows Start; the step-by-step help works offline.")); return false; } }
 }

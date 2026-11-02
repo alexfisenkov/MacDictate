@@ -246,3 +246,14 @@
 - Root confirmed global latest remainsv1.6.0. This append changed only new Windows release verification metadata/card/checklist/action/index; no runtime, scripts, manifests, HTML, Git/publish/CI action or Mac1.6.0/build14 metadata changed. Physical Windows10/11/native-DPI and retained unsigned/model-recovery/PNG limitations remain unchanged.
 
 - Subsequent root API read-back confirmed Pages run40752369737 completed SUCCESS with exact head1d4873e628956a8bde3d76bcd07de9cfd66de62a; global latest remainedv1.6.0. The earlier in-progress observation above is historical, not the final conclusion.
+
+
+## 2026-11-02 — Windows permission/setup help
+
+- Owner requested detailed OS-specific steps instead of a general privacy hint. Work isolated in branch `codex/windows-help`; unrelated untracked Mac licensing research in main is preserved and excluded.
+- Windows candidate1.6.2 is registered before changing csproj version; published Windows1.6.1 and global/Mac1.6.0 remain selected during preparation.
+- Microsoft Windows10/11 microphone troubleshooting and desktop privacy documentation checked live; guide distinguishes desktop access switches, manual settings paths, input selection, signal test and keyboard troubleshooting. Physical client hardware remains unavailable.
+- Local/hosted/publication evidence to be appended after execution.
+- Narrow evidence-retention repair: retain `installed-first-launch-smoke*.png`, including the populated normal-launch screenshot named by the existing test; no additional CI run is introduced.
+- Source checks:60portable policy/storage/download/process PASS, Windows cross-build0warnings0errors; packaging preservation guards,34portable installed-UI snapshots, UTF-8 regression, two pinned HTML fallbacks, delivery and architecture checks PASS. Website RU/EN at390/1440px and native keyboard details PASS; no-JS/CDN-blocked guide remains reachable without overflow. Native Windows help/ASR/installer still pending finalCI.
+- Verification follows the owner's requested lightweight continuation without a new critic-agent cycle; local checks and upcoming hosted runtime evidence are separate.

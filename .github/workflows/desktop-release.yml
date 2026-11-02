@@ -103,6 +103,6 @@ jobs:
             windows/dist/WINDOWS-SHA256SUMS
             windows/dist/*-smoke.json
             windows/dist/*-smoke-*.png
-            windows/dist/installed-first-launch-smoke.png
+            windows/dist/installed-first-launch-smoke*.png
           if-no-files-found: error
           retention-days: 14

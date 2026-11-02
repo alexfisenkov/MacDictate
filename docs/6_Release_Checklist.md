@@ -122,3 +122,14 @@
 - [ ] Physical Windows10/11 microphone/Alt/editor, native125/150%, GUI model HTTP-success and interactive installer/SmartScreen acceptance. Until then retain NOT_RUN and unsigned/manual-model-recovery limitations.
 
 HTTPS file and complete EXE download receipts establish delivered bytes; final Pages workflow success was independently confirmed by root API read-back. Browser acceptance, complete ZIP download and physical client-OS acceptance are not established by these receipts.
+
+
+## Windows1.6.2 setup-help iteration — 2026-11-02
+
+- [x] Baseline governance passes; isolated working branch preserves unrelated main files.
+- [x] Windows-only candidate recorded; global/Mac latest unchanged.
+- [ ] RU/EN offline help and Windows10/11 selector checked in hosted GUI; physical hardware status explicit.
+- [ ] Targeted local build/landing/governance checks pass.
+- [ ] One final manual exact-source CI passes; actual JSON/PNG/package bytes read back.
+- [ ] Checked-source annotated tag, four Windows public assets, make_latest=false read back.
+- [ ] Windows ledger/manifest/HTML promoted; one final Pages snapshot/HTTPS read-back.

@@ -24,8 +24,9 @@ try {
     if ($process.ExitCode -ne 0 -or !$result.success) { throw 'Onboarding acceptance failed; inspect onboarding-smoke.json (synthetic fixture only)' }
     if ($result.scenario -ne 'isolated-onboarding' -or !$result.realWhisper -or !$result.realFixturePhraseMatched -or !$result.syntheticMicrophone -or !$result.syntheticHotkeyActivation) { throw 'Onboarding report must prove real ASR and disclose synthetic capture/hotkey activation' }
     if (!$result.resultVisibleBeforeTestScroll) { throw 'Production recognition left result/Copy below viewport before diagnostic test scrolling; fix the UI before release' }
+    if (!$result.offlineSetupHelp -or !$result.helpWindows10And11 -or !$result.helpRussianAndEnglish -or $result.helpSettingsOpenedInSmoke) { throw 'Offline help must cover both OS versions/languages without changing runner privacy settings' }
     if ($result.sources.recognition -ne 'real bundled Whisper' -or $result.sources.microphone -notmatch 'synthetic fixture' -or $result.sources.keyboard -notmatch 'physical Alt NOT_TESTED') { throw 'Onboarding source disclosure mismatch' }
-    foreach ($expected in @('01-fresh-ru', '01-download-network', '01-download-integrity', '02-model-saved', '03-microphone-NoDevice', '03-microphone-Silent', '03-microphone-Error', '03-microphone-Signal', '04-hotkey-test', '05-recording', '06-processing', '07-result-before-test-scroll', '07-result-ru', '08-result-en', '09-missing-model', '09-missing-runtime')) {
+    foreach ($expected in @('01-fresh-ru', 'help-ru-windows-10', 'help-ru-windows-11', 'help-en-windows-10', 'help-en-windows-11', '01-download-network', '01-download-integrity', '02-model-saved', '03-microphone-NoDevice', '03-microphone-Silent', '03-microphone-Error', '03-microphone-Signal', '04-hotkey-test', '05-recording', '06-processing', '07-result-before-test-scroll', '07-result-ru', '08-result-en', '09-missing-model', '09-missing-runtime')) {
         $name = 'onboarding-smoke-' + $expected + '.png'
         if ($name -notin $result.screenshots -or !(Test-Path (Join-Path $root "dist/$name"))) { throw "Missing actual UI screenshot: $name" }
     }
@@ -38,6 +39,7 @@ try {
         if (!$process.WaitForExit(45000)) { $process.Kill(); $process.WaitForExit(); throw "Layout stress $scale timed out" }
         $layout = Get-Content $layoutReport -Raw | ConvertFrom-Json
         if ($process.ExitCode -ne 0 -or !$layout.success -or !$layout.syntheticLayoutStress -or $layout.requestedLayoutScale -ne [double]::Parse($scale, [Globalization.CultureInfo]::InvariantCulture) -or $layout.realWhisper -or $layout.actualDesktopDpi -le 0 -or !$layout.resultVisibleBeforeTestScroll) { throw "Synthetic layout stress $scale failed or misidentified its evidence" }
+        if (!$layout.offlineSetupHelp -or !$layout.helpWindows10And11 -or !$layout.helpRussianAndEnglish -or $layout.helpSettingsOpenedInSmoke) { throw "Offline help evidence missing from layout stress $scale" }
         foreach ($name in $layout.screenshots) { if (!(Test-Path (Join-Path $root "dist/$name"))) { throw "Layout stress screenshot missing: $name" } }
     }
     Write-Host 'Onboarding UI + one real bundled Whisper invocation PASS; synthetic fixture/capture/key activation; physical Windows10/11 NOT_TESTED.'
