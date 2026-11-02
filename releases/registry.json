@@ -695,6 +695,69 @@
       },
       "summary": "Windows-only step-by-step offline setup help for Windows10/11 in RU/EN plus public landing instructions. Candidate only; no new hosted or published artifact claimed.",
       "sourceConfidence": "source_candidate_only"
+    },
+    {
+      "version": "v1.6.2",
+      "status": "local_only",
+      "platform": "win-x64",
+      "channel": "windows-only-checked-candidate",
+      "git": {
+        "commit": "3ce00dc83a149eba60ea1413cf60fd91efd2762f",
+        "localTag": "v1.6.2",
+        "remoteTags": [],
+        "tagRequiredLocally": true
+      },
+      "github": {
+        "releaseUrl": null,
+        "assetName": null,
+        "githubAssetSha256": null,
+        "publishedAt": null
+      },
+      "local": {
+        "releaseDir": "releases/versions/v1.6.2",
+        "artifactPath": "releases/versions/v1.6.2/artifacts/MacDictate_Windows_v1.6.2_x64.exe",
+        "localArtifactSha256": "bb23e61ece6acefcdd63b893ab4faccf670077c8f0f336a23e61aca66f88ea54",
+        "buildLogPath": null
+      },
+      "windows": {
+        "version": "1.6.2",
+        "platform": "win-x64",
+        "minimumWindowsBuild": 19041,
+        "status": "checked-candidate",
+        "signed": false,
+        "sourceSHA": "3ce00dc83a149eba60ea1413cf60fd91efd2762f",
+        "ciRunURL": "https://github.com/alexfisenkov/MacDictate/actions/runs/41384129041",
+        "installerAssetName": "MacDictate_Windows_v1.6.2_x64.exe",
+        "installerBytes": 54367459,
+        "installerSha256": "bb23e61ece6acefcdd63b893ab4faccf670077c8f0f336a23e61aca66f88ea54",
+        "portableAssetName": "MacDictate_Windows_v1.6.2_x64.zip",
+        "portableBytes": 77353465,
+        "portableSha256": "0c0bdd20bd96468480a654ecef4993f3ed012ace248f90e4de8c1ad37369b7e8",
+        "manifestAssetName": "windows-build-manifest.json",
+        "checksumsAssetName": "WINDOWS-SHA256SUMS",
+        "makeLatest": false,
+        "validation": {
+          "hostedOS": "Windows Server2025",
+          "coreTests": 62,
+          "finalCIJobs": "3/3 PASS (first attempt)",
+          "offlineSetupHelp": "PASS (actual WinForms; Windows10/11 × RU/EN; reusable modeless window; settings callbacks simulated)",
+          "onboardingRealASR": "PASS (real bundled Whisper; synthetic capture/hotkey activation)",
+          "installerNormalProfile": "PASS (normal production launch; UIA and clipboard read-back)",
+          "installedPayloadFilesVerified": 492,
+          "reinstallUninstallPreservation": "PASS (synthetic sentinels)",
+          "syntheticLayout125_150": "PASS (main and offline help; actual desktop DPI96)",
+          "installedPopulatedPng": "retained; actual UIA/clipboard PASS",
+          "nativeMonitor125_150": "NOT_RUN",
+          "physicalWindows10_11MicAltEditor": "NOT_RUN",
+          "guiModelHttpSuccess": "NOT_RUN"
+        },
+        "manifestSha256": "5c905f4d043e7000d5e12b207c9c56743d888bf0a651d05193334328c2abb7c5",
+        "manifestBytes": 1917,
+        "checksumsSha256": "eef4de8a567643ca7ada6d3aa90d945f7b4da945c4a6a3d0f78e32d53e0ee0de",
+        "checksumsBytes": 202
+      },
+      "summary": "Windows1.6.2 exact-source candidate; first final manual CI3/3 PASS and actual JSON/PNG/package hashes verified locally. Not published yet; Windows1.6.1 remains stable and Mac/global latest1.6.0 unchanged.",
+      "sourceConfidence": "verified_ci_hosted_ui_and_exact_artifact_bytes"
     }
   ],
   "checkpoints": [
