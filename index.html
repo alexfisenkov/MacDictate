@@ -21,6 +21,12 @@
     </script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        #windows-setup { scroll-margin-top: 5rem; }
+        .windows-guide summary { min-height: 44px; cursor: pointer; padding: 0.6rem 0; }
+        .windows-guide summary:focus-visible, a:focus-visible { outline: 2px solid #60a5fa; outline-offset: 4px; }
+        .windows-guide ol { padding-left: 1.5rem; }
+        .windows-guide li + li { margin-top: 0.75rem; }
+        .windows-guide { overflow-wrap: anywhere; }
         .glass {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -60,7 +66,7 @@
                 Распознавайте речь на своём компьютере и вставляйте текст в активное окно. После загрузки модели диктовка работает без интернета.
             </p>
             <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-4">
-                <a href="https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.1/MacDictate_Windows_v1.6.1_x64.exe" data-windows-asset="installer" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition" data-i18n="btn_windows">Скачать установщик EXE · Windows 10/11 x64</a>
+                <a href="https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.2/MacDictate_Windows_v1.6.2_x64.exe" data-windows-asset="installer" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition" data-i18n="btn_windows">Скачать установщик EXE · Windows 10/11 x64</a>
                 <a href="https://github.com/alexfisenkov/MacDictate/releases/latest/download/MacDictate_Latest.dmg" class="inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-2xl text-white bg-white/10 hover:bg-white/20 transition">
                     <span class="mr-2" data-i18n="btn_download">Скачать для macOS</span>
                     <span class="text-sm font-normal opacity-80">( Silicon)</span>
@@ -69,6 +75,7 @@
                     <span data-i18n="btn_install">Как установить</span>
                 </a>
             </div>
+            <p class="mt-5"><a href="#windows-setup" class="inline-flex min-h-[44px] items-center text-blue-400 hover:text-blue-300 underline" data-i18n="windows_guide_link">Пошаговая настройка Windows 10 / 11 →</a></p>
             <p class="mt-6 text-base text-gray-300" data-i18n="hero_free">Бесплатно без ограничения срока. Без регистрации и активации.</p>
         </div>
     </section>
@@ -107,7 +114,8 @@
             <article class="glass p-5 sm:p-8 rounded-3xl text-left" aria-labelledby="windows-download-title">
                 <h3 id="windows-download-title" class="text-2xl font-bold mb-4" data-i18n="windows_title">Windows 10 / 11 x64</h3>
                 <p class="text-lg text-gray-300 leading-relaxed mb-6" data-i18n="windows_recommended">Рекомендуем установщик EXE. Он добавит MacDictate в меню «Пуск» и откроет окно первой настройки.</p>
-                <a href="https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.1/MacDictate_Windows_v1.6.1_x64.exe" data-windows-asset="installer" class="inline-flex w-full items-center justify-center px-5 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition text-center" data-i18n="btn_windows">Скачать установщик EXE · Windows 10/11 x64</a>
+                <a href="https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.2/MacDictate_Windows_v1.6.2_x64.exe" data-windows-asset="installer" class="inline-flex w-full items-center justify-center px-5 py-4 text-lg font-bold rounded-2xl text-white bg-brand hover:bg-blue-600 transition text-center" data-i18n="btn_windows">Скачать установщик EXE · Windows 10/11 x64</a>
+                <p class="mt-4"><a href="#windows-setup" class="inline-flex min-h-[44px] items-center text-blue-400 hover:text-blue-300 underline" data-i18n="windows_guide_link">Пошаговая настройка Windows 10 / 11 →</a></p>
                 <div class="space-y-4 mt-7 text-base text-gray-300 leading-relaxed">
                     <p data-i18n="windows_step1">1. Скачайте EXE, запустите его и завершите установку. Оставьте включённым «Запустить MacDictate»: откроется основное окно. Позже откройте программу из меню «Пуск».</p>
                     <p data-i18n="windows_step2">2. Нажмите «Начать настройку: скачать модель» (~488 МБ). Дождитесь проверки и автоматического сохранения. Затем распознавание работает без сети.</p>
@@ -115,11 +123,60 @@
                     <p data-i18n="windows_step4">4. Нажмите «Начать запись», произнесите фразу и нажмите «Остановить и распознать». Дождитесь текста в окне и нажмите «Копировать текст». Кнопка работает независимо от Alt.</p>
                     <p data-i18n="windows_step5">5. Для диктовки в другое приложение проверьте клавишу, затем поставьте курсор в текстовое поле. Два быстрых нажатия левого Alt начинают запись; ещё два останавливают. Правый Alt/AltGr не подходит. Максимум — 2 минуты; если автопечать не сработала, скопируйте текст в окне MacDictate.</p>
                 </div>
+                <section id="windows-setup" class="windows-guide mt-8 border-t border-white/10 pt-6 text-base text-gray-300 leading-relaxed" aria-labelledby="windows-setup-title">
+                    <h4 id="windows-setup-title" class="text-xl font-bold mb-4 text-white" data-i18n="windows_guide_title">Настройка Windows: от микрофона до первого текста</h4>
+                    <p class="mb-5" data-i18n="windows_guide_intro">Отдельного окна с запросом разрешения может не быть — для классической программы это нормально. Настройте доступ по шагам ниже. В приложении эту инструкцию можно открыть кнопкой «Пошаговая настройка Windows», в том числе без интернета.</p>
+                    <h5 class="text-lg font-semibold mt-6 mb-3 text-white" data-i18n="windows_guide_choose">1. Разрешите микрофон — выберите вашу версию Windows</h5>
+                    <p class="mb-4" data-i18n="windows_guide_version">Не знаете версию? Откройте «Пуск → Параметры → Система → О системе» и найдите «Характеристики Windows». Затем раскройте подходящий раздел ниже.</p>
+                    <details id="windows-11-microphone" class="border-y border-white/10 py-2">
+                        <summary class="font-semibold text-white" data-i18n="windows_guide_11">Windows 11 — куда зайти и что включить</summary>
+                        <ol class="list-decimal space-y-3 pb-4">
+                            <li data-i18n="windows_guide_11_1">В MacDictate нажмите «Доступ к микрофону в Windows». Если настройки не открылись, нажмите Win+I или «Пуск → Параметры», затем «Конфиденциальность и безопасность → Микрофон».</li>
+                            <li data-i18n="windows_guide_11_2">Включите «Доступ к микрофону».</li>
+                            <li data-i18n="windows_guide_11_3">Включите «Разрешить приложениям доступ к микрофону».</li>
+                            <li data-i18n="windows_guide_11_4">Прокрутите ниже и включите «Разрешить классическим приложениям доступ к микрофону». Этот переключатель относится к классическим программам в целом.</li>
+                        </ol>
+                    </details>
+                    <details id="windows-10-microphone" class="border-y border-white/10 py-2">
+                        <summary class="font-semibold text-white" data-i18n="windows_guide_10">Windows 10 — куда зайти и что включить</summary>
+                        <ol class="list-decimal space-y-3 pb-4">
+                            <li data-i18n="windows_guide_10_1">В MacDictate нажмите «Доступ к микрофону в Windows». Если настройки не открылись, нажмите Win+I или «Пуск → Параметры», затем «Конфиденциальность → Микрофон».</li>
+                            <li data-i18n="windows_guide_10_2">Под надписью «Доступ к микрофону для этого устройства» нажмите «Изменить» и включите доступ. Если он уже включён, переходите дальше.</li>
+                            <li data-i18n="windows_guide_10_3">Включите «Разрешить приложениям доступ к микрофону».</li>
+                            <li data-i18n="windows_guide_10_4">Прокрутите страницу вниз и включите «Разрешить классическим приложениям доступ к микрофону». Этот переключатель относится к классическим программам в целом.</li>
+                        </ol>
+                    </details>
+                    <p class="mt-4" data-i18n="windows_guide_desktop">MacDictate может отсутствовать в списке отдельных приложений: искать его там не нужно. Важно разрешение для классических приложений. Названия пунктов могут немного отличаться в разных обновлениях Windows. Если переключатель серый или настройками управляет организация, попросите администратора разрешить доступ; переустановка программы этот запрет не снимает.</p>
+                    <h5 class="text-lg font-semibold mt-7 mb-3 text-white" data-i18n="windows_guide_input">2. Выберите микрофон и проверьте сигнал</h5>
+                    <ol class="list-decimal space-y-3">
+                        <li data-i18n="windows_guide_input_1">Подключите микрофон или гарнитуру. Для Bluetooth дождитесь подключения. Проверьте кнопку выключения микрофона на гарнитуре и клавиатуре: звук не должен быть отключён.</li>
+                        <li data-i18n="windows_guide_input_2">В MacDictate нажмите «Настройки звука». Если окно не открылось, нажмите Win+I и выберите «Система → Звук». Далее используйте шаг для вашей версии Windows.</li>
+                        <li data-i18n="windows_guide_input_3">Windows 11: в разделе «Ввод» выберите нужный микрофон и откройте его свойства. Найдите «Проверка микрофона», нажмите «Начать тест», произнесите фразу и нажмите «Остановить тест». Проверьте результат; при необходимости увеличьте громкость входа.</li>
+                        <li data-i18n="windows_guide_input_4">Windows 10: в разделе «Ввод» выберите нужный микрофон. Произнесите фразу и посмотрите на индикатор «Проверьте микрофон»: он должен реагировать на голос. При необходимости увеличьте громкость входа в свойствах устройства.</li>
+                        <li data-i18n="windows_guide_input_5">Вернитесь в MacDictate, нажмите «Обновить входы» и выберите тот же микрофон в списке. Нажмите «Проверить микрофон» и говорите 3 секунды. Уровень должен двигаться, а после теста появится сообщение «Сигнал получен в этом сеансе. Можно записывать».</li>
+                        <li data-i18n="windows_guide_input_6">Если устройств нет, переподключите микрофон и снова нажмите «Обновить входы». Если проверка Windows тоже не получает звук, проверьте подключение, выбранный вход и mute; при необходимости обратитесь за помощью с устройством или драйвером. Если Windows получает звук, а MacDictate — нет, ещё раз проверьте доступ классическим приложениям и повторите тест в программе.</li>
+                    </ol>
+                    <h5 class="text-lg font-semibold mt-7 mb-3 text-white" data-i18n="windows_guide_record">3. Получите первый текст кнопкой</h5>
+                    <ol class="list-decimal space-y-3">
+                        <li data-i18n="windows_guide_record_1">Если модель ещё не загружена, нажмите «Начать настройку: скачать модель» (~488 МБ) и дождитесь окончания. Модель сохраняется автоматически. Интернет нужен для этой загрузки, а не для последующей диктовки.</li>
+                        <li data-i18n="windows_guide_record_2">Нажмите «Начать запись», произнесите короткую фразу, затем «Остановить и распознать». Дождитесь появления текста. Во время распознавания не начинайте новую запись; для отмены есть кнопка «Отменить».</li>
+                        <li data-i18n="windows_guide_record_3">Нажмите «Копировать текст», откройте Блокнот или другой редактор, щёлкните в поле текста и нажмите Ctrl+V. Появившийся текст подтверждает, что запись и распознавание прошли.</li>
+                    </ol>
+                    <h5 class="text-lg font-semibold mt-7 mb-3 text-white" data-i18n="windows_guide_hotkey">4. Настройте двойной левый Alt</h5>
+                    <ol class="list-decimal space-y-3">
+                        <li data-i18n="windows_guide_hotkey_1">В списке горячих клавиш выберите DoubleAlt, затем нажмите «Проверить клавишу без записи». Дважды быстро нажмите и отпустите левый Alt, не удерживая его. Дождитесь подтверждения и нажмите «Завершить проверку клавиши». Отдельного разрешения Windows на эту клавишу не требуется.</li>
+                        <li data-i18n="windows_guide_hotkey_2">Поставьте курсор в текстовое поле другого приложения. Два быстрых нажатия левого Alt начинают запись, ещё два — останавливают. Правый Alt/AltGr и сочетания вроде Alt+Tab не подходят. Оставьте исходное поле активным до результата.</li>
+                        <li data-i18n="windows_guide_hotkey_3">Если Alt не определяется, выберите в списке F8 или CtrlShiftSpace (Ctrl+Shift+Пробел), проверьте выбранную клавишу и завершите тест. Нажатие выбранной клавиши начинает запись, повторное — останавливает. Кнопка «Начать запись» тоже остаётся доступной.</li>
+                        <li data-i18n="windows_guide_hotkey_4">Если текст не вставился автоматически, откройте окно MacDictate, нажмите «Копировать текст» и вставьте его вручную через Ctrl+V. Если часть текста уже появилась, проверьте её перед повторной вставкой. Для открытия окна дважды щёлкните значок MacDictate у часов (он может быть под стрелкой скрытых значков) или снова запустите программу из «Пуска».</li>
+                    </ol>
+                    <p class="mt-6"><a href="https://support.microsoft.com/ru-ru/windows/hardware/drivers/fix-microphone-problems" class="inline-flex min-h-[44px] items-center text-blue-400 hover:text-blue-300 underline" data-i18n="windows_guide_sources">Справка Microsoft о микрофоне →</a></p>
+                    <p><a href="https://support.microsoft.com/en-us/windows/privacy/windows-desktop-apps-and-privacy" class="inline-flex min-h-[44px] items-center text-blue-400 hover:text-blue-300 underline" data-i18n="windows_guide_privacy_source">Как работают разрешения классических приложений (Microsoft, EN) →</a></p>
+                </section>
                 <p class="mt-5 text-gray-300 leading-relaxed" data-i18n="windows_reopen">Закрытие окна оставляет MacDictate в трее. Двойной щелчок по его значку или повторный запуск из «Пуска» снова покажет окно.</p>
                 <details class="mt-7 border-t border-white/10 pt-5">
                     <summary class="cursor-pointer py-2 text-gray-300" data-i18n="btn_portable">Portable ZIP · без установки</summary>
                     <p class="my-4 text-gray-300 leading-relaxed" data-i18n="windows_portable">ZIP — дополнительный вариант для запуска без установки: распакуйте всю папку и откройте MacDictate.exe. Не запускайте EXE прямо из архива и сохраняйте папку runtime рядом с ним.</p>
-                    <a href="https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.1/MacDictate_Windows_v1.6.1_x64.zip" data-windows-asset="portable" class="inline-flex min-h-[44px] items-center rounded-xl px-5 py-3 bg-white/10 hover:bg-white/20" data-i18n="btn_portable">Portable ZIP · без установки</a>
+                    <a href="https://github.com/alexfisenkov/MacDictate/releases/download/v1.6.2/MacDictate_Windows_v1.6.2_x64.zip" data-windows-asset="portable" class="inline-flex min-h-[44px] items-center rounded-xl px-5 py-3 bg-white/10 hover:bg-white/20" data-i18n="btn_portable">Portable ZIP · без установки</a>
                 </details>
                 <p class="mt-6 text-sm text-gray-400 leading-relaxed" data-i18n="windows_limits">Windows-пакет без цифровой подписи: Windows может предупредить или заблокировать запуск. Проверьте источник — официальный GitHub Release; при необходимости сверьте SHA-256 из WINDOWS-SHA256SUMS. Если доступно, выберите «Подробнее» → «Выполнить в любом случае» только после проверки. Если политика компьютера запрещает запуск, обратитесь к администратору. Не отключайте защиту Windows. Проверки на Windows Server 2025 и синтетическое аудио не подтверждают работу физического микрофона и Alt на Windows 10/11. Windows 10 Home/Pro вне официального срока поддержки .NET 10. Дополнительной модели улучшения текста в Windows пока нет.</p>
                 <p class="mt-5 text-base text-gray-300 leading-relaxed" data-i18n="windows_support">При ошибке нажмите в окне «Копировать диагностику без личных данных» и отправьте этот текст в поддержку. Аудио, диктовку, пароли и снимки чужой переписки отправлять не нужно.</p>
@@ -164,6 +221,40 @@
                 download_steps: "Установите MacDictate на Mac с Apple Silicon. При первом запуске загрузите модель Whisper и разрешите доступ к микрофону и «Универсальному доступу». Дважды нажмите Option для начала записи и один раз — для завершения.",
                 btn_windows: "Скачать установщик EXE · Windows 10/11 x64",
                 btn_portable: "Portable ZIP · без установки",
+                windows_guide_link: "Пошаговая настройка Windows 10 / 11 →",
+                windows_guide_title: "Настройка Windows: от микрофона до первого текста",
+                windows_guide_intro: "Отдельного окна с запросом разрешения может не быть — для классической программы это нормально. Настройте доступ по шагам ниже. В приложении эту инструкцию можно открыть кнопкой «Пошаговая настройка Windows», в том числе без интернета.",
+                windows_guide_choose: "1. Разрешите микрофон — выберите вашу версию Windows",
+                windows_guide_version: "Не знаете версию? Откройте «Пуск → Параметры → Система → О системе» и найдите «Характеристики Windows». Затем раскройте подходящий раздел ниже.",
+                windows_guide_11: "Windows 11 — куда зайти и что включить",
+                windows_guide_11_1: "В MacDictate нажмите «Доступ к микрофону в Windows». Если настройки не открылись, нажмите Win+I или «Пуск → Параметры», затем «Конфиденциальность и безопасность → Микрофон».",
+                windows_guide_11_2: "Включите «Доступ к микрофону».",
+                windows_guide_11_3: "Включите «Разрешить приложениям доступ к микрофону».",
+                windows_guide_11_4: "Прокрутите ниже и включите «Разрешить классическим приложениям доступ к микрофону». Этот переключатель относится к классическим программам в целом.",
+                windows_guide_10: "Windows 10 — куда зайти и что включить",
+                windows_guide_10_1: "В MacDictate нажмите «Доступ к микрофону в Windows». Если настройки не открылись, нажмите Win+I или «Пуск → Параметры», затем «Конфиденциальность → Микрофон».",
+                windows_guide_10_2: "Под надписью «Доступ к микрофону для этого устройства» нажмите «Изменить» и включите доступ. Если он уже включён, переходите дальше.",
+                windows_guide_10_3: "Включите «Разрешить приложениям доступ к микрофону».",
+                windows_guide_10_4: "Прокрутите страницу вниз и включите «Разрешить классическим приложениям доступ к микрофону». Этот переключатель относится к классическим программам в целом.",
+                windows_guide_desktop: "MacDictate может отсутствовать в списке отдельных приложений: искать его там не нужно. Важно разрешение для классических приложений. Названия пунктов могут немного отличаться в разных обновлениях Windows. Если переключатель серый или настройками управляет организация, попросите администратора разрешить доступ; переустановка программы этот запрет не снимает.",
+                windows_guide_input: "2. Выберите микрофон и проверьте сигнал",
+                windows_guide_input_1: "Подключите микрофон или гарнитуру. Для Bluetooth дождитесь подключения. Проверьте кнопку выключения микрофона на гарнитуре и клавиатуре: звук не должен быть отключён.",
+                windows_guide_input_2: "В MacDictate нажмите «Настройки звука». Если окно не открылось, нажмите Win+I и выберите «Система → Звук». Далее используйте шаг для вашей версии Windows.",
+                windows_guide_input_3: "Windows 11: в разделе «Ввод» выберите нужный микрофон и откройте его свойства. Найдите «Проверка микрофона», нажмите «Начать тест», произнесите фразу и нажмите «Остановить тест». Проверьте результат; при необходимости увеличьте громкость входа.",
+                windows_guide_input_4: "Windows 10: в разделе «Ввод» выберите нужный микрофон. Произнесите фразу и посмотрите на индикатор «Проверьте микрофон»: он должен реагировать на голос. При необходимости увеличьте громкость входа в свойствах устройства.",
+                windows_guide_input_5: "Вернитесь в MacDictate, нажмите «Обновить входы» и выберите тот же микрофон в списке. Нажмите «Проверить микрофон» и говорите 3 секунды. Уровень должен двигаться, а после теста появится сообщение «Сигнал получен в этом сеансе. Можно записывать».",
+                windows_guide_input_6: "Если устройств нет, переподключите микрофон и снова нажмите «Обновить входы». Если проверка Windows тоже не получает звук, проверьте подключение, выбранный вход и mute; при необходимости обратитесь за помощью с устройством или драйвером. Если Windows получает звук, а MacDictate — нет, ещё раз проверьте доступ классическим приложениям и повторите тест в программе.",
+                windows_guide_record: "3. Получите первый текст кнопкой",
+                windows_guide_record_1: "Если модель ещё не загружена, нажмите «Начать настройку: скачать модель» (~488 МБ) и дождитесь окончания. Модель сохраняется автоматически. Интернет нужен для этой загрузки, а не для последующей диктовки.",
+                windows_guide_record_2: "Нажмите «Начать запись», произнесите короткую фразу, затем «Остановить и распознать». Дождитесь появления текста. Во время распознавания не начинайте новую запись; для отмены есть кнопка «Отменить».",
+                windows_guide_record_3: "Нажмите «Копировать текст», откройте Блокнот или другой редактор, щёлкните в поле текста и нажмите Ctrl+V. Появившийся текст подтверждает, что запись и распознавание прошли.",
+                windows_guide_hotkey: "4. Настройте двойной левый Alt",
+                windows_guide_hotkey_1: "В списке горячих клавиш выберите DoubleAlt, затем нажмите «Проверить клавишу без записи». Дважды быстро нажмите и отпустите левый Alt, не удерживая его. Дождитесь подтверждения и нажмите «Завершить проверку клавиши». Отдельного разрешения Windows на эту клавишу не требуется.",
+                windows_guide_hotkey_2: "Поставьте курсор в текстовое поле другого приложения. Два быстрых нажатия левого Alt начинают запись, ещё два — останавливают. Правый Alt/AltGr и сочетания вроде Alt+Tab не подходят. Оставьте исходное поле активным до результата.",
+                windows_guide_hotkey_3: "Если Alt не определяется, выберите в списке F8 или CtrlShiftSpace (Ctrl+Shift+Пробел), проверьте выбранную клавишу и завершите тест. Нажатие выбранной клавиши начинает запись, повторное — останавливает. Кнопка «Начать запись» тоже остаётся доступной.",
+                windows_guide_hotkey_4: "Если текст не вставился автоматически, откройте окно MacDictate, нажмите «Копировать текст» и вставьте его вручную через Ctrl+V. Если часть текста уже появилась, проверьте её перед повторной вставкой. Для открытия окна дважды щёлкните значок MacDictate у часов (он может быть под стрелкой скрытых значков) или снова запустите программу из «Пуска».",
+                windows_guide_sources: "Справка Microsoft о микрофоне →",
+                windows_guide_privacy_source: "Как работают разрешения классических приложений (Microsoft, EN) →",
                 windows_title: "Windows 10 / 11 x64",
                 windows_recommended: "Рекомендуем установщик EXE. Он добавит MacDictate в меню «Пуск» и откроет окно первой настройки.",
                 windows_step1: "1. Скачайте EXE, запустите его и завершите установку. Оставьте включённым «Запустить MacDictate»: откроется основное окно. Позже откройте программу из меню «Пуск».",
@@ -191,6 +282,40 @@
                 download_steps: "Install MacDictate on a Mac with Apple Silicon. On first launch, download the Whisper model and allow Microphone and Accessibility access. Press Option twice to start recording and once to finish.",
                 btn_windows: "Download EXE installer · Windows 10/11 x64",
                 btn_portable: "Portable ZIP · no installer",
+                windows_guide_link: "Windows 10 / 11 setup, step by step →",
+                windows_guide_title: "Windows setup: from microphone access to your first text",
+                windows_guide_intro: "A separate permission prompt may never appear; this is normal for a desktop app. Follow the steps below to set up access. In the app, “Step-by-step Windows setup” opens the guide even when you are offline.",
+                windows_guide_choose: "1. Allow microphone access — choose your Windows version",
+                windows_guide_version: "Not sure which version? Open Start → Settings → System → About and look under Windows specifications. Then expand the matching section below.",
+                windows_guide_11: "Windows 11 — where to go and what to enable",
+                windows_guide_11_1: "In MacDictate, select “Windows microphone privacy”. If Settings does not open, press Win+I or open Start → Settings, then Privacy & security → Microphone.",
+                windows_guide_11_2: "Turn on Microphone access.",
+                windows_guide_11_3: "Turn on Let apps access your microphone.",
+                windows_guide_11_4: "Scroll down and turn on Let desktop apps access your microphone. This setting applies to desktop apps as a group.",
+                windows_guide_10: "Windows 10 — where to go and what to enable",
+                windows_guide_10_1: "In MacDictate, select “Windows microphone privacy”. If Settings does not open, press Win+I or open Start → Settings, then Privacy → Microphone.",
+                windows_guide_10_2: "Under Microphone access for this device, select Change and turn access on. If it is already on, continue to the next step.",
+                windows_guide_10_3: "Turn on Allow apps to access your microphone.",
+                windows_guide_10_4: "Scroll down and turn on Allow desktop apps to access your microphone. This setting applies to desktop apps as a group.",
+                windows_guide_desktop: "MacDictate may be absent from the list of individual apps; you do not need to find it there. Check the desktop-app setting. Wording may vary between Windows updates. If a switch is greyed out or managed by your organization, ask your administrator to allow access; reinstalling MacDictate does not remove that restriction.",
+                windows_guide_input: "2. Choose your microphone and check the signal",
+                windows_guide_input_1: "Connect your microphone or headset. For Bluetooth, wait until it is connected. Check any microphone mute switch on the headset or keyboard and unmute it.",
+                windows_guide_input_2: "In MacDictate, select “Sound settings”. If it does not open, press Win+I and choose System → Sound. Then use the step for your Windows version.",
+                windows_guide_input_3: "Windows 11: under Input, choose your microphone and open its properties. Find Microphone test, select Start test, say a phrase, then select Stop test. Check the result and increase the input volume if needed.",
+                windows_guide_input_4: "Windows 10: under Input, choose your microphone. Say a phrase and watch Test your microphone; its meter should respond to your voice. Increase the input volume in Device properties if needed.",
+                windows_guide_input_5: "Return to MacDictate, select “Refresh inputs”, and choose the same microphone from the list. Select “Test microphone” and speak for 3 seconds. The level should move, followed by “Signal received in this session. You can record.”",
+                windows_guide_input_6: "If no device is listed, reconnect the microphone and select “Refresh inputs” again. If the Windows test also receives no sound, check the connection, selected input, and mute switch; seek device or driver support if needed. If Windows receives sound but MacDictate does not, recheck desktop-app access and retry the test in the app.",
+                windows_guide_record: "3. Get your first text using the record button",
+                windows_guide_record_1: "If the model is not downloaded yet, select “Start setup: download model” (~488 MB) and wait until it finishes. The model is saved automatically. This download needs internet; later dictation does not.",
+                windows_guide_record_2: "Select “Start recording”, say a short phrase, then select “Stop and recognize”. Wait for the text to appear. Do not start another recording during recognition; use “Cancel” if you need to stop it.",
+                windows_guide_record_3: "Select “Copy text”, open Notepad or another editor, click in its text field, and press Ctrl+V. The pasted text confirms that recording and recognition have completed.",
+                windows_guide_hotkey: "4. Set up double left Alt",
+                windows_guide_hotkey_1: "Choose DoubleAlt in the hotkey list, then select “Test hotkey without recording”. Quickly press and release left Alt twice without holding it down. Wait for confirmation, then select “Finish hotkey test”. No separate Windows permission is needed for this key.",
+                windows_guide_hotkey_2: "Place the cursor in a text field in another app. Tap left Alt twice quickly to start recording and twice again to stop. Right Alt/AltGr and combinations such as Alt+Tab do not work. Keep the original field active until the result arrives.",
+                windows_guide_hotkey_3: "If Alt is not detected, choose F8 or CtrlShiftSpace (Ctrl+Shift+Space), test it, and finish the test. Press the selected hotkey once to start and again to stop. The “Start recording” button is also available.",
+                windows_guide_hotkey_4: "If text is not inserted automatically, open MacDictate, select “Copy text”, and paste manually with Ctrl+V. If some text was already inserted, check it before pasting again. To reopen MacDictate, double-click its icon near the clock (it may be under the hidden-icons arrow) or launch it from Start again.",
+                windows_guide_sources: "Microsoft microphone troubleshooting →",
+                windows_guide_privacy_source: "How desktop-app permissions work (Microsoft) →",
                 windows_title: "Windows 10 / 11 x64",
                 windows_recommended: "Recommended: the EXE installer. It adds MacDictate to Start and opens the first setup window.",
                 windows_step1: "1. Download the EXE, run it, and finish installation. Keep “Launch MacDictate” selected to open the main window. Later, open it from Start.",
@@ -223,6 +348,8 @@
                 link.href = './legal.html' + url.search + url.hash;
             });
             document.getElementById('langToggle').textContent = lang === 'ru' ? 'EN' : 'RU';
+            const source = document.querySelector('[data-i18n="windows_guide_sources"]');
+            source.href = 'https://support.microsoft.com/' + (lang === 'ru' ? 'ru-ru' : 'en-us') + '/windows/hardware/drivers/fix-microphone-problems';
             document.title = lang === 'ru' ? 'MacDictate — Бесплатная диктовка для macOS и Windows' : 'MacDictate — Free dictation for macOS and Windows';
         }
 
